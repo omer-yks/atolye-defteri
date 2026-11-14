@@ -1,0 +1,25 @@
+ATÖLYE YAZICI — Asus'a kurulum
+================================
+
+Bu program yazıcıyı (Bambucuk, A1 mini) ev ağından izler; baskı başlayınca,
+bitince ve durum değişince bilgileri Atölye Defteri'nin bulut veritabanına
+(Supabase) yazar. Claude'a bağlı değildir. Bilgisayar açık olduğu sürece
+arka planda çalışır; pencere açmaz.
+
+KURULUM
+1) Bu klasördeki "kur.bat" dosyasına çift tıkla.
+   - Node.js yoksa kendisi kurar (bir kez, birkaç dakika).
+   - Yazıcının erişim kodunu sorar: yazıcı ekranında
+     Ayarlar > WLAN (ya da LAN Only) > Access Code.
+   - IP sorusunu boş geçebilirsin; bulamazsa 192.168.31.147 yaz.
+2) Windows Güvenlik Duvarı "Node.js" için izin sorarsa "Özel ağlar"ı seçip izin ver.
+3) Pencerede "Yazıcıya bağlandı" yazınca bitti.
+
+Program kendini %LOCALAPPDATA%\AtolyeYazici klasörüne kopyalar; bu indirilen
+klasörü sonra silebilirsin.
+
+DURUM: durum.bat → tarayıcıda yazıcının ve buluta yazmanın durumunu gösterir.
+KALDIRMA: kaldir.bat → servisi kapatır ve açılıştan kaldırır.
+Kayıtlar: %USERPROFILE%\.atolye-yazici-servis\servis.log
+
+"ayarlar.json" içinde defterin gizli anahtarı var; bu klasörü başkasıyla paylaşma.
