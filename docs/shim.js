@@ -43,11 +43,11 @@ function loginUI(){
       if(!/^\S+@\S+\.\S+$/.test(em))return say('Geçerli bir e-posta yaz.');if(pw.length<6)return say('Şifre en az 6 karakter olmalı.');
       go.disabled=true;
       try{
-        if(mode==='up'){const{data,error}=await sb.auth.signUp({email:em,password:pw});if(error)throw error;
-          if(!data.session){say('Hesap oluşturuldu. E-postana gelen bağlantıya tıklayıp onayladıktan sonra burada giriş yap.',true);swb.onclick();go.disabled=false;return}
+        if(mode==='up'){const{data,error}=await sb.auth.signUp({email:em,password:pw,options:{emailRedirectTo:location.origin+location.pathname}});if(error)throw error;
+          if(!data.session){say('Hesap oluşturuldu. E-postana gelen bağlantıya tıkla; açılan sayfa hata gösterse bile hesabın onaylanır. Sonra buraya dönüp giriş yap.',true);swb.onclick();go.disabled=false;return}
           w.remove();resolve(data.session.user);return}
         const{data,error}=await sb.auth.signInWithPassword({email:em,password:pw});if(error)throw error;w.remove();resolve(data.user);
-      }catch(er){const m=String(er&&er.message||er);say(/invalid login/i.test(m)?'E-posta ya da şifre yanlış.':/not confirmed/i.test(m)?'E-postanı henüz onaylamadın; gelen bağlantıya tıkla.':/already registered/i.test(m)?'Bu e-postayla zaten hesap var; giriş yap.':/rate|too many/i.test(m)?'Çok fazla deneme oldu; biraz sonra tekrar dene.':'Olmadı: '+m)}
+      }catch(er){const m=String(er&&er.message||er);say(/invalid login/i.test(m)?'E-posta ya da şifre yanlış.':/not confirmed/i.test(m)?'E-postanı henüz onaylamadın; gelen bağlantıya tıkla.':/already registered/i.test(m)?'Bu e-postayla zaten hesap var; giriş yap.':/sahibi var|Database error saving new user/i.test(m)?'Bu defterin zaten bir sahibi var; yeni hesap açılamaz. Kendi hesabınla giriş yap.':/rate|too many/i.test(m)?'Çok fazla deneme oldu; biraz sonra tekrar dene.':'Olmadı: '+m)}
       finally{go.disabled=false}};
     setTimeout(()=>{try{f.e.focus()}catch(e){}},50);
   });
