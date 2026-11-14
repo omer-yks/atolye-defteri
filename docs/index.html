@@ -2751,14 +2751,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=1.80-1794647419"></script>
+<script src="shim.js?v=1.81-1794650634"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.80',VERDATE='14 Kasım 2026';
+const VERSION='1.81',VERDATE='14 Kasım 2026';
 const CHANGES=[
+  ['1.81',['Ayarlar: “Mikrofon ve sesle yazma” bölümü; mikrofonu dene, sorun neyse ve nereden açılacağı yazar']],
   ['1.80',['Sesle yazma her yerde çalışıyor: mikrofona bas, konuş, tekrar bas; söylediklerin Gemini ile yazıya dökülür (Brave ve Mac uygulaması dahil)','Mac için masaüstü uygulaması']],
   ['1.79',['Ayarlar: “Yeni uygulamaya taşı” ile bütün defter tek dosya (JSON) olarak iner; bağımsız uygulamada içe aktarılır']],
   ['1.78',['Yazıcı artık atölyedeki Windows bilgisayardaki “Atölye Yazıcı” programından, buluttan (Supabase) okunur; Claude eklentisine bağlı kalmadan Mac’ten, telefondan, her yerden görünür','Atölyedeki bilgisayar kapalıysa ya da bilgi göndermiyorsa bu ayrıca yazar']],
@@ -3359,9 +3360,9 @@ $('diaryTxt').addEventListener('blur',()=>{if(noteDirty)saveNote()});
 
 /* Mikrofon */
 let REC=null,LISTEN=false;
-function micHint(msg){const h=$('micHint');if(msg==='__DICT__'){h.innerHTML=dictHTML('note');h.hidden=false;$('diaryTxt').focus();return}h.textContent=msg;h.hidden=!msg}
+function micHint(msg){const h=$('micHint');h.style.whiteSpace='pre-line';if(msg==='__DICT__'){h.innerHTML=dictHTML('note');h.hidden=false;$('diaryTxt').focus();return}h.textContent=msg;h.hidden=!msg}
 function setMic(on){LISTEN=on;$('micBtn').classList.toggle('rec',on);$('micTxt').textContent=on?'Dinliyorum · durdur':'Konuşarak yaz'}
-function sttMsg(e){const c=e&&e.code;return c==='not_granted'?'Sesle yazmak için Ayarlar > Yapay zekâ bölümüne Gemini anahtarını gir.':c==='mic_denied'?'Mikrofon izni kapalı. Tarayıcının adres çubuğundaki kilit simgesinden (masaüstü uygulamasında Sistem Ayarları > Gizlilik ve Güvenlik > Mikrofon) izin ver.':c==='mic_none'?'Mikrofon bulunamadı.':c==='rate_limited'?'Gemini kullanım sınırına gelindi; biraz sonra tekrar dene.':'Ses yazıya dökülemedi: '+((e&&e.message)||'bilinmeyen hata')}
+function sttMsg(e){const c=e&&e.code,h=window.__atlMicHelp&&window.__atlMicHelp(c);if(h)return h+' (Ayarlar → Mikrofon ve sesle yazma bölümünden deneyebilirsin.)';return c==='not_granted'?'Sesle yazmak için Ayarlar > Yapay zekâ bölümüne Gemini anahtarını gir.':c==='mic_denied'?'Mikrofon izni kapalı. Tarayıcının adres çubuğundaki kilit simgesinden (masaüstü uygulamasında Sistem Ayarları > Gizlilik ve Güvenlik > Mikrofon) izin ver.':c==='mic_none'?'Mikrofon bulunamadı.':c==='rate_limited'?'Gemini kullanım sınırına gelindi; biraz sonra tekrar dene.':'Ses yazıya dökülemedi: '+((e&&e.message)||'bilinmeyen hata')}
 $('micBtn').addEventListener('click',()=>{
   if(window.__atlSTT){const A=window.__atlSTT;if(A.active()){A.stop();return}
     micHint('');const ta=$('diaryTxt');
@@ -5830,7 +5831,7 @@ $('askMic').addEventListener('click',()=>{
     const ph=ta.placeholder;$('askTip').hidden=true;
     A.start(st=>{b.classList.toggle('rec',st==='rec');b.classList.toggle('busy',st==='busy');b.title=st==='rec'?'Durdurmak için tekrar bas':'Konuşarak yaz';ta.placeholder=st==='rec'?'Dinliyorum… bitince mikrofona tekrar bas':st==='busy'?'Yazıya dökülüyor…':ph})
       .then(t=>{if(!t){toast('Ses anlaşılamadı, tekrar dene');return}const base=ta.value.replace(/\s+$/,'');ta.value=(base?base+' ':'')+t;askGrow();ta.focus()})
-      .catch(e=>toast(sttMsg(e)));
+      .catch(e=>{const t=$('askTip');t.innerHTML=`<span class="tip-i" aria-hidden="true">🎤</span><span style="white-space:pre-line">${esc(sttMsg(e))}</span><button type="button" class="tip-x" data-tipx aria-label="Kapat">×</button>`;t.hidden=false});
     return}
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(AREC){AREC.stop();return}

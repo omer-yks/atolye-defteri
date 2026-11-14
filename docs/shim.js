@@ -177,7 +177,7 @@ const STT={rec:null,stopT:null,
     if(!aiKey())throw err('not_granted','Gemini anahtarı girilmemiş');
     if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder)throw err('mic_none','Bu tarayıcı ses kaydını desteklemiyor');
     let st;try{st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,channelCount:1}})}
-    catch(e){throw err(e&&(e.name==='NotAllowedError'||e.name==='SecurityError')?'mic_denied':'mic_none',e&&e.message||'')}
+    catch(e){throw err(e&&(e.name==='NotAllowedError'||e.name==='SecurityError')?'mic_denied':e&&(e.name==='NotReadableError'||e.name==='AbortError')?'mic_busy':'mic_none',e&&e.message||'')}
     const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'].find(m=>{try{return MediaRecorder.isTypeSupported(m)}catch(e){return false}})||'';
     const rec=new MediaRecorder(st,mime?{mimeType:mime}:undefined),chunks=[];this.rec=rec;
     rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
@@ -196,6 +196,33 @@ const STT={rec:null,stopT:null,
   }
 };
 window.__atlSTT=STT;
+const IS_DESKTOP=/Electron\//.test(navigator.userAgent);
+function micHelp(code){
+  if(code==='mic_denied')return IS_DESKTOP
+    ?'Mac mikrofon iznini kapalı tutuyor.\nSistem Ayarları → Gizlilik ve Güvenlik → Mikrofon → “Atolye Defteri”nin anahtarını aç. Sonra uygulamayı kapatıp (⌘Q) yeniden aç.'
+    :'Tarayıcı mikrofon iznini kapalı tutuyor.\nAdres çubuğunun solundaki simgeye tıkla → Mikrofon → İzin ver ve sayfayı yenile.\nAyrıca Mac’te: Sistem Ayarları → Gizlilik ve Güvenlik → Mikrofon → tarayıcının (ör. Brave Browser) anahtarı açık olmalı.';
+  if(code==='mic_none')return'Mikrofon bulunamadı. Mac’te Sistem Ayarları → Ses → Giriş bölümünde bir mikrofon seçili olmalı.';
+  if(code==='mic_busy')return'Mikrofon şu an başka bir uygulama tarafından kullanılıyor olabilir (ör. görüntülü görüşme). O uygulamayı kapatıp tekrar dene.';
+  if(code==='not_granted')return'Gemini anahtarı girilmemiş: ses yazıya dökülemez. Bu sayfanın üstündeki “Yapay zekâ (Gemini)” bölümüne anahtarını yapıştır.';
+  return'';
+}
+window.__atlMicHelp=micHelp;
+async function micPerm(){try{const r=await navigator.permissions.query({name:'microphone'});return r.state}catch(e){return'?'}}
+async function micPaint(){const ul=document.getElementById('atlMicSt');if(!ul)return;const k=!!aiKey(),p=await micPerm();
+  ul.innerHTML=`<li>Gemini anahtarı: ${k?'✓ girildi':'✗ <b>girilmedi</b> (sesle yazma için gerekli)'}</li><li>Mikrofon izni: ${p==='granted'?'✓ verildi':p==='denied'?'✗ <b>engellenmiş</b>':'henüz sorulmadı (“Mikrofonu dene”ye bas)'}</li>`}
+let MIC_T=null;
+async function micTest(){const m=document.getElementById('atlMicMsg'),bar=document.getElementById('atlMicBar'),b=document.getElementById('atlMicTest');
+  if(MIC_T)return;m.textContent='Mikrofon açılıyor…';bar.style.width='0';
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){m.textContent='Bu tarayıcı mikrofonu desteklemiyor.';return}
+  let st;try{st=await navigator.mediaDevices.getUserMedia({audio:true})}
+  catch(e){const n=e&&e.name;m.textContent='✗ '+micHelp(n==='NotAllowedError'||n==='SecurityError'?'mic_denied':n==='NotReadableError'||n==='AbortError'?'mic_busy':'mic_none')+(n?`\n(hata: ${n})`:'');micPaint();return}
+  const tr=st.getAudioTracks()[0],AC=window.AudioContext||window.webkitAudioContext,ac=new AC(),an=ac.createAnalyser();an.fftSize=1024;ac.createMediaStreamSource(st).connect(an);
+  const buf=new Float32Array(an.fftSize);let peak=0;b.disabled=true;m.textContent=`Dinliyorum: “${tr&&tr.label||'mikrofon'}”. Bir şeyler söyle…`;
+  const t0=Date.now();await new Promise(res=>{MIC_T=setInterval(()=>{an.getFloatTimeDomainData(buf);let s=0;for(const x of buf)s+=x*x;const rms=Math.sqrt(s/buf.length);peak=Math.max(peak,rms);bar.style.width=Math.min(100,rms*400)+'%';if(Date.now()-t0>4000){clearInterval(MIC_T);MIC_T=null;res()}},60)});
+  st.getTracks().forEach(t=>t.stop());try{ac.close()}catch(e){}bar.style.width='0';b.disabled=false;
+  m.textContent=peak>0.02?`✓ Mikrofon çalışıyor (${tr&&tr.label||'mikrofon'}).`+(aiKey()?' Sesle yazmaya hazır.':'\n'+micHelp('not_granted')):`Mikrofon açıldı ama ses gelmedi (${tr&&tr.label||'mikrofon'}). Mac’te Sistem Ayarları → Ses → Giriş’ten doğru mikrofonun seçili ve sesinin açık olduğunu denetle.`;
+  micPaint();
+}
 /* ---------- window.claude ---------- */
 window.claude={use:async name=>{
   if(name==='db'){await auth();return DB}
@@ -213,15 +240,22 @@ function settingsUI(){
     <p>Asistan ve ekran görüntüsünden okuma Google Gemini'nin ücretsiz planıyla çalışır. Anahtarı <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> adresinden ücretsiz alıp buraya yapıştır. Müşteri adları Google'a gönderilmeden önce “Müşteri 1” gibi takma adlarla değiştirilir. Mikrofonla yazarken ses kaydı yazıya dökülmek için Gemini'ye gönderilir.</p>
     <div class="bk"><input id="atlKey" type="password" autocomplete="off" placeholder="AIza…" style="flex:1;min-width:200px;border:1px solid var(--line);border-radius:12px;background:var(--soft);padding:10px 12px;font:inherit"><button type="button" class="btn primary" id="atlKeySave">Kaydet</button></div>
     <span class="bk-last" id="atlKeyMsg"></span>
+    <h2>Mikrofon ve sesle yazma</h2>
+    <p>🎤 düğmesine bas, konuş, tekrar bas; söylediklerin yazıya dökülür. Çalışmıyorsa aşağıdan dene, sorun neyse burada yazar.</p>
+    <ul id="atlMicSt" style="margin:0 0 10px;padding-left:18px;line-height:1.7"></ul>
+    <div class="bk"><button type="button" class="btn" id="atlMicTest">Mikrofonu dene</button>
+      <span style="flex:1;min-width:140px;height:10px;border-radius:99px;background:var(--soft);overflow:hidden;align-self:center"><i id="atlMicBar" style="display:block;height:100%;width:0;background:var(--ok,#1F9D55);transition:width .08s"></i></span></div>
+    <span class="bk-last" id="atlMicMsg" style="white-space:pre-line"></span>
     <h2>Hesap</h2><p id="atlAcc"></p>
     <div class="bk"><button type="button" class="btn" id="atlImp">Yedekten içe aktar (JSON)</button><button type="button" class="btn danger" id="atlOut">Çıkış yap</button><input type="file" id="atlImpF" accept=".json,application/json" hidden></div>
     <span class="bk-last" id="atlImpMsg"></span>`;
   const first=pg.querySelector('.set');first?first.after(sec):pg.appendChild(sec);
   const paint=()=>{const k=aiKey();document.getElementById('atlKey').value='';document.getElementById('atlKey').placeholder=k?'Anahtar kayıtlı (değiştirmek için yenisini yapıştır)':'AIza…';document.getElementById('atlKeyMsg').textContent=k?'✓ Anahtar bu cihazda kayıtlı'+(MODEL_OK?` · model: ${MODEL_OK}`:''):'Anahtar girilmedi: asistan ve ekran görüntüsü okuma kapalı.';document.getElementById('atlAcc').textContent=USER?`Giriş yapılan hesap: ${USER.email}`:''};
-  paint();
+  paint();micPaint();
+  document.getElementById('atlMicTest').onclick=micTest;
   document.getElementById('atlKeySave').onclick=async()=>{const v=document.getElementById('atlKey').value.trim();if(!v){LS('atl-gemini-key',null);paint();return}
     const m=document.getElementById('atlKeyMsg');m.textContent='Deneniyor…';LS('atl-gemini-key',v);
-    try{await gem([{role:'user',parts:[{text:'Sadece "tamam" yaz.'}]}],{stream:false,A:{M:[],back:new Map()}});paint();m.textContent='✓ Anahtar çalışıyor · model: '+MODEL_OK}
+    try{await gem([{role:'user',parts:[{text:'Sadece "tamam" yaz.'}]}],{stream:false,A:{M:[],back:new Map()}});paint();micPaint();m.textContent='✓ Anahtar çalışıyor · model: '+MODEL_OK}
     catch(e){m.textContent=e.code==='not_granted'?'Anahtar geçersiz; tekrar kopyalayıp yapıştır.':e.code==='rate_limited'?'Anahtar kaydedildi; şu an kullanım sınırına gelinmiş, biraz sonra çalışır.':'Anahtar kaydedildi ama denenemedi: '+(e.message||e.code)}};
   document.getElementById('atlOut').onclick=()=>{if(confirm('Bu cihazda çıkış yapılsın mı?'))sb.auth.signOut()};
   document.getElementById('atlImp').onclick=()=>document.getElementById('atlImpF').click();
