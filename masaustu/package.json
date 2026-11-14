@@ -1,7 +1,7 @@
 {
   "name": "atolye-defteri",
-  "productName": "Atölye Defteri",
-  "version": "1.0.0",
+  "productName": "Atolye Defteri",
+  "version": "1.0.1",
   "description": "Atölye Defteri masaüstü uygulaması",
   "author": "for3D design",
   "main": "main.js",
@@ -16,10 +16,17 @@
   },
   "build": {
     "appId": "com.for3d.atolyedefteri",
-    "productName": "Atölye Defteri",
+    "productName": "Atolye Defteri",
     "copyright": "for3D design",
-    "directories": { "output": "dist", "buildResources": "build" },
-    "files": ["main.js", "offline.html", "icon.png"],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "offline.html",
+      "icon.png"
+    ],
     "mac": {
       "category": "public.app-category.business",
       "icon": "build/icon.png",
@@ -27,7 +34,8 @@
       "hardenedRuntime": false,
       "extendInfo": {
         "NSMicrophoneUsageDescription": "Sesle yazmak için mikrofon kullanılır.",
-        "NSCameraUsageDescription": "Kamera kullanılmaz."
+        "NSCameraUsageDescription": "Kamera kullanılmaz.",
+        "CFBundleDisplayName": "Atölye Defteri"
       }
     }
   }

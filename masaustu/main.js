@@ -8,7 +8,6 @@ const APP_URL = 'https://omer-yks.github.io/atolye-defteri/';
 const ORIGIN = new URL(APP_URL).origin;
 const ALLOW = new Set(['media', 'clipboard-read', 'clipboard-sanitized-write', 'notifications', 'fullscreen']);
 
-app.setName('Atölye Defteri');
 if (!app.requestSingleInstanceLock()) { app.quit(); }
 
 let win = null;

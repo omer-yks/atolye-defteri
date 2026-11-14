@@ -9,6 +9,10 @@ permissions:
 jobs:
   build:
     runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [ascii, tr]
     defaults:
       run:
         working-directory: masaustu
@@ -17,29 +21,45 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Türkçe adlı deneme sürümü
+        if: matrix.variant == 'tr'
+        run: |
+          node -e "const f='package.json',j=require('./'+f);j.productName=j.build.productName='Atölye Defteri';require('fs').writeFileSync(f,JSON.stringify(j,null,2))"
+          sed -i '' "s/^const APP_URL/app.setName('Atölye Defteri');\nconst APP_URL/" main.js || true
       - run: npm install --no-audit --no-fund
       - run: npx electron-builder --mac dir --arm64
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-      - name: İmzala (ad-hoc) ve DMG oluştur
+      - name: İmzala (ad-hoc)
         run: |
           APP="$(ls -d dist/mac-arm64/*.app | head -1)"
+          echo "APP=$APP" >> $GITHUB_ENV
           codesign --force --deep --sign - "$APP"
           codesign --verify --deep --strict "$APP"
-          /usr/libexec/PlistBuddy -c 'Print :NSMicrophoneUsageDescription' "$APP/Contents/Info.plist"
+          ls "$APP/Contents/MacOS" "$APP/Contents/Frameworks"
+      - name: Çalıştırma testi
+        run: |
+          EXE="$(ls "$APP/Contents/MacOS" | head -1)"
+          ELECTRON_ENABLE_LOGGING=1 "$APP/Contents/MacOS/$EXE" > run.log 2>&1 &
+          PID=$!
+          sleep 25
+          if kill -0 $PID 2>/dev/null; then echo "SONUC: CALISIYOR"; kill $PID; OK=1; else wait $PID; echo "SONUC: COKTU kod=$?"; OK=0; fi
+          echo "---- log"; tail -60 run.log
+          echo "---- crash"; ls -t ~/Library/Logs/DiagnosticReports 2>/dev/null | head -5
+          for f in $(ls -t ~/Library/Logs/DiagnosticReports/*.ips 2>/dev/null | head -1); do head -c 3000 "$f"; done
+          echo "OK=$OK" >> $GITHUB_ENV
+      - name: DMG oluştur
+        if: matrix.variant == 'ascii' && env.OK == '1'
+        run: |
           mkdir -p dmg && cp -R "$APP" dmg/ && ln -s /Applications dmg/Applications
           VER=$(node -p "require('./package.json').version")
           hdiutil create -volname "Atölye Defteri" -srcfolder dmg -ov -format UDZO "Atolye-Defteri-$VER.dmg"
-          ls -la *.dmg
           echo "VER=$VER" >> $GITHUB_ENV
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Atolye-Defteri-mac
-          path: masaustu/*.dmg
       - name: Sürüm yayınla
+        if: matrix.variant == 'ascii' && env.OK == '1'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="mac-v${VER}"
           gh release delete "$TAG" --yes --cleanup-tag 2>/dev/null || true
-          gh release create "$TAG" Atolye-Defteri-*.dmg --title "Atölye Defteri Mac ${VER}" --notes "Mac (Apple Silicon) masaüstü uygulaması. DMG'yi aç, Atölye Defteri'ni Uygulamalar klasörüne sürükle."
+          gh release create "$TAG" Atolye-Defteri-*.dmg --title "Atölye Defteri Mac ${VER}" --notes "Mac (Apple Silicon) masaüstü uygulaması. DMG'yi aç, uygulamayı Uygulamalar klasörüne sürükle."
