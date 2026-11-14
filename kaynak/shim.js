@@ -22,7 +22,7 @@ const css=`#atlLogin{position:fixed;inset:0;z-index:9999;display:grid;place-item
 #atlLogin input:focus{outline:2px solid var(--accent,#4B3CF0);outline-offset:0;background:var(--surface,#fff)}
 #atlLogin button.go{border:0;border-radius:12px;background:var(--char,#2E2F34);color:var(--on-char,#fff);padding:12px;font:inherit;font-weight:600;cursor:pointer}
 #atlLogin button.go:disabled{opacity:.6}
-#atlLogin .sw{border:0;background:none;color:var(--accent,#4B3CF0);font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;padding:0;justify-self:start}
+#atlLogin .atl-sw{border:0;background:none;color:var(--accent,#4B3CF0);font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;padding:0;justify-self:start}
 #atlLogin .msg{font-size:.86rem;border-radius:10px;padding:9px 12px;display:none}
 #atlLogin .msg.err{display:block;background:var(--late-bg,#FFE9E9);color:var(--late,#DE454A)}
 #atlLogin .msg.ok{display:block;background:var(--ok-bg,#E1F7E9);color:var(--ok,#178F49)}`;
@@ -34,9 +34,9 @@ function loginUI(){
       <h1>Atölye Defteri</h1><p class="sub">Defterine girmek için e-posta ve şifreni yaz.</p>
       <label>E-posta<input type="email" name="e" autocomplete="username" required></label>
       <label>Şifre<input type="password" name="p" autocomplete="current-password" minlength="6" required></label>
-      <div class="msg"></div><button type="submit" class="go">Giriş yap</button><button type="button" class="sw">Hesabın yok mu? Hesap oluştur</button></form>`;
+      <div class="msg"></div><button type="submit" class="go">Giriş yap</button><button type="button" class="atl-sw">Hesabın yok mu? Hesap oluştur</button></form>`;
     document.body.appendChild(w);
-    const f=w.querySelector('form'),msg=w.querySelector('.msg'),go=w.querySelector('.go'),swb=w.querySelector('.sw'),sub=w.querySelector('.sub');let mode='in';
+    const f=w.querySelector('form'),msg=w.querySelector('.msg'),go=w.querySelector('.go'),swb=w.querySelector('.atl-sw'),sub=w.querySelector('.sub');let mode='in';
     const say=(t,ok)=>{msg.textContent=t;msg.className='msg '+(ok?'ok':'err')};
     swb.onclick=()=>{mode=mode==='in'?'up':'in';go.textContent=mode==='in'?'Giriş yap':'Hesap oluştur';swb.textContent=mode==='in'?'Hesabın yok mu? Hesap oluştur':'Hesabın var mı? Giriş yap';sub.textContent=mode==='in'?'Defterine girmek için e-posta ve şifreni yaz.':'Bir kez hesap oluştur; sonra her cihazdan bu bilgilerle girersin.';msg.className='msg';f.p.autocomplete=mode==='in'?'current-password':'new-password'};
     f.onsubmit=async e=>{e.preventDefault();const em=f.e.value.trim(),pw=f.p.value;
