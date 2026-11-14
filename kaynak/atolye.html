@@ -1290,7 +1290,7 @@ table:has(.exb){min-width:560px}
 .ask-comp:focus-within{border-color:#6D4AFF}
 .ask-comp textarea{flex:1;border:0;background:transparent;resize:none;padding:8px 0;font:inherit;line-height:1.45;max-height:160px;color:var(--ink);outline:none}
 .ask-mic,.ask-send{width:40px;height:40px;border-radius:12px;border:0;display:grid;place-items:center;flex:none}
-.ask-mic{background:transparent;color:var(--mute)}.ask-mic:hover{background:var(--surface);color:var(--ink)}.ask-mic.rec{background:var(--late);color:#fff}
+.ask-mic{background:transparent;color:var(--mute)}.ask-mic:hover{background:var(--surface);color:var(--ink)}.ask-mic.rec{background:var(--late);color:#fff;animation:pulse 1.2s ease-in-out infinite}.ask-mic.busy{background:var(--soft);color:var(--ink);opacity:.7;pointer-events:none}
 .ask-send{background:#6D4AFF;color:#fff}.ask-send:hover{filter:brightness(1.08)}
 .ask-stop{min-height:40px}
 .ask-tip{display:flex;gap:10px;align-items:flex-start;background:color-mix(in srgb,#6D4AFF 9%,var(--surface));border:1px solid color-mix(in srgb,#6D4AFF 25%,var(--line));border-radius:14px;padding:10px 12px;margin-bottom:8px;font-size:.86rem;line-height:1.5;animation:fadeUp .3s both}
@@ -2755,8 +2755,9 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.79',VERDATE='14 Kasım 2026';
+const VERSION='1.80',VERDATE='14 Kasım 2026';
 const CHANGES=[
+  ['1.80',['Sesle yazma her yerde çalışıyor: mikrofona bas, konuş, tekrar bas; söylediklerin Gemini ile yazıya dökülür (Brave ve Mac uygulaması dahil)','Mac için masaüstü uygulaması']],
   ['1.79',['Ayarlar: “Yeni uygulamaya taşı” ile bütün defter tek dosya (JSON) olarak iner; bağımsız uygulamada içe aktarılır']],
   ['1.78',['Yazıcı artık atölyedeki Windows bilgisayardaki “Atölye Yazıcı” programından, buluttan (Supabase) okunur; Claude eklentisine bağlı kalmadan Mac’ten, telefondan, her yerden görünür','Atölyedeki bilgisayar kapalıysa ya da bilgi göndermiyorsa bu ayrıca yazar']],
   ['1.77',['Yazdırma geçmişi defterde ortak tutulur: eklentinin kurulu olduğu her bilgisayar (Mac ya da Asus) yazıcıyı okudukça kaydeder; telefondan ve diğer bilgisayarlardan da görünür','Yazıcıya ulaşılamasa bile son baskılar listede kalır; yazıcının son bilinen durumu (ne zaman, hangi bilgisayardan) üstte yazar']],
@@ -3358,7 +3359,14 @@ $('diaryTxt').addEventListener('blur',()=>{if(noteDirty)saveNote()});
 let REC=null,LISTEN=false;
 function micHint(msg){const h=$('micHint');if(msg==='__DICT__'){h.innerHTML=dictHTML('note');h.hidden=false;$('diaryTxt').focus();return}h.textContent=msg;h.hidden=!msg}
 function setMic(on){LISTEN=on;$('micBtn').classList.toggle('rec',on);$('micTxt').textContent=on?'Dinliyorum · durdur':'Konuşarak yaz'}
+function sttMsg(e){const c=e&&e.code;return c==='not_granted'?'Sesle yazmak için Ayarlar > Yapay zekâ bölümüne Gemini anahtarını gir.':c==='mic_denied'?'Mikrofon izni kapalı. Tarayıcının adres çubuğundaki kilit simgesinden (masaüstü uygulamasında Sistem Ayarları > Gizlilik ve Güvenlik > Mikrofon) izin ver.':c==='mic_none'?'Mikrofon bulunamadı.':c==='rate_limited'?'Gemini kullanım sınırına gelindi; biraz sonra tekrar dene.':'Ses yazıya dökülemedi: '+((e&&e.message)||'bilinmeyen hata')}
 $('micBtn').addEventListener('click',()=>{
+  if(window.__atlSTT){const A=window.__atlSTT;if(A.active()){A.stop();return}
+    micHint('');const ta=$('diaryTxt');
+    A.start(st=>{if(st==='rec')setMic(true);else if(st==='busy'){LISTEN=false;$('micBtn').classList.remove('rec');$('micTxt').textContent='Yazıya dökülüyor…'}else setMic(false)})
+      .then(t=>{if(!t){micHint('Ses anlaşılamadı; mikrofona yakın konuşup tekrar dene.');return}const base=ta.value.replace(/\s+$/,'');ta.value=(base?base+(/[.!?]$/.test(base)?' ':'. '):'')+t;noteInput();if(noteDirty)saveNote()})
+      .catch(e=>{setMic(false);micHint(sttMsg(e))});
+    return}
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(LISTEN&&REC){REC.stop();return}
   const fallback='__DICT__';
@@ -5816,6 +5824,12 @@ function askDictTip(){const t=$('askTip');t.innerHTML=dictHTML('ask');t.hidden=f
 $('askTip').addEventListener('click',e=>{if(e.target.closest('[data-tipx]')){$('askTip').hidden=true;$('askIn').focus()}});
 let AREC=null;
 $('askMic').addEventListener('click',()=>{
+  if(window.__atlSTT){const A=window.__atlSTT,b=$('askMic'),ta=$('askIn');if(A.active()){A.stop();return}
+    const ph=ta.placeholder;$('askTip').hidden=true;
+    A.start(st=>{b.classList.toggle('rec',st==='rec');b.classList.toggle('busy',st==='busy');b.title=st==='rec'?'Durdurmak için tekrar bas':'Konuşarak yaz';ta.placeholder=st==='rec'?'Dinliyorum… bitince mikrofona tekrar bas':st==='busy'?'Yazıya dökülüyor…':ph})
+      .then(t=>{if(!t){toast('Ses anlaşılamadı, tekrar dene');return}const base=ta.value.replace(/\s+$/,'');ta.value=(base?base+' ':'')+t;askGrow();ta.focus()})
+      .catch(e=>toast(sttMsg(e)));
+    return}
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(AREC){AREC.stop();return}
   if(!SR){askDictTip();return}
@@ -5826,7 +5840,8 @@ $('askMic').addEventListener('click',()=>{
   AREC.onend=()=>{AREC=null;$('askMic').classList.remove('rec')};
   try{AREC.start();$('askMic').classList.add('rec')}catch(err){AREC=null;$('askMic').classList.remove('rec');askDictTip()}
 });
-if(PLAT==='win'||PLAT==='mac'){$('askIn').placeholder=`Yaz ya da ${PLAT==='win'?'Windows + H':'Fn’e iki kez basıp'} ile konuş… Ör. “3 Kurumsal Set Kalemlik bastım”`;$('askMic').title=`Konuşarak yaz (${PLAT==='win'?'Windows + H':'Fn × 2'})`}
+if(window.__atlSTT){$('askIn').placeholder='Yaz ya da 🎤 düğmesine basıp konuş… Ör. “3 Kurumsal Set Kalemlik bastım”'}
+else if(PLAT==='win'||PLAT==='mac'){$('askIn').placeholder=`Yaz ya da ${PLAT==='win'?'Windows + H':'Fn’e iki kez basıp'} ile konuş… Ör. “3 Kurumsal Set Kalemlik bastım”`;$('askMic').title=`Konuşarak yaz (${PLAT==='win'?'Windows + H':'Fn × 2'})`}
 
 /* ---------- Yapılacaklar ---------- */
 const todos=()=>mine('notes').filter(x=>x.kind==='todo');

@@ -1,0 +1,45 @@
+name: Mac uygulaması
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['masaustu/**', '.github/workflows/mac.yml']
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: masaustu
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: npx electron-builder --mac dir --arm64
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: İmzala (ad-hoc) ve DMG oluştur
+        run: |
+          APP="$(ls -d dist/mac-arm64/*.app | head -1)"
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --deep --strict "$APP"
+          /usr/libexec/PlistBuddy -c 'Print :NSMicrophoneUsageDescription' "$APP/Contents/Info.plist"
+          mkdir -p dmg && cp -R "$APP" dmg/ && ln -s /Applications dmg/Applications
+          VER=$(node -p "require('./package.json').version")
+          hdiutil create -volname "Atölye Defteri" -srcfolder dmg -ov -format UDZO "Atolye-Defteri-$VER.dmg"
+          ls -la *.dmg
+          echo "VER=$VER" >> $GITHUB_ENV
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Atolye-Defteri-mac
+          path: masaustu/*.dmg
+      - name: Sürüm yayınla
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="mac-v${VER}"
+          gh release delete "$TAG" --yes --cleanup-tag 2>/dev/null || true
+          gh release create "$TAG" Atolye-Defteri-*.dmg --title "Atölye Defteri Mac ${VER}" --notes "Mac (Apple Silicon) masaüstü uygulaması. DMG'yi aç, Atölye Defteri'ni Uygulamalar klasörüne sürükle."

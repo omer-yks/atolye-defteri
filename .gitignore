@@ -1,3 +1,6 @@
 yazici-servisi/ayarlar.json
 __pycache__/
 .DS_Store
+masaustu/node_modules/
+masaustu/dist/
+masaustu/*.dmg

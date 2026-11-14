@@ -128,12 +128,12 @@ async function toContents(input,images,A){
   return C;
 }
 let MODEL_OK=LS('atl-gemini-model')||'';
-async function gem(contents,{stream,json,signal,onText,A}){
+async function gem(contents,{stream,json,signal,onText,A,temp}){
   const key=aiKey();if(!key)throw err('not_granted','Gemini anahtarı girilmemiş');
   const models=[MODEL_OK,...AI_MODELS].filter((m,i,a)=>m&&a.indexOf(m)===i);let last=null;
   for(const model of models){
     const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:${stream?'streamGenerateContent?alt=sse':'generateContent'}`;
-    let r;try{r=await fetch(url,{method:'POST',signal,headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents,generationConfig:{temperature:json?0.2:0.5,maxOutputTokens:8192,...(json?{responseMimeType:'application/json'}:{})}})})}
+    let r;try{r=await fetch(url,{method:'POST',signal,headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents,generationConfig:{temperature:temp!=null?temp:json?0.2:0.5,maxOutputTokens:8192,...(json?{responseMimeType:'application/json'}:{})}})})}
     catch(e){if(e&&e.name==='AbortError')throw err('cancelled');throw err('upstream_error','İnternet bağlantısı yok gibi görünüyor.')}
     if(r.status===404){last=err('model_unavailable',model);continue}
     if(!r.ok){const t=await r.text().catch(()=>'');if(r.status===429)throw err('rate_limited',t);if(r.status===400&&/API key|API_KEY/i.test(t)||r.status===401||r.status===403)throw err('not_granted','Gemini anahtarı geçersiz');throw err('upstream_error',`Gemini ${r.status}: ${t.slice(0,200)}`)}
@@ -155,6 +155,47 @@ sample.json=async(input,opts)=>{opts=opts||{};const A=aliasMap();const C=await t
   const t=unmask(await gem(C,{stream:false,json:true,signal:opts.signal,A}),A);
   try{return JSON.parse(t)}catch(e){const m=/[\[{][\s\S]*[\]}]/.exec(t);if(m)return JSON.parse(m[0]);throw err('bad_json','Yapay zekânın cevabı okunamadı')}};
 sample.limits=async()=>({maxInputBytes:4e6,images:{maxCount:8,maxBytes:7e6,types:['image/png','image/jpeg','image/webp']},modelTiers:['quick','default','complex']});
+/* ---------- Sesle yazma: mikrofon kaydı → Gemini ile yazıya dökme (Brave ve masaüstü uygulamasında da çalışır) ---------- */
+async function toWav(blob){
+  const AC=window.AudioContext||window.webkitAudioContext,ac=new AC();
+  try{const ab=await ac.decodeAudioData(await blob.arrayBuffer());const sr=16000,len=Math.max(1,Math.ceil(ab.duration*sr));
+    const oc=new OfflineAudioContext(1,len,sr),src=oc.createBufferSource();src.buffer=ab;src.connect(oc.destination);src.start();
+    const d=(await oc.startRendering()).getChannelData(0),buf=new ArrayBuffer(44+d.length*2),v=new DataView(buf);
+    const w=(o,t)=>{for(let i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i))};
+    w(0,'RIFF');v.setUint32(4,36+d.length*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+    v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,d.length*2,true);
+    let peak=0;for(let i=0;i<d.length;i++){const x=Math.max(-1,Math.min(1,d[i]));peak=Math.max(peak,Math.abs(x));v.setInt16(44+i*2,x<0?x*0x8000:x*0x7fff,true)}
+    return{wav:new Blob([buf],{type:'audio/wav'}),sec:ab.duration,peak}}
+  finally{try{ac.close()}catch(e){}}
+}
+const STT_MAX=120000;
+const STT={rec:null,stopT:null,
+  active(){return!!this.rec},
+  stop(){if(this.rec&&this.rec.state!=='inactive')this.rec.stop()},
+  async start(onState){
+    if(this.rec)throw err('busy','Kayıt zaten sürüyor');
+    if(!aiKey())throw err('not_granted','Gemini anahtarı girilmemiş');
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder)throw err('mic_none','Bu tarayıcı ses kaydını desteklemiyor');
+    let st;try{st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,channelCount:1}})}
+    catch(e){throw err(e&&(e.name==='NotAllowedError'||e.name==='SecurityError')?'mic_denied':'mic_none',e&&e.message||'')}
+    const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'].find(m=>{try{return MediaRecorder.isTypeSupported(m)}catch(e){return false}})||'';
+    const rec=new MediaRecorder(st,mime?{mimeType:mime}:undefined),chunks=[];this.rec=rec;
+    rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+    const done=new Promise(res=>{rec.onstop=res});
+    rec.start(1000);onState&&onState('rec');this.stopT=setTimeout(()=>this.stop(),STT_MAX);
+    await done;clearTimeout(this.stopT);st.getTracks().forEach(t=>t.stop());this.rec=null;
+    try{
+      if(!chunks.length)return'';
+      onState&&onState('busy');
+      const{wav,sec,peak}=await toWav(new Blob(chunks,{type:rec.mimeType||mime||'audio/webm'}));
+      if(sec<0.4||peak<0.01)return'';
+      const C=[{role:'user',parts:[{text:'Bu ses kaydında Türkçe konuşan birinin söylediklerini aynen yazıya dök. Uygun noktalama ve büyük harf kullan; sayıları rakamla yaz. Yalnızca söylenen metni yaz: açıklama, tırnak, başlık ekleme. Kayıtta anlaşılır konuşma yoksa hiçbir şey yazma.'},{inline_data:{mime_type:'audio/wav',data:await b64(wav)}}]}];
+      const t=await gem(C,{stream:false,temp:0,A:{M:[],back:new Map()}});
+      return String(t||'').replace(/^\s*["“”]|["“”]\s*$/g,'').trim();
+    }finally{onState&&onState('idle')}
+  }
+};
+window.__atlSTT=STT;
 /* ---------- window.claude ---------- */
 window.claude={use:async name=>{
   if(name==='db'){await auth();return DB}
@@ -169,7 +210,7 @@ function settingsUI(){
   const pg=document.getElementById('pg-settings');if(!pg||document.getElementById('atlSet'))return;
   const sec=document.createElement('section');sec.className='set';sec.id='atlSet';sec.setAttribute('aria-labelledby','atlAiT');
   sec.innerHTML=`<h2 id="atlAiT">Yapay zekâ (Gemini)</h2>
-    <p>Asistan ve ekran görüntüsünden okuma Google Gemini'nin ücretsiz planıyla çalışır. Anahtarı <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> adresinden ücretsiz alıp buraya yapıştır. Müşteri adları Google'a gönderilmeden önce “Müşteri 1” gibi takma adlarla değiştirilir.</p>
+    <p>Asistan ve ekran görüntüsünden okuma Google Gemini'nin ücretsiz planıyla çalışır. Anahtarı <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> adresinden ücretsiz alıp buraya yapıştır. Müşteri adları Google'a gönderilmeden önce “Müşteri 1” gibi takma adlarla değiştirilir. Mikrofonla yazarken ses kaydı yazıya dökülmek için Gemini'ye gönderilir.</p>
     <div class="bk"><input id="atlKey" type="password" autocomplete="off" placeholder="AIza…" style="flex:1;min-width:200px;border:1px solid var(--line);border-radius:12px;background:var(--soft);padding:10px 12px;font:inherit"><button type="button" class="btn primary" id="atlKeySave">Kaydet</button></div>
     <span class="bk-last" id="atlKeyMsg"></span>
     <h2>Hesap</h2><p id="atlAcc"></p>
