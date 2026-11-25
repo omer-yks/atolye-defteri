@@ -128,15 +128,29 @@ async function toContents(input,images,A){
   return C;
 }
 let MODEL_OK=LS('atl-gemini-model')||'';
+/* Hesapta açık olan Gemini modellerini Google'a sorar (günde bir), en uygun “flash” modelleri sıralar */
+async function aiModels(key){
+  try{const c=JSON.parse(LS('atl-gemini-models')||'null');if(c&&c.k===key.slice(-6)&&Date.now()-c.t<864e5&&c.m.length)return c.m}catch(e){}
+  try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',{headers:{'x-goog-api-key':key}});if(!r.ok)return[];
+    const j=await r.json(),ver=n=>{const m=/gemini-(\d+(?:\.\d+)?)/.exec(n);return m?+m[1]:0};
+    const L=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>String(m.name||'').replace(/^models\//,''))
+      .filter(n=>/^gemini-[\d.]+-flash/.test(n)&&!/(image|tts|audio|live|embedding|thinking-exp)/.test(n))
+      .sort((a,b)=>(/lite/.test(a)-/lite/.test(b))||(/(preview|exp)/.test(a)-/(preview|exp)/.test(b))||(ver(b)-ver(a))||(a.length-b.length));
+    LS('atl-gemini-models',JSON.stringify({k:key.slice(-6),t:Date.now(),m:L.slice(0,8)}));return L.slice(0,8)}catch(e){return[]}
+}
+function gErr(status,t){let m='';try{m=JSON.parse(t).error.message||''}catch(e){m=t||''}return String(m).replace(/\s+/g,' ').slice(0,220)}
 async function gem(contents,{stream,json,signal,onText,A,temp}){
   const key=aiKey();if(!key)throw err('not_granted','Gemini anahtarı girilmemiş');
-  const models=[MODEL_OK,...AI_MODELS].filter((m,i,a)=>m&&a.indexOf(m)===i);let last=null;
+  const found=await aiModels(key);
+  const models=[MODEL_OK,...found,...AI_MODELS].filter((m,i,a)=>m&&a.indexOf(m)===i);let last=null,rate=null;
   for(const model of models){
     const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:${stream?'streamGenerateContent?alt=sse':'generateContent'}`;
     let r;try{r=await fetch(url,{method:'POST',signal,headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents,generationConfig:{temperature:temp!=null?temp:json?0.2:0.5,maxOutputTokens:8192,...(json?{responseMimeType:'application/json'}:{})}})})}
     catch(e){if(e&&e.name==='AbortError')throw err('cancelled');throw err('upstream_error','İnternet bağlantısı yok gibi görünüyor.')}
-    if(r.status===404){last=err('model_unavailable',model);continue}
-    if(!r.ok){const t=await r.text().catch(()=>'');if(r.status===429)throw err('rate_limited',t);if(r.status===400&&/API key|API_KEY/i.test(t)||r.status===401||r.status===403)throw err('not_granted','Gemini anahtarı geçersiz');throw err('upstream_error',`Gemini ${r.status}: ${t.slice(0,200)}`)}
+    if(!r.ok){const t=await r.text().catch(()=>''),msg=gErr(r.status,t);
+      if((r.status===400||r.status===401||r.status===403)&&/API key|API_KEY|PERMISSION_DENIED.*key|unregistered callers/i.test(t))throw err('not_granted','Gemini anahtarı geçersiz: '+msg);
+      if(r.status===429){rate=err('rate_limited',`${model}: ${msg}`);if(MODEL_OK===model){MODEL_OK='';LS('atl-gemini-model',null)}continue}
+      last=err(r.status===404?'model_unavailable':'upstream_error',`Gemini ${r.status} (${model}): ${msg}`);if(MODEL_OK===model){MODEL_OK='';LS('atl-gemini-model',null)}continue}
     if(MODEL_OK!==model){MODEL_OK=model;LS('atl-gemini-model',model)}
     if(!stream){const j=await r.json();const t=(((j.candidates||[])[0]||{}).content||{}).parts||[];return t.map(p=>p.text||'').join('')}
     const rd=r.body.getReader(),dec=new TextDecoder();let buf='',full='';
@@ -146,7 +160,7 @@ async function gem(contents,{stream,json,signal,onText,A,temp}){
     catch(e){if(e&&e.name==='AbortError')throw Object.assign(err('cancelled'),{text:unmask(full,A)});throw e}
     return full;
   }
-  throw last||err('model_unavailable');
+  throw rate||last||err('model_unavailable','Hesabında kullanılabilir Gemini modeli bulunamadı');
 }
 function sample(input,opts){opts=opts||{};const A=aliasMap();return(async()=>{const C=await toContents(input,opts.images,A);
   try{const t=await gem(C,{stream:true,signal:opts.signal,onText:opts.onText,A});return{text:unmask(t,A),truncated:false}}
@@ -238,7 +252,7 @@ function settingsUI(){
   const sec=document.createElement('section');sec.className='set';sec.id='atlSet';sec.setAttribute('aria-labelledby','atlAiT');
   sec.innerHTML=`<h2 id="atlAiT">Yapay zekâ (Gemini)</h2>
     <p>Asistan ve ekran görüntüsünden okuma Google Gemini'nin ücretsiz planıyla çalışır. Anahtarı <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> adresinden ücretsiz alıp buraya yapıştır. Müşteri adları Google'a gönderilmeden önce “Müşteri 1” gibi takma adlarla değiştirilir. Mikrofonla yazarken ses kaydı yazıya dökülmek için Gemini'ye gönderilir.</p>
-    <div class="bk"><input id="atlKey" type="password" autocomplete="off" placeholder="AIza…" style="flex:1;min-width:200px;border:1px solid var(--line);border-radius:12px;background:var(--soft);padding:10px 12px;font:inherit"><button type="button" class="btn primary" id="atlKeySave">Kaydet</button></div>
+    <div class="bk"><input id="atlKey" type="password" autocomplete="off" placeholder="AIza…" style="flex:1;min-width:200px;border:1px solid var(--line);border-radius:12px;background:var(--soft);padding:10px 12px;font:inherit"><button type="button" class="btn primary" id="atlKeySave">Kaydet ve dene</button></div>
     <span class="bk-last" id="atlKeyMsg"></span>
     <h2>Mikrofon ve sesle yazma</h2>
     <p>🎤 düğmesine bas, konuş, tekrar bas; söylediklerin yazıya dökülür. Çalışmıyorsa aşağıdan dene, sorun neyse burada yazar.</p>
@@ -253,10 +267,10 @@ function settingsUI(){
   const paint=()=>{const k=aiKey();document.getElementById('atlKey').value='';document.getElementById('atlKey').placeholder=k?'Anahtar kayıtlı (değiştirmek için yenisini yapıştır)':'AIza…';document.getElementById('atlKeyMsg').textContent=k?'✓ Anahtar bu cihazda kayıtlı'+(MODEL_OK?` · model: ${MODEL_OK}`:''):'Anahtar girilmedi: asistan ve ekran görüntüsü okuma kapalı.';document.getElementById('atlAcc').textContent=USER?`Giriş yapılan hesap: ${USER.email}`:''};
   paint();micPaint();
   document.getElementById('atlMicTest').onclick=micTest;
-  document.getElementById('atlKeySave').onclick=async()=>{const v=document.getElementById('atlKey').value.trim();if(!v){LS('atl-gemini-key',null);paint();return}
+  document.getElementById('atlKeySave').onclick=async()=>{const v=document.getElementById('atlKey').value.trim()||aiKey();if(!v){LS('atl-gemini-key',null);paint();return}LS('atl-gemini-models',null);document.getElementById('atlKeyMsg').style.whiteSpace='pre-line';
     const m=document.getElementById('atlKeyMsg');m.textContent='Deneniyor…';LS('atl-gemini-key',v);
     try{await gem([{role:'user',parts:[{text:'Sadece "tamam" yaz.'}]}],{stream:false,A:{M:[],back:new Map()}});paint();micPaint();m.textContent='✓ Anahtar çalışıyor · model: '+MODEL_OK}
-    catch(e){m.textContent=e.code==='not_granted'?'Anahtar geçersiz; tekrar kopyalayıp yapıştır.':e.code==='rate_limited'?'Anahtar kaydedildi; şu an kullanım sınırına gelinmiş, biraz sonra çalışır.':'Anahtar kaydedildi ama denenemedi: '+(e.message||e.code)}};
+    catch(e){m.textContent=(e.code==='not_granted'?'✗ Anahtar geçersiz; aistudio.google.com/apikey adresinden tekrar kopyalayıp yapıştır.':e.code==='rate_limited'?'Anahtar kaydedildi ama Google şu an kullanım sınırı diyor; biraz sonra tekrar dene.':'Anahtar kaydedildi ama çalışmadı.')+(e.message?`\nGoogle’ın cevabı: ${e.message}`:'')}};
   document.getElementById('atlOut').onclick=()=>{if(confirm('Bu cihazda çıkış yapılsın mı?'))sb.auth.signOut()};
   document.getElementById('atlImp').onclick=()=>document.getElementById('atlImpF').click();
   document.getElementById('atlImpF').onchange=async e=>{const f=e.target.files[0];if(!f)return;const m=document.getElementById('atlImpMsg');

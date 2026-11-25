@@ -2804,8 +2804,9 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.82',VERDATE='14 Kasım 2026';
+const VERSION='1.83',VERDATE='14 Kasım 2026';
 const CHANGES=[
+  ['1.83',['Yapay zekâ: hesabında açık olan Gemini modelini kendisi bulur, biri çalışmazsa sıradakini dener','Ayarlar > Yapay zekâ: “Kaydet ve dene”; çalışmazsa Google’ın gerçek hata mesajı görünür']],
   ['1.82',['Ana sayfa: Masraflar kartına baskı maliyeti eklendi; üzerine gelince ne için harcandığı sipariş sipariş, ürün ürün görünür (filament alımı stoğa sayılır, iki kez sayılmaz)','Baskılar grafiği: yeni Çizgi ve Alan türleri, Maliyet ölçüsü, ortalama çizgisi ve özet kutuları, yenilenen görünüm','Grafikte Asistan: ne görmek istediğini yaz ya da boş bırak, grafiği kendisi ayarlar ve kısa bir yorum yazar','Sadeleştirme: grafik türleri simgeyle, özet tek satırda; masraf dökümü daha kısa']],
   ['1.81',['Ayarlar: “Mikrofon ve sesle yazma” bölümü; mikrofonu dene, sorun neyse ve nereden açılacağı yazar']],
   ['1.80',['Sesle yazma her yerde çalışıyor: mikrofona bas, konuş, tekrar bas; söylediklerin Gemini ile yazıya dökülür (Brave ve Mac uygulaması dahil)','Mac için masaüstü uygulaması']],
@@ -5795,7 +5796,7 @@ async function askSend(text){
     if(p.bad)ASK.msgs.push({r:'a',t:'Eylem listesini okuyamadım; aynı isteği bir kez daha yazar mısın?',acts:[],err:true});
   }catch(e){
     const c=e&&e.code;
-    ASK.msgs.push({r:'a',t:c==='cancelled'?((e.text?askVisible(e.text)+' ':'')+'(durduruldu)'):c==='not_granted'?'Yapay zekâ kullanımına izin verilmedi. Sayfanın izinlerinden Claude\'a izin verirsen asistan çalışır.':c==='rate_limited'?'Çok sık istek gitti ya da kullanım sınırına gelindi. Biraz sonra tekrar dene.':c==='sampling_disabled'?'Bu hesapta yapay zekâ kapalı görünüyor.':'Bir sorun oldu, cevap gelmedi. Aynı mesajı tekrar gönderebilirsin.',acts:[],err:c!=='cancelled',retry:c!=='cancelled'&&c!=='not_granted'&&c!=='sampling_disabled'?text:''});
+    ASK.msgs.push({r:'a',t:c==='cancelled'?((e.text?askVisible(e.text)+' ':'')+'(durduruldu)'):c==='not_granted'?'Yapay zekâ kullanımına izin verilmedi. Sayfanın izinlerinden Claude\'a izin verirsen asistan çalışır.':c==='rate_limited'?'Çok sık istek gitti ya da kullanım sınırına gelindi. Biraz sonra tekrar dene.'+(window.__atlSTT&&e&&e.message?`\n\nGoogle’ın cevabı: ${e.message}`:''):c==='sampling_disabled'?'Bu hesapta yapay zekâ kapalı görünüyor.':'Bir sorun oldu, cevap gelmedi. Aynı mesajı tekrar gönderebilirsin.'+(window.__atlSTT&&e&&e.message&&c!=='cancelled'?`\n\nGoogle’ın cevabı: ${e.message}`:''),acts:[],err:c!=='cancelled',retry:c!=='cancelled'&&c!=='not_granted'&&c!=='sampling_disabled'?text:''});
   }finally{ASK.busy=false;ASK.ctl=null;ASK.live='';askSave();askRender(true);paintComposer()}
 }
 /* ---- Görünüm ---- */
