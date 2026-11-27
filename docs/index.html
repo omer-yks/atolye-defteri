@@ -671,7 +671,60 @@ dialog[open] .dlg-b>*:nth-child(n+7){animation-delay:.4s}
 .mix-h{display:flex;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;align-items:baseline}
 .mix-h b{font-weight:700}
 .mix-h span{font-size:.78rem;color:var(--mute)}
-.mpart{background:var(--soft);border-radius:12px;padding:10px;display:grid;gap:6px}
+.mpart{background:var(--soft);border-radius:18px;padding:12px;display:grid;gap:10px;animation:fadeUp .35s calc(var(--i,0)*50ms) both}
+.mph{display:flex;align-items:center;gap:8px;padding:2px 2px 0 4px}
+.mph .nm{flex:1;min-width:0;display:grid;line-height:1.25}.mph .nm b{font-weight:700;overflow-wrap:anywhere}
+.mph .msum{margin:0;font-size:.76rem;color:var(--mute)}.mph .msum .w{color:var(--today);font-weight:600;white-space:nowrap}
+.mqty{display:inline-flex;align-items:center;gap:6px;border:0;background:var(--surface);border-radius:99px;padding:6px 12px;font-weight:700;font-size:.88rem;color:var(--ink);white-space:nowrap;box-shadow:0 1px 2px rgba(20,30,50,.07);transition:box-shadow .2s}
+button.mqty:hover{box-shadow:0 0 0 1.5px var(--accent)}
+.mqty .ic{width:13px;height:13px;color:var(--mute)}
+.mqty.st{background:transparent;box-shadow:none;color:var(--mute);font-weight:600}
+.mqty.ed{padding:3px;gap:2px;animation:fadeUp .2s both}
+.mqty.ed b{min-width:64px;text-align:center}
+.mqty.ed button{border:0;width:30px;height:30px;border-radius:50%;background:var(--soft);color:var(--accent);font-weight:800;font-size:1rem;display:grid;place-items:center}
+.mqty.ed button:hover{background:var(--accent-soft)}
+.mqty.ed button.ok{background:var(--accent);color:var(--on-accent);font-size:.85rem}
+.mpx,.mdx{border:0;background:transparent;color:var(--mute);width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:none}
+.mpx:hover,.mdx:hover{background:var(--late-bg);color:var(--late)}
+.mpx .ic,.mdx .ic{width:14px;height:14px}
+.mtiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:10px}
+.mix{container-type:inline-size}
+.mtile{background:var(--surface);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(20,30,50,.05),0 6px 16px rgba(20,30,50,.04);display:grid;align-content:start}
+.mtw{display:flex;align-items:center;gap:2px;padding-right:6px;background:color-mix(in srgb,var(--h) 20%,var(--surface));border-bottom:1px solid color-mix(in srgb,var(--h) 38%,var(--line));transition:background .25s}
+.mtop{flex:1;min-width:0;display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:10px 6px 10px 12px;text-align:left;color:var(--ink)}
+.mtop .ft{flex:1;min-width:0;display:grid;line-height:1.2}
+.mtop .ft b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mtop .ft small{font-size:.72rem;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mtop .chev{width:15px;height:15px;color:var(--mute);transition:transform .2s}
+.mtop:hover .chev{transform:translateY(2px);color:var(--ink)}
+.mspool{width:28px;height:28px;flex:none;border-radius:50%;background:radial-gradient(circle,var(--surface) 0 27%,rgba(0,0,0,.1) 28% 31%,var(--h) 32% 100%);box-shadow:inset 0 0 0 1px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.12)}
+.mtop.empty .mspool{background:transparent;box-shadow:none;border:2px dashed var(--line-2)}
+.mtop.empty .ft b{color:var(--accent)}
+.mtile.nohex .mtw{background:var(--soft);border-bottom-color:var(--line)}
+.mnums{display:grid;grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr);gap:4px;align-items:end;padding:10px 12px 8px}
+.mnums label,.mto{display:grid;gap:4px;min-width:0}
+.mnums label>span:first-child,.mto>span{font-size:.68rem;font-weight:700;color:var(--mute)}
+.mto{text-align:right}
+.mto b{font-weight:800;font-size:1.02rem;padding:7px 2px;font-variant-numeric:tabular-nums;white-space:nowrap}.mto b small,.mnums .gw em{font-size:.74rem;color:var(--mute);font-weight:600;font-style:normal}
+.mnums .gw{display:flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0 9px;transition:border-color .2s,box-shadow .2s}
+.mnums .gw:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.mnums .gw input{border:0;background:transparent;outline:0;min-width:0;width:100%;text-align:right;font-weight:800;font-size:1.02rem;padding:6px 0;color:var(--ink);font-variant-numeric:tabular-nums}
+.mnums .ar{color:var(--line-2);text-align:center;padding-bottom:9px}
+.mst{margin:0 12px 12px;border-radius:10px;padding:6px 9px;font-size:.74rem;line-height:1.35;font-weight:700;display:flex;gap:6px;align-items:flex-start;background:var(--soft);color:var(--mute);transition:background .25s,color .25s}
+.mst:before{content:'';width:7px;height:7px;margin-top:.33em;border-radius:50%;background:currentColor;flex:none}
+.mst.ok{color:var(--ok);background:var(--ok-bg)}.mst.no{color:var(--late);background:var(--late-bg)}
+.maddt{display:grid;place-items:center;align-content:center;gap:2px;border:1.5px dashed var(--line-2);border-radius:16px;background:transparent;color:var(--accent);font-weight:700;font-size:.88rem;min-height:150px;transition:border-color .2s,background .2s}
+.maddt small{color:var(--mute);font-weight:600;font-size:.72rem}
+.maddt:hover{border-color:var(--accent);background:var(--accent-soft)}
+.maddt.wide{grid-column:1 / -1;min-height:52px}.maddt.wide small{display:none}
+.mfoot{display:flex;flex-wrap:wrap;gap:8px}
+.mfoot .mpnew{position:relative;display:inline-flex}
+.mfoot .mpn-l,.mback{display:inline-flex;align-items:center;border:1.5px dashed var(--line-2);border-radius:12px;padding:9px 13px;font-weight:700;font-size:.86rem;color:var(--accent);background:transparent;transition:border-color .2s,background .2s}
+.mfoot .mpnew:hover .mpn-l,.mback:hover{border-color:var(--accent);background:var(--accent-soft)}
+.mfoot .mpnew select{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.mfoot .mpnew:focus-within .mpn-l{box-shadow:0 0 0 3px var(--accent-soft);border-color:var(--accent)}
+.mback{color:var(--mute)}
+@container (max-width:440px){.mtiles{grid-template-columns:1fr}.maddt{min-height:52px}.maddt small{display:none}}
 .mpt{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap}
 .mpdel{border:0;background:transparent;color:var(--mute);font-weight:600;font-size:.76rem;padding:2px 6px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
 .mpdel:hover{background:var(--late-bg);color:var(--late)}
@@ -2967,14 +3020,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=1.97-1795808059"></script>
+<script src="shim.js?v=1.98-1795810917"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.97',VERDATE='14 Kasım 2026';
+const VERSION='1.98',VERDATE='27 Kasım 2026';
 const CHANGES=[
+  ['1.98',['Renk ve filament yeniden tasarlandı: her parça kendi kutusunda, her renk makara renginde ayrı bir kart','Kartta “1 adette 15,61 g → 60 adette 937 g” yan yana; altında depoda yetip yetmediği tek cümleyle','Set sayacı kalktı: parçanın adedi “60 adet ✎” ile değişir; yüzde yok','“Renk ekle” kartların yanında boş bir kutucuk; çıkarılan parçalar altta ↺ ile geri eklenir']],
   ['1.97',['Yeni ürün seçici: resimli, “Setler” ve “Ürünler” diye gruplu; setin parçaları, gram, süre ve maliyet görünür; yazdıkça süzülür, ok tuşları ve Enter ile seçilir (sipariş, satış, hesaplayıcı)']],
   ['1.96',['Sipariş > Bilgiler yeni tasarım: zaman çizgisi; Sipariş alındı → Ne yapılacak → Teslim → Ödeme, her adım kendi renginde kart; adet, kalan gün ve ödeme durumu başlıklarda']],
   ['1.95',['Siparişte “Acil sipariş” kutucuğu teslim tarihinin üstüne, başlığın yanına taşındı; alttaki boşluk kalktı']],
@@ -4122,27 +4176,62 @@ function colorOpts(sel){
   return '<option value="">Renk seç</option>'+brands().map(b=>seriesOf(b.id).map(x=>{const cs=colorsOf(x.id).sort((a,c)=>(st[c.id]||0)-(st[a.id]||0));return cs.length?`<optgroup label="${esc(b.name+' '+x.name)}">${cs.map(c=>`<option value="${c.id}"${c.id===sel?' selected':''}>${esc(c.name)} · ${fmtG(st[c.id]||0)}</option>`).join('')}</optgroup>`:''}).join('')).join('');
 }
 const mixQty=k=>k==='o'?oQtyEff():num($('sQty').value)||1;
+const MQE={s:-1,o:-1};
+const XIC='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+function mtopHTML(k,i,j,pt,l){
+  const at=`data-pick="${k}:${i}:${j}"`,c=l.c&&invGet(l.c);
+  if(c){const x=invGet(c.series),b=x&&invGet(x.brand);return `<button type="button" class="mtop" ${at} aria-label="${esc(pt.name)} ${j+1}. renk: ${esc(filName(l.c))}, değiştir"><i class="mspool"></i><span class="ft"><b>${esc(c.name)}</b><small>${esc([b&&b.name,x&&x.name].filter(Boolean).join(' '))}</small></span>${chev}</button>`}
+  if(l.want&&l.want.col)return `<button type="button" class="mtop" ${at} aria-label="${esc(pt.name)} ${j+1}. renk: ${esc(l.want.col)}, alınacak"><i class="mspool"></i><span class="ft"><b>${esc(l.want.col)}</b><small>${esc([l.want.b,l.want.s].filter(Boolean).join(' '))} · alınacak</small></span>${chev}</button>`;
+  return `<button type="button" class="mtop empty" ${at} aria-label="${esc(pt.name)} ${j+1}. renk: filament seçilmedi"><i class="mspool"></i><span class="ft"><b>Filament seç</b><small>seçmek için dokun</small></span>${chev}</button>`;
+}
 function renderMix(k){
   const box=$(k+'Mix'),M=MIX[k];
   if(!M||!M.parts.length){box.hidden=true;box.innerHTML='';return}
   M.parts.forEach(pt=>pt.lines.forEach(l=>{if(!l.c&&l.want){const c=wantCid(l.want);if(c){l.c=c;delete l.want}}}));
-  const noDepot=!brands().length;
+  if(MQE[k]>=M.parts.length)MQE[k]=-1;
+  const noDepot=!brands().length,full=fullParts(k);
   box.hidden=false;
-  box.innerHTML=`<div class="mix-h"><b>Renk ve filament</b><span>${k==='s'?'1 adet için gram yaz; adetle çarpılıp toplanır':'1 adet için gram yaz; adetle çarpılıp depodan düşer'}</span></div>
+  const off=(M.off||[]),rem=off.length?full.filter(p=>off.includes(p.pid)):[];
+  const L=mine('library').filter(x=>!x.set).sort((a,b)=>String(a.name).localeCompare(String(b.name),'tr'));
+  box.innerHTML=`<div class="mix-h"><b>Renk ve filament</b><span>gramı 1 adet için yaz</span></div>
     ${noDepot?'<span class="k" style="font-size:.84rem;color:var(--mute)">Depoda henüz filament yok. Renk seçerken “Depoda yok · alınacak” ile fiyat listendeki ürünlerden seçebilirsin.</span>':''}
-    ${(()=>{const off=M.off||[];if(!off.length)return '';const rem=fullParts(k).filter(p=>off.includes(p.pid));return rem.length?`<div class="moff"><span>${k==='s'?'Bu satışta yok':'Bu siparişte yok'}:</span>${rem.map(p=>`<button type="button" data-mpadd="${esc(p.pid)}" title="Geri ekle">+ ${esc(p.name)}</button>`).join('')}</div>`:''})()}
-    ${M.parts.map((pt,i)=>`<div class="mpart" data-mi="${i}">
-      <div class="mpt"><b>${esc(pt.name)}</b>${M.parts.length>1||(+pt.per||1)>1?`<span class="mper" title="1 sette kaç tane"><button type="button" data-mper="${i}" data-d="-1" aria-label="Azalt">−</button><b>${nf.format(+pt.per||1)}</b><button type="button" data-mper="${i}" data-d="1" aria-label="Artır">+</button><small>sette</small></span>`:''}<span class="chip info" data-mcount="${i}"></span><span class="msum" data-msum="${i}"></span>${M.parts.length>1&&!fullParts(k).some(p=>p.pid===pt.pid)?`<button type="button" class="mpdel" data-mprm="${i}" title="Bu parçayı çıkar" aria-label="${esc(pt.name)} parçasını çıkar"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>Çıkar</button>`:''}${M.parts.length>1&&fullParts(k).some(p=>p.pid===pt.pid)?`<button type="button" class="mpdel" data-mpdel="${i}" title="Bu parçayı çıkar" aria-label="${esc(pt.name)} parçasını çıkar"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>Çıkar</button>`:''}</div>
-      ${pt.lines.map((l,j)=>`<div class="mline">${fpickBtn(l.c,`data-pick="${k}:${i}:${j}"`,`${esc(pt.name)} ${j+1}. renk`,l.want)}
-        <span class="gw"><input data-mi="${i}" data-mj="${j}" data-mk="g" inputmode="decimal" value="${esc(inStr(l.g))}" aria-label="${esc(pt.name)} ${j+1}. renk gramı"><span>g</span></span>
-        ${pt.lines.length>1?`<button type="button" class="ldel" data-mdel="${i}:${j}" aria-label="Bu rengi çıkar">${'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'}</button>`:'<span></span>'}
-      </div>`).join('')}
-      ${pt.lines.length<MAXF?`<button type="button" class="maddc" data-madd="${i}">+ Renk ekle</button>`:''}
-    </div>`).join('')}
-    ${(()=>{const L=mine('library').filter(x=>!x.set).sort((a,b)=>String(a.name).localeCompare(String(b.name),'tr'));return L.length?`<label class="mpnew"><span class="sr">Parça ekle</span><select data-mpnew data-nodirty><option value="">+ Parça ekle (kütüphaneden)</option>${L.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}${+x.g?` · ${fmtG(+x.g)}`:''}</option>`).join('')}</select></label>`:''})()}
+    ${M.parts.map((pt,i)=>{const multi=M.parts.length>1||(+pt.per||1)>1,ed=MQE[k]===i,inFull=full.some(p=>p.pid===pt.pid);
+      return `<div class="mpart" data-mi="${i}" style="--i:${i}">
+      <div class="mph"><span class="nm"><b>${esc(pt.name)}</b><small class="msum" data-msum="${i}"></small></span>
+        ${multi?(ed?`<span class="mqty ed"><button type="button" data-mper="${i}" data-d="-1" aria-label="Azalt">−</button><b data-mcount="${i}"></b><button type="button" data-mper="${i}" data-d="1" aria-label="Artır">+</button><button type="button" class="ok" data-mqe="${i}" aria-label="Tamam">✓</button></span>`
+          :`<button type="button" class="mqty" data-mqe="${i}" title="Adedi değiştir"><b data-mcount="${i}"></b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/></svg></button>`)
+          :`<span class="mqty st"><b data-mcount="${i}"></b></span>`}
+        ${M.parts.length>1?`<button type="button" class="mpx" ${inFull?`data-mpdel="${i}"`:`data-mprm="${i}"`} title="Bu parçayı çıkar" aria-label="${esc(pt.name)} parçasını çıkar">${XIC}</button>`:''}
+      </div>
+      <div class="mtiles">${pt.lines.map((l,j)=>{const hx=hexOfCid(l.c,l.want);return `<div class="mtile${hx?'':' nohex'}" style="--h:${hx||'#B9BEC7'}">
+        <div class="mtw">${mtopHTML(k,i,j,pt,l)}${pt.lines.length>1?`<button type="button" class="mdx" data-mdel="${i}:${j}" aria-label="Bu rengi çıkar">${XIC}</button>`:''}</div>
+        <div class="mnums"><label><span>1 adette</span><span class="gw"><input data-mi="${i}" data-mj="${j}" data-mk="g" inputmode="decimal" value="${esc(inStr(l.g))}" aria-label="${esc(pt.name)} ${j+1}. renk, 1 adette gram"><em>g</em></span></label>
+          <span class="ar" aria-hidden="true">→</span><span class="mto"><span data-mlt="${i}:${j}"></span><b data-mlv="${i}:${j}"></b></span></div>
+        <div class="mst" data-mst="${i}:${j}"></div>
+      </div>`}).join('')}
+      ${pt.lines.length<MAXF?`<button type="button" class="maddt${pt.lines.length%2===0?' wide':''}" data-madd="${i}"><span>＋ Renk ekle</span><small>bu parçaya başka renk</small></button>`:''}</div>
+    </div>`}).join('')}
+    <div class="mfoot">${L.length?`<label class="mpnew"><span class="sr">Parça ekle</span><span class="mpn-l" aria-hidden="true">＋ Parça ekle</span><select data-mpnew data-nodirty><option value="">Kütüphaneden parça seç</option>${L.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}${+x.g?` · ${fmtG(+x.g)}`:''}</option>`).join('')}</select></label>`:''}
+      ${rem.map(p=>`<button type="button" class="mback" data-mpadd="${esc(p.pid)}" title="${k==='s'?'Bu satışa':'Bu siparişe'} geri ekle">↺ ${esc(p.name)}</button>`).join('')}</div>
     <div class="mtot" data-mtot></div>
     ${k==='o'?'':`<div class="fcw"><button type="button" class="fcalc-btn" data-fcalc aria-expanded="${!!FCALC[k]}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h2M14 10h2M8 14h2M14 14h2M8 18h2M14 18h2"/></svg>Filament hesapla</button><div data-fcbox></div></div>`}`;
   mixTotals(k);
+}
+/* Her renk kartı için: bu parçada kaç gram, depoda yetiyor mu */
+function mixLineStock(k,q,plog,prev,recNow){
+  const st=stockMap(),M=MIX[k],pool={},out={};
+  let cov={},own={},pend={};
+  if(k==='o'){cov=orderCovered(recNow,ORES||undefined);pend=ORES?sumByGroup(ORES):{};own=ORES?sumByGroup(recNow&&recNow.reserved||{}):{}}
+  const get=gk=>{if(!pool[gk]){let h=groupStock(gk,st);
+      if(k==='o')h=Math.max(0,h+(own[gk]||0)-(pend[gk]||0))+(cov[gk]||0);
+      else h+=prev.filter(x=>x&&x.c&&gkeyCid(x.c)===gk).reduce((a,x)=>a+(+x.g||0),0);
+      pool[gk]={left:h,tot:h,inDep:groupCids(gk).length>0||h>0}}return pool[gk]};
+  M.parts.forEach((pt,i)=>{const cnt=(+pt.per||1)*q,made=k==='o'&&plog.length?plog.filter(l=>l.ok&&l.part===pt.pid).reduce((a,l)=>a+l.n,0):0,rest=Math.max(0,cnt-made);
+    pt.lines.forEach((l,j)=>{const cid=lineCid(l),need=(+l.g||0)*rest,key=i+':'+j;
+      if(!cid){out[key]={kind:l.want&&l.want.col?'want':'none',need,cnt,rest};return}
+      const p=get(gkeyCid(cid)),use=Math.min(need,p.left);p.left-=use;out[key]={kind:'c',need,short:need-use,tot:p.tot,inDep:p.inDep,cnt,rest}});
+  });
+  return out;
 }
 function mixTotals(k){
   const box=$(k+'Mix'),M=MIX[k];if(!M||box.hidden)return;
@@ -4152,10 +4241,22 @@ function mixTotals(k){
   M.parts.forEach((pt,i)=>{
     const cnt=(+pt.per||1)*q,sum=pt.lines.reduce((a,l)=>a+(+l.g||0),0);
     const c=box.querySelector(`[data-mcount="${i}"]`);if(c)c.textContent=`${nf.format(cnt)} adet`;
-    const m=box.querySelector(`[data-msum="${i}"]`);if(m){m.textContent=`1 adet ${nf.format(r2(sum))} g${pt.lg&&Math.abs(sum-pt.lg)>0.5?` · kütüphanede ${nf.format(pt.lg)} g`:''}`;m.classList.toggle('warn',!!(pt.lg&&Math.abs(sum-pt.lg)>0.5))}
+    const m=box.querySelector(`[data-msum="${i}"]`);if(m){const w=pt.lg&&Math.abs(sum-pt.lg)>0.5;m.innerHTML=`1 adet ${nf.format(r2(sum))} g · ${nf.format(cnt)} adet ${fmtG(sum*cnt)}${w?` · <span class="w" title="Kütüphanedeki gram farklı">kütüphanede ${nf.format(pt.lg)} g</span>`:''}`}
   });
   const rec=k==='s'?editSale:editOrder,st=stockMap();
   const recNow=k==='o'&&rec?(S.orders.find(x=>x.id===rec.id)||rec):null,plog=recNow&&recNow.prod?recNow.prod.log||[]:[];
+  {const prv=rec?(k==='o'?[]:(rec.deduct===false?[]:[rec.use,...(rec.uses||[])])).filter(Boolean):[],ls=mixLineStock(k,q,plog,prv,recNow);
+    Object.entries(ls).forEach(([key,r])=>{const [i,j]=key.split(':').map(Number),l=M.parts[i]&&M.parts[i].lines[j];if(!l)return;
+      const lt=box.querySelector(`[data-mlt="${key}"]`),lv=box.querySelector(`[data-mlv="${key}"]`),ms=box.querySelector(`[data-mst="${key}"]`);
+      if(lt)lt.textContent=r.rest<r.cnt?`kalan ${nf.format(r.rest)} adette`:`${nf.format(r.cnt)} adette`;
+      if(lv)lv.innerHTML=fmtG((+l.g||0)*r.rest).replace(/ (k?g)$/,' <small>$1</small>');
+      if(!ms)return;let cls='mute',t;
+      if(r.kind==='none')t='Önce filament seç';
+      else if(r.kind==='want'){cls=r.need>0.5?'no':'mute';t=r.need>0.5?`${fmtG(r.need)} eksik · depoda yok`:'Depoda yok · alınacak'}
+      else if(r.need<=0.5)t=r.tot>0.5?`Depoda ${fmtG(r.tot)} var`:'Depoda yok';
+      else if(r.short<=0.5){cls='ok';t=`Yeter · depoda ${fmtG(r.tot)} var`}
+      else{cls='no';t=r.tot>0.5?`${fmtG(r.short)} eksik · depoda ${fmtG(r.tot)}`:`${fmtG(r.short)} eksik · depoda yok`}
+      ms.className='mst '+cls;ms.textContent=t});}
   let uses;
   if(k==='o'&&plog.length){const m={};M.parts.forEach(pt=>{const made=plog.filter(l=>l.ok&&l.part===pt.pid).reduce((a,l)=>a+l.n,0),rest=Math.max(0,(+pt.per||1)*q-made);pt.lines.forEach(l=>{if(l.c&&+l.g>0)m[l.c]=(m[l.c]||0)+(+l.g)*rest})});uses=Object.entries(m).map(([c,g])=>({c,g:r2(g)})).filter(u=>u.g>0)}
   else uses=mixUses(M.parts,q);
@@ -4295,11 +4396,12 @@ function fcalcBuy(k){
 });
 ['s','o'].forEach(k=>{const box=$(k+'Mix'),dirty=()=>{(k==='s'?$('dSale'):$('dOrder')).dataset.dirty='1'};
   box.addEventListener('click',e=>{
+    const qe=e.target.closest('[data-mqe]');if(qe){const i=+qe.dataset.mqe;MQE[k]=MQE[k]===i?-1:i;renderMix(k);const f=box.querySelector(MQE[k]===i?`[data-mper="${i}"][data-d="1"]`:`[data-mqe="${i}"]`);if(f)f.focus();return}
     const pp=e.target.closest('[data-mper]');if(pp){const pt=MIX[k]&&MIX[k].parts[+pp.dataset.mper];if(!pt)return;pt.per=Math.max(1,(+pt.per||1)+(+pp.dataset.d));renderMix(k);dirty();return}
     const rm=e.target.closest('[data-mprm]');if(rm){const M=MIX[k],pt=M&&M.parts[+rm.dataset.mprm];if(!pt||M.parts.length<2)return;M.parts.splice(+rm.dataset.mprm,1);renderMix(k);dirty();toast(`${pt.name} çıkarıldı`)}
   });
   box.addEventListener('change',e=>{const sel=e.target.closest('[data-mpnew]');if(!sel||!sel.value||!MIX[k])return;const it=libById(sel.value);sel.value='';if(!it)return;
-    const M=MIX[k],ex=M.parts.find(p=>p.pid===it.id);if(ex){ex.per=(+ex.per||1)+1;toast(`${it.name}: sette ${ex.per} oldu`)}else{const np=blankMix(defaultMix(it))[0];if(!np)return;M.parts.push({...np,per:1});M.off=(M.off||[]).filter(x=>x!==it.id);toast(`${it.name} eklendi`)}
+    const M=MIX[k],ex=M.parts.find(p=>p.pid===it.id);if(ex){ex.per=(+ex.per||1)+1;toast(`${it.name}: ${nf.format(ex.per*mixQty(k))} adet oldu`)}else{const np=blankMix(defaultMix(it))[0];if(!np)return;M.parts.push({...np,per:1});M.off=(M.off||[]).filter(x=>x!==it.id);toast(`${it.name} eklendi`)}
     renderMix(k);dirty();k==='s'?saleLib():orderLib()});
 });
 $('sQty').addEventListener('input',()=>mixTotals('s'));$('oQty').addEventListener('input',()=>mixTotals('o'));
