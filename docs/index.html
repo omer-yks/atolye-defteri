@@ -1110,6 +1110,15 @@ table:has(.exb){min-width:560px}
 .cdbar.ok i{background:var(--ok)}
 .cdparts{display:grid;gap:4px;margin-top:6px}.cdparts div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;font-size:.78rem;color:var(--mute)}.cdparts b{color:var(--ink);font-weight:700}
 .cdpane{animation:fadeUp .3s both}
+.cdord{background:var(--soft);border-radius:14px;padding:12px 14px;display:grid;gap:10px;cursor:pointer;transition:background .2s,box-shadow .2s;animation:fadeUp .3s both;animation-delay:calc(var(--i) * 50ms)}
+.cdord:hover{box-shadow:0 0 0 2px var(--accent-soft)}
+.cdord-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.cdord-h .t{flex:1;min-width:0;font-weight:700;font-size:1rem;overflow-wrap:anywhere}.cdord-h .p{font-weight:700;white-space:nowrap}
+.cdord-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.cdord-g div{background:var(--surface);border-radius:10px;padding:8px 10px;min-width:0}
+.cdord-g small{display:block;font-size:.72rem;color:var(--mute)}.cdord-g b{font-weight:700;font-size:.92rem;overflow-wrap:anywhere}.cdord-g em{display:block;font-style:normal;font-size:.72rem;color:var(--mute)}
+.cdord.done{opacity:.75}
+@media (max-width:640px){.cdord-g{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cdpane .cdback{justify-self:start;font-size:.84rem}
 .cdpane .cdstats{margin-bottom:4px}
 .cdpane h4{margin-top:6px}
 .favs2{display:flex;flex-wrap:wrap;gap:6px}
@@ -2663,15 +2672,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 <dialog id="dCust" aria-labelledby="dCustT">
   <form method="dialog" id="fCust" novalidate>
     <div class="dlg-h"><div><h3 id="dCustT">Müşteri</h3><p id="dCustTs"></p></div><button type="button" class="x" data-close aria-label="Kapat"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-    <div class="otabs" id="cdTabs" hidden><div class="period seg" role="tablist" aria-label="Müşteri bölümleri"><span class="seg-ind" aria-hidden="true"></span><button type="button" role="tab" data-cdt="cost" aria-selected="false">Maliyet</button><button type="button" role="tab" data-cdt="info" aria-selected="true">Bilgiler</button><button type="button" role="tab" data-cdt="prod" aria-selected="false">Üretim <span id="cdTProd" style="opacity:.7;font-weight:500"></span></button><button type="button" role="tab" data-cdt="pay" aria-selected="false">Ödeme <span id="cdTPay" style="opacity:.7;font-weight:500"></span></button></div></div>
+    <div class="otabs" id="cdTabs" hidden><div class="period seg" role="tablist" aria-label="Müşteri bölümleri"><span class="seg-ind" aria-hidden="true"></span><button type="button" role="tab" data-cdt="cost" aria-selected="false">Maliyet</button><button type="button" role="tab" data-cdt="prod" aria-selected="false">Üretim <span id="cdTProd" style="opacity:.7;font-weight:500"></span></button><button type="button" role="tab" data-cdt="pay" aria-selected="false">Ödeme <span id="cdTPay" style="opacity:.7;font-weight:500"></span></button></div></div>
     <div class="dlg-b">
       <div class="cdtop" id="cdTop"></div>
       <div class="cdstats" id="cdStats"></div>
       <div class="f cdinfo"><label for="cdName">Ad</label><input id="cdName" autocomplete="off" placeholder="ör. Ömer Abi"></div>
       <div class="f cdinfo"><label for="cdPhone">Telefon</label><div class="phone"><input id="cdPhone" inputmode="tel" autocomplete="off" placeholder="05xx xxx xx xx"><button type="button" class="btn" id="cdCopy" title="Numarayı kopyala">Kopyala</button></div></div>
+      <div class="cdsec cdinfo" id="cdOpen"></div>
       <div class="f w cdinfo"><label for="cdNote">Not</label><input id="cdNote" autocomplete="off" placeholder="Adres, Instagram, sevdiği renkler…"></div>
       <label class="cd-free w cdinfo"><input type="checkbox" id="cdFree"><span><b>Ücret almıyorum (aile, yakın)</b><small>Bu kişinin işlerinde sadece maliyet görünür; kazanç, satış tablosu ve grafiklere girmez.</small></span></label>
-      <div class="cdsec cdinfo" id="cdOpen"></div>
       <div class="cdsec cdinfo" id="cdFav"></div>
       <div class="cdsec cdinfo" id="cdHist"></div>
       <div class="cdsec cdpane" id="cdPane" hidden></div>
@@ -2812,7 +2821,7 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=1.84-1795798989"></script>
+<script src="shim.js?v=1.84-1795799481"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
@@ -2820,7 +2829,7 @@ const MAXF=16;
 document.documentElement.lang='tr';
 const VERSION='1.84',VERDATE='14 Kasım 2026';
 const CHANGES=[
-  ['1.84',['Müşteri penceresi: bekleyen siparişlerde sipariş tarihi, adet, teslim, üretim ve ödeme ilk bakışta görünür; toplu siparişlerde aynı ürünler birleşir','Müşteri penceresinin üstünde sipariş penceresindeki gibi Maliyet · Bilgiler · Üretim · Ödeme sekmeleri; + Satış ve + Sipariş her sekmede altta: sipariş sipariş maliyet ve kâr, parça parça üretim ilerlemesi, ödenen/kalan ve ödeme geçmişi']],
+  ['1.84',['Müşteri penceresi: adın ve telefonun altında “Siparişler”: her sipariş için ürün ve adet (ör. 30 × Kurumsal Set), sipariş alınma tarihi, istenen teslim tarihi, üretim ve ödeme','Müşteri penceresinin üstünde Maliyet · Üretim · Ödeme sekmeleri (açılış sayfası bilgiler; seçili sekmeye tekrar basınca geri döner); + Satış ve + Sipariş her sekmede altta: sipariş sipariş maliyet ve kâr, parça parça üretim ilerlemesi, ödenen/kalan ve ödeme geçmişi']],
   ['1.83',['Yapay zekâ: hesabında açık olan Gemini modelini kendisi bulur, biri çalışmazsa sıradakini dener','Ayarlar > Yapay zekâ: “Kaydet ve dene”; çalışmazsa Google’ın gerçek hata mesajı görünür']],
   ['1.82',['Ana sayfa: Masraflar kartına baskı maliyeti eklendi; üzerine gelince ne için harcandığı sipariş sipariş, ürün ürün görünür (filament alımı stoğa sayılır, iki kez sayılmaz)','Baskılar grafiği: yeni Çizgi ve Alan türleri, Maliyet ölçüsü, ortalama çizgisi ve özet kutuları, yenilenen görünüm','Grafikte Asistan: ne görmek istediğini yaz ya da boş bırak, grafiği kendisi ayarlar ve kısa bir yorum yazar','Sadeleştirme: grafik türleri simgeyle, özet tek satırda; masraf dökümü daha kısa']],
   ['1.81',['Ayarlar: “Mikrofon ve sesle yazma” bölümü; mikrofonu dene, sorun neyse ve nereden açılacağı yazar']],
@@ -6356,10 +6365,22 @@ function ordWhat(o){
   return `${o.item||'Sipariş'}${+o.qty>1?` ×${nf.format(o.qty)}`:''}`;
 }
 let CDTAB='info';
+const fmtLong=s=>s?new Intl.DateTimeFormat('tr-TR',{day:'numeric',month:'long',year:'numeric'}).format(D(s)):'—';
+function ordTitle(o){
+  if(Array.isArray(o.lines)&&o.lines.length>1){const m=new Map();o.lines.forEach(l=>{const k=lc(l.item||''),x=m.get(k)||{n:l.item||'Ürün',q:0};x.q+=+l.qty||0;m.set(k,x)});return [...m.values()].map(x=>`${nf.format(x.q)} × ${x.n}`).join(' · ')}
+  return `${nf.format(+o.qty||1)} × ${o.item||'Sipariş'}`;
+}
+function cdOrdCard(o,t,i,free){
+  const pg=prodProgress(o),pr=+o.price||0,pd=paidOf(o),done=o.status==='done';
+  const dn=o.due?diffDays(o.due,t):null,dueSub=done?`teslim edildi${o.doneAt?' · '+fmtDay(o.doneAt):''}`:dn==null?'':dn<0?`${-dn} gün gecikti`:dn===0?'bugün':`${dn} gün kaldı`;
+  const pay=free?'ücretsiz':!pr?'—':pd>=pr-0.009?'✓ ödendi':pd>0?`${tl(pd)} alındı`:'ödenmedi';
+  return `<div class="cdord${done?' done':''}" data-cdo="${o.id}" style="--i:${i}" tabindex="0" role="button"><div class="cdord-h"><span class="t">${esc(ordTitle(o))}</span>${done?'<span class="chip ok">Teslim edildi</span>':o.due&&o.due<t?'<span class="chip late">Gecikti</span>':''}${pr&&!free?`<span class="p">${tl(pr)}</span>`:''}</div>
+    <div class="cdord-g"><div><small>Sipariş alındı</small><b>${fmtLong(o.created)}</b></div><div><small>İstenen teslim</small><b>${o.due?fmtLong(o.due):'tarih yok'}</b>${dueSub?`<em>${dueSub}</em>`:''}</div><div><small>Üretim</small><b>${pg.target?`${nf.format(pg.done)} / ${nf.format(pg.target)}`:'—'}</b><em>parça</em></div><div><small>Ödeme</small><b style="${!free&&pr&&pd<pr-0.009?'color:var(--late)':''}">${pay}</b>${!free&&pr&&pd<pr-0.009?`<em>${tl(pr-pd)} kaldı</em>`:''}</div></div></div>`;
+}
 function cdPaint(){
   const box=$('cdTabs').querySelector('.seg');box.querySelectorAll('[data-cdt]').forEach(b=>b.setAttribute('aria-selected',b.dataset.cdt===CDTAB));placeInd(box);
   const info=CDTAB==='info';$('dCust').querySelectorAll('.cdinfo').forEach(el=>el.hidden=!info);$('cdPane').hidden=info;
-  if(!info&&CUR)$('cdPane').innerHTML=CDTAB==='cost'?cdCostHTML(CUR):CDTAB==='prod'?cdProdHTML(CUR):cdPayHTML(CUR);
+  if(!info&&CUR)$('cdPane').innerHTML=`<button type="button" class="lnk cdback" data-cdback>← Müşteri bilgileri</button>`+(CDTAB==='cost'?cdCostHTML(CUR):CDTAB==='prod'?cdProdHTML(CUR):cdPayHTML(CUR));
   $('cdStats').hidden=!CUR||!info;$('cdTop').hidden=!CUR||!info;
   if(info){$('cdOpen').hidden=!$('cdOpen').innerHTML;$('cdFav').hidden=!$('cdFav').innerHTML;$('cdHist').hidden=!$('cdHist').innerHTML}
 }
@@ -6367,7 +6388,7 @@ function cdOrders(c){return c.orders.slice().sort((a,b)=>(a.status==='done')-(b.
 function cdCostHTML(c){
   const t=todayISO();let tc=0,tp=0,unk=0;
   const rows=cdOrders(c).map(o=>{const C=orderCost(o),cost=C?C.cost:null,price=c.free?0:+o.price||0;if(cost==null)unk++;else tc+=cost;tp+=price;const pr=price-(cost||0);
-    return `<div class="cdrow" data-cdo="${o.id}"><span class="chip">${o.created?fmtDay(o.created):'—'}</span><span class="w">${esc(ordWhat(o))}<span class="meta"><span>${nf.format(ordQty(o))} adet</span>${C?`<span>${fmtG(C.g)} filament</span><span>${hm(C.hrs)} baskı</span>`:''}<span>${o.status==='done'?'teslim edildi':'bekliyor'}</span></span></span><span class="a">${cost==null?'—':tl(cost)}${!c.free&&price?`<small>fiyat ${tl(price)} · <span class="${pr>=0?'ok':'late'}" style="color:var(--${pr>=0?'ok':'late'})">${pr>=0?'+':'−'}${tl(Math.abs(pr))}</span></small>`:''}</span></div>`});
+    return `<div class="cdrow" data-cdo="${o.id}"><span class="chip">${o.created?fmtDay(o.created):'—'}</span><span class="w">${esc(ordTitle(o))}<span class="meta"><span>${nf.format(ordQty(o))} adet</span>${C?`<span>${fmtG(C.g)} filament</span><span>${hm(C.hrs)} baskı</span>`:''}<span>${o.status==='done'?'teslim edildi':'bekliyor'}</span></span></span><span class="a">${cost==null?'—':tl(cost)}${!c.free&&price?`<small>fiyat ${tl(price)} · <span class="${pr>=0?'ok':'late'}" style="color:var(--${pr>=0?'ok':'late'})">${pr>=0?'+':'−'}${tl(Math.abs(pr))}</span></small>`:''}</span></div>`});
   const sr=c.sales.slice().sort((a,b)=>a.date<b.date?1:-1).map(x=>{const cost=+x.cost||0,amt=c.free?0:+x.amt||0;tc+=cost;tp+=amt;const pr=amt-cost;
     return `<div class="cdrow" data-cdr="s:${x.id}"><span class="chip">${fmtDay(x.date)}</span><span class="w">${esc(x.item||'Satış')}<span class="meta"><span>${nf.format(+x.qty||1)} adet</span><span>satış</span></span></span><span class="a">${tl(cost)}${amt?`<small>tutar ${tl(amt)} · <span style="color:var(--${pr>=0?'ok':'late'})">${pr>=0?'+':'−'}${tl(Math.abs(pr))}</span></small>`:''}</span></div>`});
   if(!rows.length&&!sr.length)return '<p class="help">Bu müşterinin henüz siparişi ya da satışı yok.</p>';
@@ -6383,16 +6404,16 @@ function cdProdHTML(c){
   let D=0,T=0,F=0;
   const rows=os.map(o=>{const pg=prodProgress(o),parts=prodPartsOf(o),log=(o.prod&&o.prod.log)||[];D+=pg.done;T+=pg.target;F+=pg.fails;const pct=pg.target?pg.done/pg.target*100:0;
     const pl=parts.length>1||parts[0].pid!=='_'?`<div class="cdparts">${parts.map(p=>{const d=Math.min(p.target,log.filter(l=>l.ok&&l.part===p.pid).reduce((a,l)=>a+l.n,0));return `<div><span>${esc(p.name)}</span><span><b>${nf.format(d)}</b> / ${nf.format(p.target)}</span></div>`}).join('')}</div>`:'';
-    return `<div class="cdrow" data-cdo="${o.id}">${dueChip(o,t)}<span class="w">${esc(ordWhat(o))}<span class="meta"><span>Sipariş ${o.created?fmtDay(o.created):'—'}</span><span><b>${nf.format(pg.done)}</b> / ${nf.format(pg.target)} parça</span>${pg.fails?`<span style="color:var(--late)">${pg.fails} hatalı baskı · ${fmtG(pg.fg)} fire</span>`:''}</span><div class="cdbar${pct>=99.95?' ok':''}"><i style="width:${pct.toFixed(1)}%"></i></div>${pl}</span><span class="a">%${Math.floor(pct)}</span></div>`});
+    return `<div class="cdrow" data-cdo="${o.id}">${dueChip(o,t)}<span class="w">${esc(ordTitle(o))}<span class="meta"><span>Sipariş ${o.created?fmtDay(o.created):'—'}</span><span><b>${nf.format(pg.done)}</b> / ${nf.format(pg.target)} parça</span>${pg.fails?`<span style="color:var(--late)">${pg.fails} hatalı baskı · ${fmtG(pg.fg)} fire</span>`:''}</span><div class="cdbar${pct>=99.95?' ok':''}"><i style="width:${pct.toFixed(1)}%"></i></div>${pl}</span><span class="a">%${Math.floor(pct)}</span></div>`});
   return `<div class="cdstats"><div><small>Üretilen</small><b>${nf.format(D)} / ${nf.format(T)}</b></div><div><small>Kalan parça</small><b>${nf.format(Math.max(0,T-D))}</b></div><div><small>Bekleyen sipariş</small><b>${os.length}</b></div><div><small>Hatalı baskı</small><b style="color:${F?'var(--late)':'inherit'}">${F}</b></div></div><h4>Bekleyen siparişler</h4>${rows.join('')}`;
 }
 function cdPayHTML(c){
   if(c.free)return '<p class="help">Bu müşteriden ücret alınmıyor; ödeme takibi yok. Maliyetler Maliyet sekmesinde.</p>';
   const os=cdOrders(c).filter(o=>+o.price>0);let B=0,P=0;
   const rows=os.map(o=>{const pr=+o.price||0,pd=Math.min(pr,paidOf(o)),rest=pr-pd;B+=pr;P+=pd;const pct=pr?pd/pr*100:0;
-    return `<div class="cdrow" data-cdo="${o.id}"><span class="chip ${rest<=0.009?'ok':pd>0?'today':'late'}">${rest<=0.009?'Ödendi':pd>0?'Kısmen':'Ödenmedi'}</span><span class="w">${esc(ordWhat(o))}<span class="meta"><span>Sipariş ${o.created?fmtDay(o.created):'—'}</span><span>Ödenen <b>${tl(pd)}</b> / ${tl(pr)}</span></span><div class="cdbar${pct>=99.95?' ok':''}"><i style="width:${pct.toFixed(1)}%"></i></div></span><span class="a ${rest>0.009?'late':'ok'}">${rest>0.009?tl(rest):'✓'}${rest>0.009?'<small>kalan</small>':''}</span></div>`});
+    return `<div class="cdrow" data-cdo="${o.id}"><span class="chip ${rest<=0.009?'ok':pd>0?'today':'late'}">${rest<=0.009?'Ödendi':pd>0?'Kısmen':'Ödenmedi'}</span><span class="w">${esc(ordTitle(o))}<span class="meta"><span>Sipariş ${o.created?fmtDay(o.created):'—'}</span><span>Ödenen <b>${tl(pd)}</b> / ${tl(pr)}</span></span><div class="cdbar${pct>=99.95?' ok':''}"><i style="width:${pct.toFixed(1)}%"></i></div></span><span class="a ${rest>0.009?'late':'ok'}">${rest>0.009?tl(rest):'✓'}${rest>0.009?'<small>kalan</small>':''}</span></div>`});
   c.sales.forEach(x=>{B+=+x.amt||0;P+=+x.amt||0});
-  const hist=[...c.orders.flatMap(o=>(o.pays||[]).map(p=>({d:p.d,a:+p.a||0,w:ordWhat(o),k:'Sipariş ödemesi',ref:'o',id:o.id}))),...c.sales.map(x=>({d:x.date,a:+x.amt||0,w:x.item||'Satış',k:'Satış',ref:'s',id:x.id}))].filter(h=>h.a>0).sort((a,b)=>(a.d||'')<(b.d||'')?1:-1);
+  const hist=[...c.orders.flatMap(o=>(o.pays||[]).map(p=>({d:p.d,a:+p.a||0,w:ordTitle(o),k:'Sipariş ödemesi',ref:'o',id:o.id}))),...c.sales.map(x=>({d:x.date,a:+x.amt||0,w:x.item||'Satış',k:'Satış',ref:'s',id:x.id}))].filter(h=>h.a>0).sort((a,b)=>(a.d||'')<(b.d||'')?1:-1);
   const rest=B-P,pct=B?P/B*100:0;
   return `<div class="cdstats"><div><small>Toplam tutar</small><b>${tl(B)}</b></div><div><small>Ödenen</small><b style="color:var(--ok)">${tl(P)}</b></div><div><small>Kalan</small><b style="color:${rest>0.009?'var(--late)':'inherit'}">${tl(rest)}</b></div><div><small>Ödeme oranı</small><b>%${Math.floor(pct)}</b></div></div>
     ${rows.length?`<h4>Siparişler</h4>${rows.join('')}`:''}
@@ -6409,7 +6430,8 @@ function openCust(key){
   if(c&&c.free)$('cdStats').innerHTML=`<div><small>Toplam maliyet</small><b>${tl(c.fcost)}</b></div><div><small>İş</small><b>${c.n}</b></div><div><small>Ortalama maliyet</small><b>${tl(c.n?c.fcost/c.n:0)}</b></div><div><small>Alınan para</small><b>0 ₺</b></div>`;
   else if(c)$('cdStats').innerHTML=`<div><small>Toplam harcama</small><b>${tl(c.spent)}</b></div><div><small>Alışveriş</small><b>${c.n}</b></div><div><small>Ortalama</small><b>${tl(c.n?c.spent/c.n:0)}</b></div><div><small>Alacak</small><b style="color:${c.owed>0.009?'var(--late)':'inherit'}">${tl(c.owed)}</b></div>`;
   // bekleyen siparişler
-  $('cdOpen').innerHTML=c&&c.open.length?`<h4>Bekleyen siparişler</h4>${c.open.sort((a,b)=>(a.due||'9999')<(b.due||'9999')?-1:1).map(o=>{const pg=prodProgress(o);return `<div class="cdrow" data-cdo="${o.id}">${dueChip(o,t)}<span class="w">${esc(ordWhat(o))}<span class="meta"><span>Sipariş <b>${o.created?fmtDay(o.created):'—'}</b></span><span><b>${nf.format(ordQty(o))}</b> adet</span><span>Teslim <b>${o.due?fmtDay(o.due):'tarihsiz'}</b></span>${pg.target?`<span>Üretim <b>${nf.format(pg.done)}/${nf.format(pg.target)}</b></span>`:''}<span>${payLine(o).replace(/<[^>]+>/g,'')}</span></span></span><span class="a">${tl(+o.price||0)}</span></div>`}).join('')}`:'';
+  {const os=c?c.orders.slice().sort((a,b)=>(a.status==='done')-(b.status==='done')||(a.status==='done'?((b.doneAt||'')<(a.doneAt||'')?-1:1):((a.due||'9999')<(b.due||'9999')?-1:1))):[];
+   $('cdOpen').innerHTML=os.length?`<h4>Siparişler</h4>${os.map((o,i)=>cdOrdCard(o,t,i,c.free)).join('')}`:'';}
   // sık aldıkları
   if(c){const m=new Map();[...c.sales.map(x=>({n:x.item,q:+x.qty||1})),...c.orders.flatMap(o=>Array.isArray(o.lines)&&o.lines.length>1?o.lines.map(l=>({n:l.item,q:+l.qty||1})):[{n:o.item,q:+o.qty||1}])].forEach(x=>{if(!x.n)return;const k=lc(x.n);const g=m.get(k)||{n:x.n,q:0};g.q+=x.q;m.set(k,g)});
     const fav=[...m.values()].sort((a,b)=>b.q-a.q).slice(0,6);
@@ -6417,7 +6439,7 @@ function openCust(key){
   }else $('cdFav').innerHTML='';
   // geçmiş
   if(c){const rows=[...c.sales.map(x=>({d:x.date,w:x.item||'Satış',s:'Satış'+(+x.qty>1?` · ${nf.format(x.qty)} adet`:''),a:+x.amt||0,ref:'s:'+x.id})),...c.done.map(o=>({d:o.doneAt,w:o.item||'Sipariş',s:`Sipariş ${o.created?fmtDay(o.created):''} · teslim · ${nf.format(ordQty(o))} adet`,a:c.free?freeCostOfOrder(o):+o.price||0,ref:'o:'+o.id}))].map(r=>c.free&&r.ref.startsWith('s:')?{...r,a:+(c.sales.find(x=>'s:'+x.id===r.ref)||{}).cost||0}:r).sort((a,b)=>a.d<b.d?1:-1);
-    $('cdHist').innerHTML=rows.length?`<h4>${c.free?'Yapılan işler · maliyet':'Alışveriş geçmişi'}</h4>${rows.slice(0,12).map(r=>`<div class="cdrow" data-cdr="${r.ref}"><span class="chip">${r.d===t?'Bugün':fmtDay(r.d)}</span><span class="w">${esc(r.w)}<small>${esc(r.s)}</small></span><span class="a">${tl(r.a)}</span></div>`).join('')}${rows.length>12?`<small style="color:var(--mute)">ve ${rows.length-12} alışveriş daha</small>`:''}`:'';
+    const rs=rows.filter(r=>r.ref.startsWith('s:'));$('cdHist').innerHTML=rs.length?`<h4>${c.free?'Satışlar · maliyet':'Satışlar'}</h4>${rs.slice(0,12).map(r=>`<div class="cdrow" data-cdr="${r.ref}"><span class="chip">${r.d===t?'Bugün':fmtDay(r.d)}</span><span class="w">${esc(r.w)}<small>${esc(r.s)}</small></span><span class="a">${tl(r.a)}</span></div>`).join('')}${rs.length>12?`<small style="color:var(--mute)">ve ${rs.length-12} satış daha</small>`:''}`:'';
   }else $('cdHist').innerHTML='';
   $('cdEditBtns').hidden=!(c&&c.prof);resetDel('cdDel');$('cdDel').textContent='Kartı sil';
   $('cdSale').hidden=$('cdOrder').hidden=!c;
@@ -6444,8 +6466,10 @@ $('cdCopy').addEventListener('click',()=>{const v=$('cdPhone').value.trim();if(!
 $('cdDel').addEventListener('click',e=>armDelete(e.currentTarget,()=>{if(CUR&&CUR.prof)remove('customers',CUR.prof.id);$('dCust').close();toast('Müşteri kartı silindi; satış ve siparişler duruyor')}));
 $('cdSale').addEventListener('click',()=>{const n=CUR&&CUR.name;$('dCust').close();openSale();$('sCust').value=n||'';saleOrdHint()});
 $('cdOrder').addEventListener('click',()=>{const n=CUR&&CUR.name;$('dCust').close();openOrder();$('oCust').value=n||'';$('oItem').focus()});
-$('cdTabs').addEventListener('click',e=>{const b=e.target.closest('[data-cdt]');if(!b||b.dataset.cdt===CDTAB)return;CDTAB=b.dataset.cdt;cdPaint();if(CDTAB!=='info')stagger($('cdPane').querySelectorAll('.cdrow'),60)});
+$('cdTabs').addEventListener('click',e=>{const b=e.target.closest('[data-cdt]');if(!b)return;CDTAB=b.dataset.cdt===CDTAB?'info':b.dataset.cdt;cdPaint();if(CDTAB!=='info')stagger($('cdPane').querySelectorAll('.cdrow'),60)});
+$('dCust').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.cdord')){$('dCust').close();openOrderById(e.target.dataset.cdo)}});
 $('dCust').addEventListener('click',e=>{
+  if(e.target.closest('[data-cdback]')){CDTAB='info';cdPaint();return}
   const o=e.target.closest('[data-cdo]');if(o){$('dCust').close();openOrderById(o.dataset.cdo);return}
   const r=e.target.closest('[data-cdr]');if(r){$('dCust').close();openSlRef(r.dataset.cdr)}
 });
