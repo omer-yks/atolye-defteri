@@ -713,6 +713,22 @@ dialog[open] .dlg-b>*:nth-child(n+7){animation-delay:.4s}
 .pk-fam>h5 .fdot{width:10px;height:10px;border-radius:50%;background:var(--fc);flex:none}
 .pk-fam>h5 small{font-family:var(--f-body);font-weight:500;font-size:.78rem;color:var(--mute)}
 .pk-fam>h5 i{display:none}
+details.pk-acc{display:block}details.pk-acc>summary{list-style:none;cursor:pointer;border-radius:10px;outline:none}
+details.pk-acc>summary::-webkit-details-marker,details.pk-sub>summary::-webkit-details-marker{display:none}
+details.pk-acc>summary h5{margin:0;font-family:var(--f-display);font-weight:600;font-size:1rem;display:flex;align-items:center;gap:8px}
+details.pk-acc>summary h5 .fdot{width:10px;height:10px;border-radius:50%;background:var(--fc);flex:none}
+details.pk-acc>summary h5 small{font-family:var(--f-body);font-weight:500;font-size:.78rem;color:var(--mute)}
+.pk-chev{margin-left:auto;width:22px;height:22px;border-radius:50%;background:var(--surface);flex:none;position:relative;transition:transform .25s cubic-bezier(.2,.9,.3,1)}
+.pk-chev::after{content:'';position:absolute;left:7px;top:6px;width:6px;height:6px;border-right:2px solid var(--mute);border-bottom:2px solid var(--mute);transform:rotate(45deg)}
+details[open]>summary .pk-chev{transform:rotate(180deg)}
+details.pk-acc[open]>summary{margin-bottom:10px}
+details.pk-acc[open]>:not(summary),details.pk-sub[open]>:not(summary){animation:fadeUp .28s both}
+details.pk-sub{background:var(--surface);border-radius:12px;padding:8px 10px;margin-top:8px}
+details.pk-sub>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:.9rem;padding:2px 0}
+details.pk-sub>summary small{color:var(--mute);font-size:.76rem}
+details.pk-sub[open]>summary{margin-bottom:8px}
+details.pk-sub .pk-ptile{background:var(--soft)}
+.fpick.empty{border-style:dashed}.fpick .st.nosel{color:var(--mute);font-weight:600}
 .pk-fam .pk-prod+.pk-prod{padding-top:10px;border-top:1px dashed color-mix(in srgb,var(--fc) 40%,transparent)}
 .pk-fam .pk-tile{background:var(--surface)}
 .pk-prod{display:grid;gap:6px}
@@ -2863,8 +2879,9 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.88',VERDATE='14 Kasım 2026';
+const VERSION='1.89',VERDATE='14 Kasım 2026';
 const CHANGES=[
+  ['1.89',['Renk ve filament: ürün seçince renkler otomatik gelmez, “Filament seçilmedi” yazar; gramlar dolu gelir, filamenti sen seçersin','Filament seç: markalar açılır kapanır; her markada “Eco serisi” ve “Normal seri” ayrı açılır gruplar']],
   ['1.88',['Sipariş ve satışta “Kütüphaneden” kutusu satır satır: maliyet, önerilen fiyat, tahmini kâr ve üretilecek parçalar alt alta; parçaları değiştirince anında güncellenir']],
   ['1.87',['Sipariş > Maliyet: parça ve filament düzenleyicisi burada; setteki adet (−/+), parça çıkarma, kütüphaneden parça ekleme (ör. Not Kağıtlığı), her parçanın rengi ve gramı; maliyet ve kâr anında yeniden hesaplanır','Müşteri > Maliyet: “Parçaları ve filamenti düzenle” ile siparişin Maliyet sekmesi açılır']],
   ['1.86',['Müşteri sekmeleri sipariş penceresiyle aynı ve düzenlenebilir: üstten sipariş ya da satış seçilir; Maliyet’te parça parça döküm ve fiyat/tutar buradan değişir, Üretim’de baskı eklenir ve kayıt silinir, Ödeme’de ödeme eklenir ve silinir','Satışlarda da parça parça maliyet görünür']],
@@ -3547,7 +3564,7 @@ function multiParts(L,old){
   const parts=[];
   L.forEach((l,li)=>{
     const it=libFind(l.item);
-    const ps=it?defaultMix(it).map(p=>({...p,per:(+p.per||1)*l.qty})):[{pid:'_'+lc(l.item).replace(/\s+/g,'-'),name:l.item,per:l.qty,lg:0,lines:[{c:'',g:0}]}];
+    const ps=it?blankMix(defaultMix(it)).map(p=>({...p,per:(+p.per||1)*l.qty})):[{pid:'_'+lc(l.item).replace(/\s+/g,'-'),name:l.item,per:l.qty,lg:0,lines:[{c:'',g:0}]}];
     ps.forEach(p=>{const ex=parts.find(x=>x.pid===p.pid);if(ex)ex.per+=p.per;else parts.push(p)});
   });
   if(old)parts.forEach(p=>{const o=old.find(x=>x.pid===p.pid);if(o&&o.lines&&o.lines.length)p.lines=JSON.parse(JSON.stringify(o.lines))});
@@ -3829,6 +3846,7 @@ function depLines(uses,prev){
 }
 /* ---------- Renk ve filament dağılımı ---------- */
 const MIX={s:null,o:null};
+const blankMix=parts=>(parts||[]).map(p=>({...p,lines:(p.lines&&p.lines.length?p.lines:[{g:+p.lg||0}]).map(l=>({c:'',g:+l.g||0}))}));
 function defaultMix(it){
   const parts=it.set?(it.items||[]).map(x=>({p:libById(x.id),per:+x.q||1})).filter(x=>x.p&&!x.p.set):[{p:it,per:1}];
   return parts.map(x=>({pid:x.p.id,name:x.p.name,per:x.per,lg:+x.p.g||0,lines:Array.isArray(x.p.fils)&&x.p.fils.length?x.p.fils.map(f=>{const cid=f.c||wantCid(f.want);return cid?{c:cid,g:+f.g||0}:f.want?{c:'',want:{...f.want},g:+f.g||0}:{c:'',g:+f.g||0}}):[{c:x.p.color||'',g:+x.p.g||0}]}));
@@ -3836,7 +3854,7 @@ function defaultMix(it){
 function mixFor(k,it,rec){
   if(MIX[k]&&MIX[k].item===it.id){mixTotals(k);return}
   const same=rec&&lc(rec.item)===lc(it.name),own=same&&rec.mix?JSON.parse(JSON.stringify(rec.mix)):null,off=same&&Array.isArray(rec.mixOff)?[...rec.mixOff]:[];
-  MIX[k]={item:it.id,parts:own||defaultMix(it).filter(p=>!off.includes(p.pid)),off};
+  MIX[k]={item:it.id,parts:own||blankMix(defaultMix(it)).filter(p=>!off.includes(p.pid)),off};
   renderMix(k);
 }
 /* Gruptan parça çıkarma */
@@ -3845,7 +3863,7 @@ function adjCP(it,off){const cp=libCostPrice(it);if(!it.set||!off||!off.length)r
 function libPartsOff(it,q,off){return it&&it.set?(it.items||[]).filter(x=>!(off||[]).includes(x.id)).map(x=>{const m=libById(x.id);return m?`${nf.format(x.q*q)} ${m.name}`:null}).filter(Boolean).join(' · '):''}
 function fullParts(k){
   if(k==='o'&&oMulti())return multiParts(orderLines(),null);
-  const it=libFind($(k==='s'?'sItem':'oItem').value);return it?defaultMix(it):[];
+  const it=libFind($(k==='s'?'sItem':'oItem').value);return it?blankMix(defaultMix(it)):[];
 }
 function wantCid(w){if(!w)return '';const b=findBrand(w.b||''),x=b&&findSeries(b.id,w.s||''),c=x&&findColor(x.id,w.col||'');return c?c.id:''}
 const lineCid=l=>l.c||wantCid(l.want);
@@ -3858,7 +3876,7 @@ function mixUses(parts,qty){
 function fpickBtn(cid,attr,label,want){
   const c=cid&&invGet(cid);
   if(!c&&want&&want.col)return `<button type="button" class="fpick want" ${attr} aria-label="${label}: ${esc(want.col)}, alınacak">${swatch(want.col)}<span class="ft"><b>${esc(want.col)}</b><small>${esc([want.b,want.s].filter(Boolean).join(' '))}</small></span><span class="st buy">alınacak</span>${chev}</button>`;
-  if(!c)return `<button type="button" class="fpick empty" ${attr} aria-label="${label}: renk seç"><i class="swt"></i><span class="ft"><b>Renk seç</b><small>depodan</small></span>${chev}</button>`;
+  if(!c)return `<button type="button" class="fpick empty" ${attr} aria-label="${label}: filament seçilmedi"><i class="swt"></i><span class="ft"><b>Filament seçilmedi</b><small>seçmek için dokun</small></span>${chev}</button>`;
   const x=invGet(c.series),b=x&&invGet(x.brand),g=stockMap()[cid]||0;
   return `<button type="button" class="fpick" ${attr} aria-label="${label}: ${esc(filName(cid))}">${swatch(c.name)}<span class="ft"><b>${esc(c.name)}</b><small>${esc([b&&b.name,x&&x.name].filter(Boolean).join(' '))}</small></span><span class="st${g<=0?' bad':''}">${fmtG(g)}</span>${chev}</button>`;
 }
@@ -3882,7 +3900,6 @@ function openPickAll(title,cur,want,cb){
   const c=cur&&invGet(cur),x=c&&invGet(c.series),b=x&&invGet(x.brand);
   PICK={cb,cur,want:want||(c&&x&&b?{b:b.name,s:x.name,t:x.type||'PLA',col:c.name}:null),all:true};
   PKW=PICK.want?{b:PICK.want.b,s:PICK.want.s}:null;
-  if(!PKW){const pr=buyProducts().find(p=>lc(p.t)===lc(ctype));if(pr)PKW={b:pr.b,s:pr.s}}
   $('pkMode').hidden=true;$('pkTs').textContent=title+' · her marka, seri ve renk';
   $('pkQ').value='';renderPick();$('dPick').showModal();
   setTimeout(()=>{const w=$('pkWcol');if(w)w.scrollIntoView({block:'nearest'})},40);
@@ -3905,7 +3922,7 @@ function pickTile(c,st,cur){
   const g=st[c.id]||0;
   return `<button type="button" class="pk-tile${g<=0?' out':g<=200?' low':''}" data-pc="${c.id}" aria-pressed="${c.id===cur}">${swatch(c.name)}<b>${esc(c.name)}</b><small>${g<=0?'bitti':fmtG(g)}</small></button>`;
 }
-let PKM='depot',PKW=null;
+let PKM='depot',PKW=null;const PKOPEN=new Set();
 function buyProducts(){
   const out=[],seen=new Set(),add=o=>{const k=lc(o.b+'|'+o.s);if(!o.b||!o.s||seen.has(k))return;seen.add(k);out.push(o)};
   prices().forEach(p=>add({b:p.brand,s:p.series,t:p.type||'PLA',fam:famOf(p),w:+p.w||1000,unit:+p.unit||0,sp:p.spool!==false}));
@@ -3928,7 +3945,11 @@ function renderBuyPick(){
     return `<div class="pk-wcol" id="pkWcol"><h5>${esc(sel.s)} <small>· ${esc(sel.b)} · hangi renk?</small><span class="catn">${cat.length?`${cat.length} renk · Filamentler listesinden`:'Genel renkler · bu ürünün gerçek renklerini Depo → Filamentler\'den ekleyebilirsin'}</span></h5>
       <div class="pk-tiles">${names.map(n=>`<button type="button" class="pk-tile" data-wc="${esc(n)}" aria-pressed="${!!(curW&&lc(curW.col)===lc(n)&&lc(curW.s)===lc(sel.s))}">${swatch(n)}<b>${esc(n)}</b><small>${(()=>{const hcc=hc.find(c=>lc(c.name)===lc(n));if(PICK&&PICK.all){const g=hcc?st[hcc.id]||0:0,cu=colorUnit(sel.b,sel.s,n);return (hcc&&g>0?fmtG(g):'depoda yok')+(cu?` · ${tl(cu)}`:'')}return hcc?'depoda var':'alınacak'})()}</small></button>`).join('')}</div>
       <div class="pk-wnew"><input id="pkWn" data-nodirty placeholder="Listede yoksa renk adını yaz, ör. Kirpi" aria-label="Renk adı"><button type="button" class="btn" id="pkWadd">Seç</button></div></div>`})():(PICK&&PICK.all?'<div class="pk-empty">Önce markanın ürününü seç, sonra rengini.</div>':'');
-  $('pkBody').innerHTML=(groups.length?groups.map((g,gi)=>`<div class="pk-fam" style="--fc:${FAMC[gi%FAMC.length]}"><h5><span class="fdot"></span>${esc(g.b)}<small>${g.items.length} ürün</small><i></i></h5><div class="pk-ptiles">${g.items.map(p=>`<button type="button" class="pk-ptile" data-wp="${esc(p.b)}|${esc(p.s)}" aria-pressed="${!!(sel&&sel===p)}"><b>${esc(p.s)}</b><small>${esc(p.t)} · ${fmtG(p.w)}${p.sp===false?' · makarasız':''}${p.unit?' · '+tl(p.unit):''}</small></button>`).join('')}</div></div>`).join(''):'<div class="pk-empty">Bu aramaya uyan ürün yok.</div>')+colBox;
+  const isEco=p=>/^eco\b/i.test(String(p.s||'').trim()),openAll=!!q;
+  const tiles=L=>`<div class="pk-ptiles">${L.map(p=>`<button type="button" class="pk-ptile" data-wp="${esc(p.b)}|${esc(p.s)}" aria-pressed="${!!(sel&&sel===p)}"><b>${esc(p.s)}</b><small>${esc(p.t)} · ${fmtG(p.w)}${p.sp===false?' · makarasız':''}${p.unit?' · '+tl(p.unit):''}</small></button>`).join('')}</div>`;
+  const sub=(lab,L,key)=>L.length?`<details class="pk-sub" data-acc="${esc(key)}"${openAll||PKOPEN.has(key)||(sel&&L.includes(sel))?' open':''}><summary><b>${lab}</b><small>${L.length} ürün</small><span class="pk-chev" aria-hidden="true"></span></summary>${tiles(L)}</details>`:'';
+  $('pkBody').innerHTML=(groups.length?groups.map((g,gi)=>{const bk=lc(g.b),eco=g.items.filter(isEco),std=g.items.filter(p=>!isEco(p)),op=openAll||PKOPEN.has(bk)||(sel&&g.items.includes(sel));
+    return `<details class="pk-fam pk-acc" data-acc="${esc(bk)}" style="--fc:${FAMC[gi%FAMC.length]}"${op?' open':''}><summary><h5><span class="fdot"></span>${esc(g.b)}<small>${g.items.length} ürün${eco.length&&std.length?` · ${eco.length} Eco · ${std.length} normal`:''}</small><span class="pk-chev" aria-hidden="true"></span></h5></summary>${eco.length&&std.length?sub('Eco serisi',eco,bk+'|eco')+sub('Normal seri',std,bk+'|std'):tiles(g.items)}</details>`}).join(''):'<div class="pk-empty">Bu aramaya uyan ürün yok.</div>')+colBox;
 }
 function pickWant(col){
   if(!PICK||!PKW||!col.trim())return;
@@ -3964,6 +3985,7 @@ function renderPick(){
   $('pkBody').innerHTML=fams.map((f,fi)=>`<div class="pk-fam" style="--fc:${FAMC[fi%FAMC.length]}"><h5><span class="fdot"></span>${esc(f.name)}<small>${f.items.length>1?f.items.length+' ürün · ':''}${f.items.reduce((a,x)=>a+colorsOf(x.id).length,0)} renk</small><i></i></h5>${f.items.map(x=>{const cs=colorsOf(x.id).sort((a,c)=>(st[c.id]||0)-(st[a.id]||0));return cs.length?prodBlock(x,cs):''}).join('')}</div>`).join('')||'<div class="pk-empty">Bu markada renk yok.</div>';
 }
 $('pkQ').addEventListener('input',renderPick);
+$('pkBody').addEventListener('toggle',e=>{const d=e.target;if(!d||!d.matches||!d.matches('details[data-acc]'))return;const k=d.dataset.acc;if(d.open)PKOPEN.add(k);else PKOPEN.delete(k)},true);
 $('pkMode').addEventListener('click',e=>{const b=e.target.closest('[data-pm]');if(!b||b.dataset.pm===PKM)return;PKM=b.dataset.pm;$('pkQ').value='';renderPick();stagger($('pkBody').querySelectorAll('.pk-tile,.pk-ptile'))});
 $('pkBody').addEventListener('click',e=>{
   const p=e.target.closest('[data-wp]');if(p){const i=p.dataset.wp.indexOf('|');PKW={b:p.dataset.wp.slice(0,i),s:p.dataset.wp.slice(i+1)};renderBuyPick();const w=$('pkWcol');if(w)w.scrollIntoView({block:'nearest',behavior:REDUCE()?'auto':'smooth'});return}
@@ -4134,7 +4156,7 @@ function fcalcBuy(k){
     const rm=e.target.closest('[data-mprm]');if(rm){const M=MIX[k],pt=M&&M.parts[+rm.dataset.mprm];if(!pt||M.parts.length<2)return;M.parts.splice(+rm.dataset.mprm,1);renderMix(k);dirty();toast(`${pt.name} çıkarıldı`)}
   });
   box.addEventListener('change',e=>{const sel=e.target.closest('[data-mpnew]');if(!sel||!sel.value||!MIX[k])return;const it=libById(sel.value);sel.value='';if(!it)return;
-    const M=MIX[k],ex=M.parts.find(p=>p.pid===it.id);if(ex){ex.per=(+ex.per||1)+1;toast(`${it.name}: sette ${ex.per} oldu`)}else{const np=defaultMix(it)[0];if(!np)return;M.parts.push({...np,per:1});M.off=(M.off||[]).filter(x=>x!==it.id);toast(`${it.name} eklendi`)}
+    const M=MIX[k],ex=M.parts.find(p=>p.pid===it.id);if(ex){ex.per=(+ex.per||1)+1;toast(`${it.name}: sette ${ex.per} oldu`)}else{const np=blankMix(defaultMix(it))[0];if(!np)return;M.parts.push({...np,per:1});M.off=(M.off||[]).filter(x=>x!==it.id);toast(`${it.name} eklendi`)}
     renderMix(k);dirty();k==='s'?saleLib():orderLib()});
 });
 $('sQty').addEventListener('input',()=>mixTotals('s'));$('oQty').addEventListener('input',()=>mixTotals('o'));
