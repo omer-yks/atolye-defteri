@@ -3020,14 +3020,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=1.98-1795810917"></script>
+<script src="shim.js?v=1.99-1795811166"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.98',VERDATE='27 Kasım 2026';
+const VERSION='1.99',VERDATE='27 Kasım 2026';
 const CHANGES=[
+  ['1.99',['Renk kartları: depoda varsa yeşil, yoksa kırmızı','Parça başlığındaki “kütüphanede … g” notu kaldırıldı']],
   ['1.98',['Renk ve filament yeniden tasarlandı: her parça kendi kutusunda, her renk makara renginde ayrı bir kart','Kartta “1 adette 15,61 g → 60 adette 937 g” yan yana; altında depoda yetip yetmediği tek cümleyle','Set sayacı kalktı: parçanın adedi “60 adet ✎” ile değişir; yüzde yok','“Renk ekle” kartların yanında boş bir kutucuk; çıkarılan parçalar altta ↺ ile geri eklenir']],
   ['1.97',['Yeni ürün seçici: resimli, “Setler” ve “Ürünler” diye gruplu; setin parçaları, gram, süre ve maliyet görünür; yazdıkça süzülür, ok tuşları ve Enter ile seçilir (sipariş, satış, hesaplayıcı)']],
   ['1.96',['Sipariş > Bilgiler yeni tasarım: zaman çizgisi; Sipariş alındı → Ne yapılacak → Teslim → Ödeme, her adım kendi renginde kart; adet, kalan gün ve ödeme durumu başlıklarda']],
@@ -4223,13 +4224,13 @@ function mixLineStock(k,q,plog,prev,recNow){
   let cov={},own={},pend={};
   if(k==='o'){cov=orderCovered(recNow,ORES||undefined);pend=ORES?sumByGroup(ORES):{};own=ORES?sumByGroup(recNow&&recNow.reserved||{}):{}}
   const get=gk=>{if(!pool[gk]){let h=groupStock(gk,st);
-      if(k==='o')h=Math.max(0,h+(own[gk]||0)-(pend[gk]||0))+(cov[gk]||0);
-      else h+=prev.filter(x=>x&&x.c&&gkeyCid(x.c)===gk).reduce((a,x)=>a+(+x.g||0),0);
-      pool[gk]={left:h,tot:h,inDep:groupCids(gk).length>0||h>0}}return pool[gk]};
+      let dep=h;if(k==='o'){dep=Math.max(0,h+(own[gk]||0)-(pend[gk]||0));h=dep+(cov[gk]||0)}
+      else{h+=prev.filter(x=>x&&x.c&&gkeyCid(x.c)===gk).reduce((a,x)=>a+(+x.g||0),0);dep=h}
+      pool[gk]={left:h,tot:h,dep,inDep:groupCids(gk).length>0||h>0}}return pool[gk]};
   M.parts.forEach((pt,i)=>{const cnt=(+pt.per||1)*q,made=k==='o'&&plog.length?plog.filter(l=>l.ok&&l.part===pt.pid).reduce((a,l)=>a+l.n,0):0,rest=Math.max(0,cnt-made);
     pt.lines.forEach((l,j)=>{const cid=lineCid(l),need=(+l.g||0)*rest,key=i+':'+j;
       if(!cid){out[key]={kind:l.want&&l.want.col?'want':'none',need,cnt,rest};return}
-      const p=get(gkeyCid(cid)),use=Math.min(need,p.left);p.left-=use;out[key]={kind:'c',need,short:need-use,tot:p.tot,inDep:p.inDep,cnt,rest}});
+      const p=get(gkeyCid(cid)),use=Math.min(need,p.left);p.left-=use;out[key]={kind:'c',need,short:need-use,tot:p.tot,dep:p.dep,inDep:p.inDep,cnt,rest}});
   });
   return out;
 }
@@ -4241,7 +4242,7 @@ function mixTotals(k){
   M.parts.forEach((pt,i)=>{
     const cnt=(+pt.per||1)*q,sum=pt.lines.reduce((a,l)=>a+(+l.g||0),0);
     const c=box.querySelector(`[data-mcount="${i}"]`);if(c)c.textContent=`${nf.format(cnt)} adet`;
-    const m=box.querySelector(`[data-msum="${i}"]`);if(m){const w=pt.lg&&Math.abs(sum-pt.lg)>0.5;m.innerHTML=`1 adet ${nf.format(r2(sum))} g · ${nf.format(cnt)} adet ${fmtG(sum*cnt)}${w?` · <span class="w" title="Kütüphanedeki gram farklı">kütüphanede ${nf.format(pt.lg)} g</span>`:''}`}
+    const m=box.querySelector(`[data-msum="${i}"]`);if(m){m.innerHTML=`1 adet ${nf.format(r2(sum))} g · ${nf.format(cnt)} adet ${fmtG(sum*cnt)}`}
   });
   const rec=k==='s'?editSale:editOrder,st=stockMap();
   const recNow=k==='o'&&rec?(S.orders.find(x=>x.id===rec.id)||rec):null,plog=recNow&&recNow.prod?recNow.prod.log||[]:[];
@@ -4252,8 +4253,8 @@ function mixTotals(k){
       if(lv)lv.innerHTML=fmtG((+l.g||0)*r.rest).replace(/ (k?g)$/,' <small>$1</small>');
       if(!ms)return;let cls='mute',t;
       if(r.kind==='none')t='Önce filament seç';
-      else if(r.kind==='want'){cls=r.need>0.5?'no':'mute';t=r.need>0.5?`${fmtG(r.need)} eksik · depoda yok`:'Depoda yok · alınacak'}
-      else if(r.need<=0.5)t=r.tot>0.5?`Depoda ${fmtG(r.tot)} var`:'Depoda yok';
+      else if(r.kind==='want'){cls='no';t=r.need>0.5?`${fmtG(r.need)} eksik · depoda yok`:'Depoda yok · alınacak'}
+      else if(r.need<=0.5){cls=r.dep>0.5?'ok':'no';t=r.dep>0.5?`Depoda ${fmtG(r.dep)} var`:'Depoda yok'}
       else if(r.short<=0.5){cls='ok';t=`Yeter · depoda ${fmtG(r.tot)} var`}
       else{cls='no';t=r.tot>0.5?`${fmtG(r.short)} eksik · depoda ${fmtG(r.tot)}`:`${fmtG(r.short)} eksik · depoda yok`}
       ms.className='mst '+cls;ms.textContent=t});}
