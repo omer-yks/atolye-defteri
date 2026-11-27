@@ -1126,6 +1126,12 @@ table:has(.exb){min-width:560px}
 .cdsel button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft);background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
 .cdsel.one{display:flex;align-items:baseline;gap:10px;overflow:visible}.cdsel.one b{font-size:1rem}
 .cdview{display:grid;gap:10px;animation:fadeUp .3s both}
+.cmixslot{grid-column:1 / -1}.cmixslot .mix{margin:0}
+.mper{display:inline-flex;align-items:center;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1px 4px;font-size:.8rem}
+.mper button{width:24px;height:24px;border:0;background:transparent;border-radius:7px;font-weight:700;color:var(--mute)}.mper button:hover{background:var(--soft);color:var(--ink)}
+.mper b{min-width:18px;text-align:center;font-weight:700}.mper small{color:var(--mute);margin:0 4px 0 2px}
+.mpnew select{width:100%;appearance:none;border:1.5px dashed var(--line-2);background:transparent;color:var(--accent);border-radius:12px;padding:10px 12px;font:inherit;font-weight:700;font-size:.88rem;cursor:pointer}
+.mpnew select:hover{border-color:var(--accent)}
 .cdpin{display:inline-flex;align-items:center;gap:4px;font-weight:700}.cdpin input{width:110px;text-align:right;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:inherit;border-radius:8px;padding:5px 8px;font:inherit;font-weight:700}
 .cdpin input:focus-visible{outline:2px solid #6EE7A8;outline-offset:1px}
 .cres .crow:has(.cdpin){align-items:center}
@@ -2299,7 +2305,7 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
       <div class="f"><span class="lab">Ödeme</span><button type="button" class="btn" id="oPayGo" style="justify-content:flex-start;min-height:44px"></button></div>
       <div class="f w"><label for="oNote">Not</label><input id="oNote" autocomplete="off" placeholder="Renk, ölçü, kargo adresi…"></div>
       <div class="libhint" id="oLib" hidden></div>
-      <div class="mix" id="oMix" hidden></div>
+      <span id="oMixHome" hidden></span><div class="mix" id="oMix" hidden></div>
       <div class="deliver" id="oDeliver" hidden>
         <label id="oRestRow"><input type="checkbox" id="oRest" checked><span id="oRestTxt">Kalan tutar tahsil edildi</span></label>
         <button type="button" class="btn primary" id="oDeliverOk">Teslimi kaydet</button>
@@ -2845,14 +2851,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=1.86-1795800675"></script>
+<script src="shim.js?v=1.87-1795801241"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.86',VERDATE='14 Kasım 2026';
+const VERSION='1.87',VERDATE='14 Kasım 2026';
 const CHANGES=[
+  ['1.87',['Sipariş > Maliyet: parça ve filament düzenleyicisi burada; setteki adet (−/+), parça çıkarma, kütüphaneden parça ekleme (ör. Not Kağıtlığı), her parçanın rengi ve gramı; maliyet ve kâr anında yeniden hesaplanır','Müşteri > Maliyet: “Parçaları ve filamenti düzenle” ile siparişin Maliyet sekmesi açılır']],
   ['1.86',['Müşteri sekmeleri sipariş penceresiyle aynı ve düzenlenebilir: üstten sipariş ya da satış seçilir; Maliyet’te parça parça döküm ve fiyat/tutar buradan değişir, Üretim’de baskı eklenir ve kayıt silinir, Ödeme’de ödeme eklenir ve silinir','Satışlarda da parça parça maliyet görünür']],
   ['1.85',['Müşteri > Maliyet: sipariş penceresindeki gibi parça parça (ör. Kurumsal Set: kalemlik, 2 logo, telefon standı), adet, 1 adetin ve toplamın maliyeti; altta filament, baskı ve kâr','Müşteri > Üretim: baskı buradan da girilir; siparişin Üretim sekmesiyle aynı kayıt, anında eşitlenir','Üretimde tabla adedi her kayıttan sonra 1’e döner, son girilen sayıda takılı kalmaz','Müşteri > Ödeme: sadece ödeme tarihleri, ödediği ve kalan borç (fazla ödediyse vereceğin)']],
   ['1.84',['Müşteri penceresi: adın ve telefonun altında “Siparişler”: her sipariş için ürün ve adet (ör. 30 × Kurumsal Set), sipariş alınma tarihi, istenen teslim tarihi, üretim ve ödeme','Müşteri penceresinin üstünde Maliyet · Üretim · Ödeme sekmeleri (açılış sayfası bilgiler; seçili sekmeye tekrar basınca geri döner); + Satış ve + Sipariş her sekmede altta: sipariş sipariş maliyet ve kâr, parça parça üretim ilerlemesi, ödenen/kalan ve ödeme geçmişi']],
@@ -3573,6 +3580,8 @@ function paintOTab(){
   const box=$('oTabs').querySelector('.seg');
   box.querySelectorAll('[data-otab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.otab===OTAB));placeInd(box);
   $('oInfo').hidden=OTAB!=='info';$('oProd').hidden=OTAB!=='prod';$('oPay').hidden=OTAB!=='pay';$('oCost').hidden=OTAB!=='cost';paintPayTab();
+  {const mx=$('oMix');if(OTAB==='cost'){if(!$('oCostBody'))$('oCost').innerHTML='<div id="oCostMixSlot" class="cmixslot"></div><div id="oCostBody" style="display:contents"></div>';$('oCostMixSlot').appendChild(mx);mixTotals('o')}
+   else if(mx.parentElement&&mx.parentElement.id==='oCostMixSlot')$('oMixHome').after(mx)}
   const pg=editOrder?prodProgress(editOrder):null;
   $('oTabProg').textContent=pg&&pg.target?`${nf.format(pg.done)}/${nf.format(pg.target)}`:'';
   if(OTAB==='prod')renderProd();else if(OTAB==='pay')renderPay(true);else if(OTAB==='cost')renderCost();else mixTotals('o');
@@ -3597,7 +3606,7 @@ function oDlgParts(){
   return M&&M.parts&&M.parts.length?resolveParts(M.parts).map(p=>({...p,target:(+p.per||1)*q})):(editOrder?prodPartsOf(editOrder):[]);
 }
 function renderCost(){
-  const box=$('oCost'),t=todayISO();
+  const box=$('oCostBody')||$('oCost'),t=todayISO();
   const C=costOfParts(oDlgParts());
   if(!C){box.innerHTML='<p class="help" style="grid-column:1 / -1;margin:0">Maliyeti görmek için Bilgiler\'de kütüphaneden bir ürün seç. Ürün kütüphanede yoksa önce Hesapla\'da hesaplayıp kaydet.</p>';return}
   const L=orderLines(),lsug=libSugOf($('oItem').value,num($('oQty').value)||1,L.length>1?L:null,MIX.o&&MIX.o.off),{rows,cost,g,hrs,fil}=C,sug=lsug!=null?lsug:C.sug,price=num($('oPrice').value)||0,profit=price-cost;
@@ -3971,19 +3980,21 @@ function renderMix(k){
     ${noDepot?'<span class="k" style="font-size:.84rem;color:var(--mute)">Depoda henüz filament yok. Renk seçerken “Depoda yok · alınacak” ile fiyat listendeki ürünlerden seçebilirsin.</span>':''}
     ${(()=>{const off=M.off||[];if(!off.length)return '';const rem=fullParts(k).filter(p=>off.includes(p.pid));return rem.length?`<div class="moff"><span>${k==='s'?'Bu satışta yok':'Bu siparişte yok'}:</span>${rem.map(p=>`<button type="button" data-mpadd="${esc(p.pid)}" title="Geri ekle">+ ${esc(p.name)}</button>`).join('')}</div>`:''})()}
     ${M.parts.map((pt,i)=>`<div class="mpart" data-mi="${i}">
-      <div class="mpt"><b>${esc(pt.name)}</b><span class="chip info" data-mcount="${i}"></span><span class="msum" data-msum="${i}"></span>${M.parts.length>1&&fullParts(k).some(p=>p.pid===pt.pid)?`<button type="button" class="mpdel" data-mpdel="${i}" title="Bu parçayı çıkar" aria-label="${esc(pt.name)} parçasını çıkar"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>Çıkar</button>`:''}</div>
+      <div class="mpt"><b>${esc(pt.name)}</b>${M.parts.length>1||(+pt.per||1)>1?`<span class="mper" title="1 sette kaç tane"><button type="button" data-mper="${i}" data-d="-1" aria-label="Azalt">−</button><b>${nf.format(+pt.per||1)}</b><button type="button" data-mper="${i}" data-d="1" aria-label="Artır">+</button><small>sette</small></span>`:''}<span class="chip info" data-mcount="${i}"></span><span class="msum" data-msum="${i}"></span>${M.parts.length>1&&!fullParts(k).some(p=>p.pid===pt.pid)?`<button type="button" class="mpdel" data-mprm="${i}" title="Bu parçayı çıkar" aria-label="${esc(pt.name)} parçasını çıkar"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>Çıkar</button>`:''}${M.parts.length>1&&fullParts(k).some(p=>p.pid===pt.pid)?`<button type="button" class="mpdel" data-mpdel="${i}" title="Bu parçayı çıkar" aria-label="${esc(pt.name)} parçasını çıkar"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>Çıkar</button>`:''}</div>
       ${pt.lines.map((l,j)=>`<div class="mline">${fpickBtn(l.c,`data-pick="${k}:${i}:${j}"`,`${esc(pt.name)} ${j+1}. renk`,l.want)}
         <span class="gw"><input data-mi="${i}" data-mj="${j}" data-mk="g" inputmode="decimal" value="${esc(inStr(l.g))}" aria-label="${esc(pt.name)} ${j+1}. renk gramı"><span>g</span></span>
         ${pt.lines.length>1?`<button type="button" class="ldel" data-mdel="${i}:${j}" aria-label="Bu rengi çıkar">${'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'}</button>`:'<span></span>'}
       </div>`).join('')}
       ${pt.lines.length<MAXF?`<button type="button" class="maddc" data-madd="${i}">+ Renk ekle</button>`:''}
     </div>`).join('')}
+    ${(()=>{const L=mine('library').filter(x=>!x.set).sort((a,b)=>String(a.name).localeCompare(String(b.name),'tr'));return L.length?`<label class="mpnew"><span class="sr">Parça ekle</span><select data-mpnew data-nodirty><option value="">+ Parça ekle (kütüphaneden)</option>${L.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}${+x.g?` · ${fmtG(+x.g)}`:''}</option>`).join('')}</select></label>`:''})()}
     <div class="mtot" data-mtot></div>
     <div class="fcw"><button type="button" class="fcalc-btn" data-fcalc aria-expanded="${!!FCALC[k]}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h2M14 10h2M8 14h2M14 14h2M8 18h2M14 18h2"/></svg>Filament hesapla</button><div data-fcbox></div></div>`;
   mixTotals(k);
 }
 function mixTotals(k){
   const box=$(k+'Mix'),M=MIX[k];if(!M||box.hidden)return;
+  try{if(k==='o'&&OTAB==='cost'&&!$('oCost').hidden&&$('oCostBody'))setTimeout(()=>{if(OTAB==='cost')renderCost()},0)}catch(e){}
   const q=mixQty(k);
   M.parts.forEach((pt,i)=>{
     const cnt=(+pt.per||1)*q,sum=pt.lines.reduce((a,l)=>a+(+l.g||0),0);
@@ -4094,12 +4105,21 @@ function fcalcBuy(k){
       else{ORES=res;$('dOrder').dataset.dirty='1';mixTotals('o');toast(`✓ ${fmtG(tot)} ayrıldı · siparişi kaydedince depodan düşer`)}
       const d=$('oMix').querySelector('.ores');if(d&&!REDUCE())d.animate([{boxShadow:'0 0 0 4px color-mix(in srgb,var(--ok) 35%,transparent)'},{boxShadow:'0 0 0 0 transparent'}],{duration:900});return}
     const pd=e.target.closest('[data-mpdel]');if(pd){const M=MIX[k],pt=M.parts[+pd.dataset.mpdel];if(!pt||M.parts.length<2)return;M.off=[...(M.off||[]),pt.pid];M.parts.splice(+pd.dataset.mpdel,1);renderMix(k);k==='s'?saleLib():orderLib();toast(`${pt.name} çıkarıldı`);(k==='s'?$('dSale'):$('dOrder')).dataset.dirty='1';return}
-    const pa=e.target.closest('[data-mpadd]');if(pa){const M=MIX[k],pid=pa.dataset.mpadd;M.off=(M.off||[]).filter(x=>x!==pid);const full=fullParts(k);M.parts=full.filter(p=>!M.off.includes(p.pid)).map(p=>M.parts.find(x=>x.pid===p.pid)||p);renderMix(k);k==='s'?saleLib():orderLib();(k==='s'?$('dSale'):$('dOrder')).dataset.dirty='1';return}
+    const pa=e.target.closest('[data-mpadd]');if(pa){const M=MIX[k],pid=pa.dataset.mpadd;M.off=(M.off||[]).filter(x=>x!==pid);const full=fullParts(k);const extra=M.parts.filter(x=>!full.some(p=>p.pid===x.pid));M.parts=[...full.filter(p=>!M.off.includes(p.pid)).map(p=>M.parts.find(x=>x.pid===p.pid)||p),...extra];renderMix(k);k==='s'?saleLib():orderLib();(k==='s'?$('dSale'):$('dOrder')).dataset.dirty='1';return}
     const fi=e.target.closest('[data-fire]');if(fi){FIRE=+fi.dataset.fire;try{localStorage.setItem('ad-fire',FIRE)}catch(er){}mixTotals(k);return}
     if(e.target.closest('[data-fcbuy]')){fcalcBuy(k);return}
     const a=e.target.closest('[data-madd]');if(a){const pt=MIX[k].parts[+a.dataset.madd];if(pt.lines.length<MAXF){pt.lines.push({c:'',g:0});renderMix(k);const bs=box.querySelectorAll(`[data-pick^="${k}:${a.dataset.madd}:"]`);const last=bs[bs.length-1];if(last){const [kk,i,j]=last.dataset.pick.split(':');mixPick(kk,+i,+j)}}return}
     const d=e.target.closest('[data-mdel]');if(d){const [i,j]=d.dataset.mdel.split(':').map(Number);MIX[k].parts[i].lines.splice(j,1);renderMix(k)}
   });
+});
+['s','o'].forEach(k=>{const box=$(k+'Mix'),dirty=()=>{(k==='s'?$('dSale'):$('dOrder')).dataset.dirty='1'};
+  box.addEventListener('click',e=>{
+    const pp=e.target.closest('[data-mper]');if(pp){const pt=MIX[k]&&MIX[k].parts[+pp.dataset.mper];if(!pt)return;pt.per=Math.max(1,(+pt.per||1)+(+pp.dataset.d));renderMix(k);dirty();return}
+    const rm=e.target.closest('[data-mprm]');if(rm){const M=MIX[k],pt=M&&M.parts[+rm.dataset.mprm];if(!pt||M.parts.length<2)return;M.parts.splice(+rm.dataset.mprm,1);renderMix(k);dirty();toast(`${pt.name} çıkarıldı`)}
+  });
+  box.addEventListener('change',e=>{const sel=e.target.closest('[data-mpnew]');if(!sel||!sel.value||!MIX[k])return;const it=libById(sel.value);sel.value='';if(!it)return;
+    const M=MIX[k],ex=M.parts.find(p=>p.pid===it.id);if(ex){ex.per=(+ex.per||1)+1;toast(`${it.name}: sette ${ex.per} oldu`)}else{const np=defaultMix(it)[0];if(!np)return;M.parts.push({...np,per:1});M.off=(M.off||[]).filter(x=>x!==it.id);toast(`${it.name} eklendi`)}
+    renderMix(k);dirty();k==='s'?saleLib():orderLib()});
 });
 $('sQty').addEventListener('input',()=>mixTotals('s'));$('oQty').addEventListener('input',()=>mixTotals('o'));
 
@@ -6435,7 +6455,7 @@ function cdCostView(it,c){
   const pin=c.free?'':`<div class="crow"><span>${lab}<small>${C?`kütüphaneye göre önerilen ${tl(C.sug)} · `:''}değiştirip Enter’a bas</small></span><span class="cdpin"><input data-cdprice inputmode="decimal" value="${esc(inStr(r2(price)))}" aria-label="${lab}"> ₺</span></div>`;
   if(!C)return `<div class="cbox"><h4>Parça parça maliyet</h4><p class="help" style="margin:0">Bu ürün kütüphanede yok; maliyet hesaplanamadı. Hesaplayıcı'da hesaplayıp kaydedince burada görünür.${it.x&&+r.cost?` Satışta kayıtlı maliyet: <b>${tl(+r.cost)}</b>.`:''}</p></div>${pin?`<div class="cres">${pin}</div>`:''}`;
   const {rows,cost,g,hrs,fil}=C,profit=price-cost;
-  return `<div class="cbox"><h4>Parça parça maliyet</h4>
+  return `<button type="button" class="btn" data-cdedit="${it.k}" style="justify-self:start">✎ Parçaları ve filamenti düzenle</button><div class="cbox"><h4>Parça parça maliyet</h4>
     ${rows.map(x=>`<div class="crow"><span>${esc(x.p.name)} <span style="color:var(--mute)">× ${nf.format(x.cnt)}</span><small>1 adet: ${x.fils.length?x.fils.map(f=>`${f.c&&invGet(f.c)?esc(invGet(f.c).name)+' ':f.want?esc(f.want.col)+' ':''}${nf.format(f.g)} g`).join(' + '):fmtG(x.pc.g)}${x.pc.hrs?` · ${hm(x.pc.hrs)}`:''} · ${tl(x.pc.cost)}${x.lib?'':' · kütüphanede yok, sadece filament'}</small></span><b>${tl(x.tot)}</b></div>`).join('')}
     <div class="crow" style="border-top:1px solid var(--line);padding-top:8px"><span>Filament<small>${fmtG(g)} toplam</small></span><b>${tl(fil)}</b></div>
     <div class="crow"><span>Baskı süresi, elektrik, aşınma, işçilik, hata payı<small>${hm(hrs)} baskı</small></span><b>${tl(cost-fil)}</b></div>
@@ -6486,6 +6506,7 @@ function cdBadges(c){const op=c.orders.filter(o=>o.status!=='done');let d=0,tt=0
 function cpPart(k){const [oid,pid]=k.split('|'),o=S.orders.find(x=>x.id===oid);return{o,oid,pid,p:o&&prodPartsOf(o).find(x=>x.pid===pid)}}
 function cdCurItem(){const v=$('cdPane').querySelector('.cdview');const k=v&&v.dataset.cdk||'';return k.startsWith('o:')?{o:S.orders.find(x=>x.id===k.slice(2))}:k.startsWith('s:')?{x:S.sales.find(x=>x.id===k.slice(2))}:{}}
 function cpClick(e){
+  const ed=e.target.closest('[data-cdedit]');if(ed){const k=ed.dataset.cdedit;$('dCust').close();if(k.startsWith('o:')){openOrderById(k.slice(2));setTimeout(()=>{const b=$('oTabs').querySelector('[data-otab="cost"]');if(b)b.click()},60)}else openSlRef(k);return true}
   const sel=e.target.closest('[data-cdsel]');if(sel){CDSEL=sel.dataset.cdsel;CPFAIL=null;cpRefresh();return true}
   const st=e.target.closest('[data-cps]');if(st){const inp=$('cdPane').querySelector(`[data-cpn="${CSS.escape(st.dataset.cps)}"]`);inp.value=Math.max(1,(num(inp.value)||1)+(+st.dataset.d));return true}
   const ok=e.target.closest('[data-cpok]');
