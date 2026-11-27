@@ -2879,8 +2879,9 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.89',VERDATE='14 Kasım 2026';
+const VERSION='1.90',VERDATE='14 Kasım 2026';
 const CHANGES=[
+  ['1.90',['Bütün filament seçme pencereleri aynı: marka > Eco serisi / Normal seri > ürün açılır kapanır (sipariş, satış, hesaplayıcı, baskı)']],
   ['1.89',['Renk ve filament: ürün seçince renkler otomatik gelmez, “Filament seçilmedi” yazar; gramlar dolu gelir, filamenti sen seçersin','Filament seç: markalar açılır kapanır; her markada “Eco serisi” ve “Normal seri” ayrı açılır gruplar']],
   ['1.88',['Sipariş ve satışta “Kütüphaneden” kutusu satır satır: maliyet, önerilen fiyat, tahmini kâr ve üretilecek parçalar alt alta; parçaları değiştirince anında güncellenir']],
   ['1.87',['Sipariş > Maliyet: parça ve filament düzenleyicisi burada; setteki adet (−/+), parça çıkarma, kütüphaneden parça ekleme (ör. Not Kağıtlığı), her parçanın rengi ve gramı; maliyet ve kâr anında yeniden hesaplanır','Müşteri > Maliyet: “Parçaları ve filamenti düzenle” ile siparişin Maliyet sekmesi açılır']],
@@ -3905,9 +3906,8 @@ function openPickAll(title,cur,want,cb){
   setTimeout(()=>{const w=$('pkWcol');if(w)w.scrollIntoView({block:'nearest'})},40);
 }
 function mixPick(k,i,j){
-  if(k!=='o')return openPick(k,i,j);
-  const pt=MIX.o.parts[i],l=pt.lines[j];
-  openPickAll(`${pt.name} · ${j+1}. renk`,l.c,l.want,r=>{l.c=r.c||'';if(r.want)l.want=r.want;else delete l.want;renderMix('o');$('dOrder').dataset.dirty='1';const btn=$('oMix').querySelector(`[data-pick="o:${i}:${j}"]`);if(btn&&!REDUCE())btn.animate([{boxShadow:'0 0 0 4px var(--accent-soft)'},{boxShadow:'0 0 0 0 transparent'}],{duration:700})});
+  const pt=MIX[k].parts[i],l=pt.lines[j];
+  openPickAll(`${pt.name} · ${j+1}. renk`,l.c,l.want,r=>{l.c=r.c||'';if(r.want)l.want=r.want;else delete l.want;renderMix(k);(k==='s'?$('dSale'):$('dOrder')).dataset.dirty='1';const btn=$(k+'Mix').querySelector(`[data-pick="${k}:${i}:${j}"]`);if(btn&&!REDUCE())btn.animate([{boxShadow:'0 0 0 4px var(--accent-soft)'},{boxShadow:'0 0 0 0 transparent'}],{duration:700})});
 }
 function openPick(k,i,j){
   PICK={k,i,j};const pt=MIX[k].parts[i],cur=pt.lines[j].c,wn=pt.lines[j].want;
@@ -3977,12 +3977,15 @@ function renderPick(){
     $('pkBody').innerHTML=hits.length?hits.map((h,hi)=>`<div class="pk-fam" style="--fc:${FAMC[hi%FAMC.length]}"><h5><span class="fdot"></span>${esc(h.b.name)}<i></i></h5>${prodBlock(h.x,h.cs)}</div>`).join(''):'<div class="pk-empty">Bu aramaya uyan renk yok.</div>';
     return;
   }
-  $('pkTabs').hidden=bs.length<2;
-  if(!$('pkTabs').querySelector('[data-pb]')||$('pkTabs').querySelectorAll('[data-pb]').length!==bs.length)$('pkTabs').innerHTML='<span class="seg-ind" aria-hidden="true"></span>'+bs.map(b=>`<button type="button" data-pb="${b.id}" aria-pressed="false">${markHTML(b.name)}${esc(b.name)}</button>`).join('');
-  $('pkTabs').querySelectorAll('[data-pb]').forEach(t=>t.setAttribute('aria-pressed',t.dataset.pb===PKB));placeInd($('pkTabs'));
-  const b=invGet(PKB)||bs[0],ss=seriesOf(b.id),fams=[];
-  ss.forEach(x=>{const pe=findPrice(b.name,x.name),fn=pe?famOf(pe):x.name;let f=fams.find(y=>lc(y.name)===lc(fn));if(!f){f={name:fn,items:[]};fams.push(f)}f.items.push(x)});
-  $('pkBody').innerHTML=fams.map((f,fi)=>`<div class="pk-fam" style="--fc:${FAMC[fi%FAMC.length]}"><h5><span class="fdot"></span>${esc(f.name)}<small>${f.items.length>1?f.items.length+' ürün · ':''}${f.items.reduce((a,x)=>a+colorsOf(x.id).length,0)} renk</small><i></i></h5>${f.items.map(x=>{const cs=colorsOf(x.id).sort((a,c)=>(st[c.id]||0)-(st[a.id]||0));return cs.length?prodBlock(x,cs):''}).join('')}</div>`).join('')||'<div class="pk-empty">Bu markada renk yok.</div>';
+  $('pkTabs').hidden=true;
+  const isEcoN=n=>/^eco\b/i.test(String(n||'').trim()),curC=cur&&invGet(cur),curX=curC&&invGet(curC.series);
+  const famsOf=list=>{const fams=[];list.forEach(({b,x})=>{const pe=findPrice(b.name,x.name),fn=pe?famOf(pe):x.name;let f=fams.find(y=>lc(y.name)===lc(fn));if(!f){f={name:fn,items:[]};fams.push(f)}f.items.push(x)});return fams};
+  const body=(list)=>list.map(({x})=>{const cs=colorsOf(x.id).sort((a,c)=>(st[c.id]||0)-(st[a.id]||0));return cs.length?prodBlock(x,cs):''}).join('');
+  $('pkBody').innerHTML=bs.map((b,bi)=>{const ss=seriesOf(b.id).filter(x=>colorsOf(x.id).length).map(x=>({b,x}));if(!ss.length)return '';
+    const bk=lc(b.name),eco=ss.filter(o=>isEcoN(o.x.name)),std=ss.filter(o=>!isEcoN(o.x.name)),has=L=>!!(curX&&L.some(o=>o.x.id===curX.id));
+    const nC=ss.reduce((a,o)=>a+colorsOf(o.x.id).length,0);
+    const sub=(lab,L,key)=>L.length?`<details class="pk-sub" data-acc="${esc(key)}"${PKOPEN.has(key)||has(L)?' open':''}><summary><b>${lab}</b><small>${L.length} ürün</small><span class="pk-chev" aria-hidden="true"></span></summary>${body(L)}</details>`:'';
+    return `<details class="pk-fam pk-acc" data-acc="${esc(bk)}" style="--fc:${FAMC[bi%FAMC.length]}"${PKOPEN.has(bk)||has(ss)?' open':''}><summary><h5><span class="fdot"></span>${esc(b.name)}<small>${ss.length} ürün · ${nC} renk${eco.length&&std.length?` · ${eco.length} Eco · ${std.length} normal`:''}</small><span class="pk-chev" aria-hidden="true"></span></h5></summary>${eco.length&&std.length?sub('Eco serisi',eco,bk+'|eco')+sub('Normal seri',std,bk+'|std'):body(ss)}</details>`}).join('')||'<div class="pk-empty">Depoda renk yok.</div>';
 }
 $('pkQ').addEventListener('input',renderPick);
 $('pkBody').addEventListener('toggle',e=>{const d=e.target;if(!d||!d.matches||!d.matches('details[data-acc]'))return;const k=d.dataset.acc;if(d.open)PKOPEN.add(k);else PKOPEN.delete(k)},true);
