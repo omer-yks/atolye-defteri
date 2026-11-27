@@ -797,6 +797,14 @@ dialog[open] .dlg-b>*:nth-child(n+7){animation-delay:.4s}
 .mtot .k{color:var(--mute)}
 .libhint{grid-column:1 / -1;background:var(--info-bg);color:var(--info);border-radius:10px;padding:9px 12px;font-size:.85rem}
 .libhint b{color:var(--ink)}
+.libhint{display:grid;gap:8px;padding:12px 14px;border-radius:14px}
+.lbx-h{display:flex;align-items:center;gap:8px;font-size:.88rem}.lbx-h em{font-style:normal;font-size:.72rem;font-weight:700;background:var(--surface);color:var(--info);border-radius:99px;padding:1px 8px;margin-left:4px}
+.lbx-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px}
+.lbx-g div{background:var(--surface);border-radius:10px;padding:7px 10px}
+.lbx-g small{display:block;font-size:.72rem;color:var(--mute)}.lbx-g b{font-size:.98rem;font-weight:700}.lbx-g b.pos{color:var(--ok)}.lbx-g b.neg{color:var(--late)}
+.lbx-p{display:grid;gap:3px;background:var(--surface);border-radius:10px;padding:8px 10px;color:var(--ink);font-size:.86rem}
+.lbx-p small{font-size:.72rem;color:var(--mute);margin-bottom:2px}.lbx-p b{display:inline-block;min-width:38px;color:var(--info)}
+.lbx-n{margin:0;font-size:.76rem;opacity:.85}
 /* Kütüphane */
 .libgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
 .libwrap{display:grid;gap:28px}
@@ -2851,14 +2859,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=1.87-1795801241"></script>
+<script src="shim.js?v=1.88-1795801413"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.87',VERDATE='14 Kasım 2026';
+const VERSION='1.88',VERDATE='14 Kasım 2026';
 const CHANGES=[
+  ['1.88',['Sipariş ve satışta “Kütüphaneden” kutusu satır satır: maliyet, önerilen fiyat, tahmini kâr ve üretilecek parçalar alt alta; parçaları değiştirince anında güncellenir']],
   ['1.87',['Sipariş > Maliyet: parça ve filament düzenleyicisi burada; setteki adet (−/+), parça çıkarma, kütüphaneden parça ekleme (ör. Not Kağıtlığı), her parçanın rengi ve gramı; maliyet ve kâr anında yeniden hesaplanır','Müşteri > Maliyet: “Parçaları ve filamenti düzenle” ile siparişin Maliyet sekmesi açılır']],
   ['1.86',['Müşteri sekmeleri sipariş penceresiyle aynı ve düzenlenebilir: üstten sipariş ya da satış seçilir; Maliyet’te parça parça döküm ve fiyat/tutar buradan değişir, Üretim’de baskı eklenir ve kayıt silinir, Ödeme’de ödeme eklenir ve silinir','Satışlarda da parça parça maliyet görünür']],
   ['1.85',['Müşteri > Maliyet: sipariş penceresindeki gibi parça parça (ör. Kurumsal Set: kalemlik, 2 logo, telefon standı), adet, 1 adetin ve toplamın maliyeti; altta filament, baskı ve kâr','Müşteri > Üretim: baskı buradan da girilir; siparişin Üretim sekmesiyle aynı kayıt, anında eşitlenir','Üretimde tabla adedi her kayıttan sonra 1’e döner, son girilen sayıda takılı kalmaz','Müşteri > Ödeme: sadece ödeme tarihleri, ödediği ve kalan borç (fazla ödediyse vereceğin)']],
@@ -3756,7 +3765,7 @@ function orderLib(){
     if(known&&(OAUTO||!$('oPrice').value.trim())){$('oPrice').value=numStr(r2(price));OAUTO=true}
     const parts=MIX.o&&MIX.o.item===key?MIX.o.parts:multiParts(L,MIX.o?MIX.o.parts:(editOrder&&editOrder.mix?editOrder.mix:null)).filter(p=>!off.includes(p.pid));
     box.hidden=false;
-    box.innerHTML=`${L.length} ürün${known?` · toplam maliyet <b data-olc>${tl(cost)}</b>, önerilen fiyat <b>${tl(price)}</b>${known<L.length?` <span style="opacity:.75">(${L.length-known} ürün kütüphanede yok)</span>`:''}`:''}<span class="stockline">Üretilecek: ${esc(parts.map(p=>`${nf.format(p.per)} ${p.name}`).join(' · '))}</span>`;
+    OLB={title:`${L.length} ürün`,tag:'',price:known?price:null,miss:L.length-known};
     if(!MIX.o||MIX.o.item!==key){MIX.o={item:key,parts,off:[...off]};renderMix('o')}else mixTotals('o');
     oLibCost();return;
   }
@@ -3765,11 +3774,19 @@ function orderLib(){
   const off=offFor('o',it,editOrder),cp=adjCP(it,off);
   if(OAUTO||!$('oPrice').value.trim()){$('oPrice').value=numStr(r2(cp.price*q));OAUTO=true}
   box.hidden=false;
-  box.innerHTML=`Kütüphaneden${it.set?' (grup)':''}: toplam maliyet <b data-olc>${tl(cp.cost*q)}</b>, önerilen fiyat <b>${tl(cp.price*q)}</b>${it.set?`<span class="stockline">Üretilecek: ${esc(libPartsOff(it,q,off))}</span>`:''}`;
+  OLB={title:it.name,tag:it.set?'set':'',price:cp.price*q,miss:0};
   mixFor('o',it,editOrder);oLibCost();
 }
-function oLibCost(){const box=$('oLib'),b=box.querySelector('[data-olc]');if(!b)return;const P=oDlgParts(),C=costOfParts(P);if(C)b.textContent=tl(C.cost);
-  const sl=box.querySelector('.stockline');if(sl&&P.length)sl.textContent='Üretilecek: '+P.map(p=>`${nf.format(p.target)} ${p.name}`).join(' · ')}
+let OLB=null;
+function libBoxHTML(o){
+  return `<div class="lbx-h"><span class="lbx-i" aria-hidden="true">📚</span><span>Kütüphaneden: <b>${esc(o.title)}</b>${o.tag?` <em>${esc(o.tag)}</em>`:''}</span></div>
+    <div class="lbx-g">${o.rows.map(r=>`<div><small>${r[0]}</small><b class="${r[2]||''}">${r[1]}</b></div>`).join('')}</div>
+    ${o.parts&&o.parts.length?`<div class="lbx-p"><small>${o.ptitle||'Üretilecek parçalar'}</small>${o.parts.map(p=>`<div><b>${nf.format(p[0])} ×</b> ${esc(p[1])}</div>`).join('')}</div>`:''}
+    ${o.note?`<p class="lbx-n">${o.note}</p>`:''}`;
+}
+function oLibCost(){const box=$('oLib');if(!OLB||box.hidden)return;const P=oDlgParts(),C=costOfParts(P);
+  const rows=[];if(C)rows.push(['Toplam maliyet',tl(C.cost)]);if(OLB.price!=null)rows.push(['Önerilen fiyat',tl(OLB.price)]);if(C&&OLB.price!=null)rows.push(['Tahmini kâr',`${OLB.price-C.cost<0?'−':''}${tl(Math.abs(OLB.price-C.cost))}`,OLB.price-C.cost<0?'neg':'pos']);
+  box.innerHTML=libBoxHTML({title:OLB.title,tag:OLB.tag,rows,parts:P.map(p=>[p.target,p.name]),note:`Fiyat alanı önerilen fiyatla doldurulur; elle değiştirebilirsin. Parçaları ve filamenti Maliyet sekmesinden düzenleyebilirsin.${OLB.miss?` ${OLB.miss} ürün kütüphanede yok, hesaba katılmadı.`:''}`})}
 $('oItem').addEventListener('input',orderLib);$('oQty').addEventListener('input',orderLib);$('oPrice').addEventListener('input',()=>{OAUTO=false});
 $('fOrder').addEventListener('submit',e=>{e.preventDefault();const o=readOrder();if(!o)return;put('orders',o);$('dOrder').close();toast(editOrder?'Sipariş güncellendi':'Sipariş eklendi')});
 $('oDeliverBtn').addEventListener('click',()=>{
@@ -3994,6 +4011,7 @@ function renderMix(k){
 }
 function mixTotals(k){
   const box=$(k+'Mix'),M=MIX[k];if(!M||box.hidden)return;
+  if(k==='o')oLibCost();
   try{if(k==='o'&&OTAB==='cost'&&!$('oCost').hidden&&$('oCostBody'))setTimeout(()=>{if(OTAB==='cost')renderCost()},0)}catch(e){}
   const q=mixQty(k);
   M.parts.forEach((pt,i)=>{
@@ -4132,7 +4150,8 @@ function saleLib(){
   const amt=num($('sAmt').value)||0,cost=num($('sCost').value)||0,p=amt-cost;
   box.hidden=false;
   const prev=editSale?[editSale.use,...(editSale.uses||[])]:[];
-  box.innerHTML=`Kütüphaneden${it.set?' (grup)':''}: ${it.set?'1 set':'adet başı'} maliyet <b>${tl(cp.cost)}</b>, fiyat <b>${tl(cp.price)}</b> · Bu satışın kârı <b>${p<0?'−':''}${tl(Math.abs(p))}</b>${it.set?`<span class="stockline">${esc(libPartsOff(it,q,off))}${off.length?' · bazı parçalar çıkarıldı':''}</span>`:''}`;
+  {const P=MIX.s&&MIX.s.item===it.id?MIX.s.parts.map(x=>[(+x.per||1)*q,x.name]):(it.set?(it.items||[]).filter(x=>!off.includes(x.id)).map(x=>{const m=libById(x.id);return m?[x.q*q,m.name]:null}).filter(Boolean):[]);
+   box.innerHTML=libBoxHTML({title:it.name,tag:it.set?'set':'',rows:[[it.set?'1 set maliyeti':'1 adet maliyeti',tl(cp.cost)],[it.set?'1 set fiyatı':'1 adet fiyatı',tl(cp.price)],['Bu satışın kârı',`${p<0?'−':''}${tl(Math.abs(p))}`,p<0?'neg':'pos']],parts:it.set?P:[],ptitle:'Satılan parçalar',note:'Maliyet ve tutar alanları buna göre doldurulur; elle değiştirebilirsin.'+(off.length?' Bazı parçalar çıkarıldı.':'')})}
   mixFor('s',it,editSale);
 }
 function saleOrdHint(){
