@@ -2879,8 +2879,9 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.90',VERDATE='14 Kasım 2026';
+const VERSION='1.91',VERDATE='14 Kasım 2026';
 const CHANGES=[
+  ['1.91',['Önerilen fiyat %100 kârla hesaplanır (maliyetin 2 katı); sipariş ve satışta fiyat alanı buna göre dolar, parçaları değiştirince güncellenir']],
   ['1.90',['Bütün filament seçme pencereleri aynı: marka > Eco serisi / Normal seri > ürün açılır kapanır (sipariş, satış, hesaplayıcı, baskı)']],
   ['1.89',['Renk ve filament: ürün seçince renkler otomatik gelmez, “Filament seçilmedi” yazar; gramlar dolu gelir, filamenti sen seçersin','Filament seç: markalar açılır kapanır; her markada “Eco serisi” ve “Normal seri” ayrı açılır gruplar']],
   ['1.88',['Sipariş ve satışta “Kütüphaneden” kutusu satır satır: maliyet, önerilen fiyat, tahmini kâr ve üretilecek parçalar alt alta; parçaları değiştirince anında güncellenir']],
@@ -3642,7 +3643,7 @@ function renderCost(){
   </div>
   <div class="cres" style="grid-column:1 / -1">
     <div class="crow"><span>Toplam maliyet<small>${nf.format(C.n)} parça</small></span><b>${tl(cost)}</b></div>
-    <div class="crow"><span>Sipariş fiyatı<small>kütüphaneye göre önerilen ${tl(sug)}</small></span><b>${tl(price)}</b></div>
+    <div class="crow"><span>Sipariş fiyatı<small>önerilen (%100 kâr) ${tl(cost*2)}</small></span><b>${tl(price)}</b></div>
     <hr>
     <div class="cprofit"><span>Kâr${cost>0?`<br>maliyet üzerine %${Math.round(profit/cost*100)}`:''}</span><b class="${profit<0?'neg':'pos'}">${profit<0?'−':''}${tl(Math.abs(profit))}</b></div>
   </div>
@@ -3801,7 +3802,8 @@ function libBoxHTML(o){
     ${o.note?`<p class="lbx-n">${o.note}</p>`:''}`;
 }
 function oLibCost(){const box=$('oLib');if(!OLB||box.hidden)return;const P=oDlgParts(),C=costOfParts(P);
-  const rows=[];if(C)rows.push(['Toplam maliyet',tl(C.cost)]);if(OLB.price!=null)rows.push(['Önerilen fiyat',tl(OLB.price)]);if(C&&OLB.price!=null)rows.push(['Tahmini kâr',`${OLB.price-C.cost<0?'−':''}${tl(Math.abs(OLB.price-C.cost))}`,OLB.price-C.cost<0?'neg':'pos']);
+  if(C){OLB.price=r2(C.cost*2);if(OAUTO||!$('oPrice').value.trim()){$('oPrice').value=numStr(OLB.price);OAUTO=true;try{paintPayTab()}catch(e){}}}
+  const rows=[];if(C)rows.push(['Toplam maliyet',tl(C.cost)]);if(OLB.price!=null)rows.push([C?'Önerilen fiyat · %100 kâr':'Önerilen fiyat',tl(OLB.price)]);if(C&&OLB.price!=null)rows.push(['Tahmini kâr',`${OLB.price-C.cost<0?'−':''}${tl(Math.abs(OLB.price-C.cost))}`,OLB.price-C.cost<0?'neg':'pos']);
   box.innerHTML=libBoxHTML({title:OLB.title,tag:OLB.tag,rows,parts:P.map(p=>[p.target,p.name]),note:`Fiyat alanı önerilen fiyatla doldurulur; elle değiştirebilirsin. Parçaları ve filamenti Maliyet sekmesinden düzenleyebilirsin.${OLB.miss?` ${OLB.miss} ürün kütüphanede yok, hesaba katılmadı.`:''}`})}
 $('oItem').addEventListener('input',orderLib);$('oQty').addEventListener('input',orderLib);$('oPrice').addEventListener('input',()=>{OAUTO=false});
 $('fOrder').addEventListener('submit',e=>{e.preventDefault();const o=readOrder();if(!o)return;put('orders',o);$('dOrder').close();toast(editOrder?'Sipariş güncellendi':'Sipariş eklendi')});
@@ -4169,12 +4171,12 @@ function saleLib(){
   if(!it){box.hidden=true;MIX.s=null;renderMix('s');return}
   const off=offFor('s',it,editSale),cp=adjCP(it,off);
   if(AUTO.cost||!$('sCost').value.trim()){$('sCost').value=numStr(r2(cp.cost*q));AUTO.cost=true}
-  if(AUTO.amt||!$('sAmt').value.trim()){$('sAmt').value=numStr(r2(cp.price*q));AUTO.amt=true}
+  if(AUTO.amt||!$('sAmt').value.trim()){$('sAmt').value=numStr(r2(cp.cost*2*q));AUTO.amt=true}
   const amt=num($('sAmt').value)||0,cost=num($('sCost').value)||0,p=amt-cost;
   box.hidden=false;
   const prev=editSale?[editSale.use,...(editSale.uses||[])]:[];
   {const P=MIX.s&&MIX.s.item===it.id?MIX.s.parts.map(x=>[(+x.per||1)*q,x.name]):(it.set?(it.items||[]).filter(x=>!off.includes(x.id)).map(x=>{const m=libById(x.id);return m?[x.q*q,m.name]:null}).filter(Boolean):[]);
-   box.innerHTML=libBoxHTML({title:it.name,tag:it.set?'set':'',rows:[[it.set?'1 set maliyeti':'1 adet maliyeti',tl(cp.cost)],[it.set?'1 set fiyatı':'1 adet fiyatı',tl(cp.price)],['Bu satışın kârı',`${p<0?'−':''}${tl(Math.abs(p))}`,p<0?'neg':'pos']],parts:it.set?P:[],ptitle:'Satılan parçalar',note:'Maliyet ve tutar alanları buna göre doldurulur; elle değiştirebilirsin.'+(off.length?' Bazı parçalar çıkarıldı.':'')})}
+   box.innerHTML=libBoxHTML({title:it.name,tag:it.set?'set':'',rows:[[it.set?'1 set maliyeti':'1 adet maliyeti',tl(cp.cost)],[(it.set?'1 set':'1 adet')+' önerilen · %100 kâr',tl(cp.cost*2)],['Bu satışın kârı',`${p<0?'−':''}${tl(Math.abs(p))}`,p<0?'neg':'pos']],parts:it.set?P:[],ptitle:'Satılan parçalar',note:'Maliyet ve tutar alanları buna göre doldurulur; elle değiştirebilirsin.'+(off.length?' Bazı parçalar çıkarıldı.':'')})}
   mixFor('s',it,editSale);
 }
 function saleOrdHint(){
@@ -6494,7 +6496,7 @@ function cdTabHTML(c){
 }
 function cdCostView(it,c){
   const r=it.o||it.x,C=orderCost(r),price=it.o?(+r.price||0):(+r.amt||0),lab=it.o?'Sipariş fiyatı':'Satış tutarı';
-  const pin=c.free?'':`<div class="crow"><span>${lab}<small>${C?`kütüphaneye göre önerilen ${tl(C.sug)} · `:''}değiştirip Enter’a bas</small></span><span class="cdpin"><input data-cdprice inputmode="decimal" value="${esc(inStr(r2(price)))}" aria-label="${lab}"> ₺</span></div>`;
+  const pin=c.free?'':`<div class="crow"><span>${lab}<small>${C?`önerilen (%100 kâr) ${tl(C.cost*2)} · `:''}değiştirip Enter’a bas</small></span><span class="cdpin"><input data-cdprice inputmode="decimal" value="${esc(inStr(r2(price)))}" aria-label="${lab}"> ₺</span></div>`;
   if(!C)return `<div class="cbox"><h4>Parça parça maliyet</h4><p class="help" style="margin:0">Bu ürün kütüphanede yok; maliyet hesaplanamadı. Hesaplayıcı'da hesaplayıp kaydedince burada görünür.${it.x&&+r.cost?` Satışta kayıtlı maliyet: <b>${tl(+r.cost)}</b>.`:''}</p></div>${pin?`<div class="cres">${pin}</div>`:''}`;
   const {rows,cost,g,hrs,fil}=C,profit=price-cost;
   return `<button type="button" class="btn" data-cdedit="${it.k}" style="justify-self:start">✎ Parçaları ve filamenti düzenle</button><div class="cbox"><h4>Parça parça maliyet</h4>
