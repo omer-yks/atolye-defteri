@@ -817,7 +817,14 @@ details.pk-sub .pk-ptile{background:var(--soft)}
 .lbx-h{display:flex;align-items:center;gap:8px;font-size:.88rem}.lbx-h em{font-style:normal;font-size:.72rem;font-weight:700;background:var(--surface);color:var(--info);border-radius:99px;padding:1px 8px;margin-left:4px}
 .lbx-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px}
 .lbx-g div{background:var(--surface);border-radius:10px;padding:7px 10px}
-.lbx-g small{display:block;font-size:.72rem;color:var(--mute)}.lbx-g b{font-size:.98rem;font-weight:700}.lbx-g b.pos{color:var(--ok)}.lbx-g b.mine{color:var(--accent)}.lbx-g b.neg{color:var(--late)}
+.lbx-g small{display:block;font-size:.72rem;color:var(--mute)}.lbx-g b{font-size:.98rem;font-weight:700}.lbx-g b.pos{color:var(--ok)}
+.ftab{display:grid;gap:6px}.ftab-h{display:flex;align-items:baseline;gap:8px}.ftab-h b{font-size:.9rem}.ftab-h small{font-size:.76rem;color:var(--mute)}
+.ftr{display:grid;grid-template-columns:22px minmax(0,1fr) auto auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px;animation:fadeUp .3s both}
+.ftr .swt{width:20px;height:20px}.ftr .n{min-width:0}.ftr .n b{display:block;font-size:.9rem;font-weight:700;overflow-wrap:anywhere}.ftr .n small{display:block;font-size:.74rem;color:var(--mute)}
+.ftr .g{text-align:right}.ftr .g small{display:block;font-size:.68rem;color:var(--mute)}.ftr .g b{font-weight:700;white-space:nowrap}
+.ftact{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px}
+.ftnote{display:block;font-size:.76rem;line-height:1.5}
+@media (max-width:640px){.ftr{grid-template-columns:20px minmax(0,1fr) auto}.ftr .chip{grid-column:2 / -1;justify-self:start}}.lbx-g b.mine{color:var(--accent)}.lbx-g b.neg{color:var(--late)}
 .lbx-p{display:grid;gap:3px;background:var(--surface);border-radius:10px;padding:8px 10px;color:var(--ink);font-size:.86rem}
 .lbx-p small{font-size:.72rem;color:var(--mute);margin-bottom:2px}.lbx-p b{display:inline-block;min-width:38px;color:var(--info)}
 .lbx-n{margin:0;font-size:.76rem;opacity:.85}
@@ -2875,14 +2882,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=1.92-1795806184"></script>
+<script src="shim.js?v=1.93-1795806380"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.92',VERDATE='14 Kasım 2026';
+const VERSION='1.93',VERDATE='14 Kasım 2026';
 const CHANGES=[
+  ['1.93',['Siparişte filament ihtiyacı sade: her renk ayrı satırda gerekli miktar ve tek bir durum (Ayrıldı / Depoda var / … eksik / Depoda yok); düğmeler ve açıklama kısaldı']],
   ['1.92',['Kütüphaneden kutusunda senin belirlediğin fiyat da görünür; kâr ve kâr oranı o fiyata göre hesaplanır']],
   ['1.91',['Önerilen fiyat %100 kârla hesaplanır (maliyetin 2 katı); sipariş ve satışta fiyat alanı buna göre dolar, parçaları değiştirince güncellenir']],
   ['1.90',['Bütün filament seçme pencereleri aynı: marka > Eco serisi / Normal seri > ürün açılır kapanır (sipariş, satış, hesaplayıcı, baskı)']],
@@ -4072,8 +4080,12 @@ function mixTotals(k){
     const pend=ORES?sumByGroup(ORES):{},own=ORES?sumByGroup(resOwn):{};
     const rows=need.map(r=>{const c=Math.min(r.need,cov[r.gk]||0),inDep=groupCids(r.gk).length>0,have=Math.max(0,groupStock(r.gk,st)+(own[r.gk]||0)-(pend[r.gk]||0));return{...r,cov:c,have,inDep,note:groupNote(r.gk,st),rem:Math.max(0,r.need-c)}});
     const canRes=rows.some(r=>r.rem>0.5&&r.have>0.5),resAmt=rows.reduce((a,r)=>a+(r.inDep?Math.min(r.rem,r.have):0),0),allCov=rows.some(r=>r.cov>0.5)&&rows.every(r=>!r.inDep||r.rem<=0.5),noStock=!canRes&&rows.some(r=>r.rem>0.5);
-    box.querySelector('[data-mtot]').innerHTML=(rows.length?`<span class="k">Toplam filament${plog.length?' (üretilenler dahil)':''}</span>`+rows.map(r=>`<div>${swatch(r.col)}<b>${fmtG(r.need)}</b> ${esc(r.bn+' '+famForC(r.bn,r.sn)+' '+r.col)} ${r.cov>0.5?`<span class="ok2">· ${fmtG(r.cov)} ayrıldı</span>`:''}${r.rem>0.5?(r.inDep?`<span class="${r.have>=r.rem?'ok2':'bad'}">· depoda ${fmtG(r.have)}${r.note}${r.have>=r.rem?'':` · ${fmtG(r.rem-r.have)} alınmalı`}</span>`:'<span class="bad">· depoda yok</span>'):''}</div>`).join('')
-      +`<div class="ores${allCov?' done':''}"><div class="ores-b">${canRes?`<button type="button" class="btn" data-ores data-amt="${r2(resAmt)}">Depodan düş · ${fmtG(resAmt)}</button>`:`<button type="button" class="btn ${allCov?'okb':''}" disabled>${allCov?'✓ Depodan düşüldü':noStock?'Depoda yeterli yok':'Depodan düş'}</button>`}<button type="button" class="btn" data-obuy aria-pressed="${!!OINBUY}">${OINBUY?'✓ Alınacaklarda':'Alınacaklara ekle'}</button></div>${allCov?`<b class="ok2" style="font-size:.84rem">✓ Bu siparişin filamenti depodan düşüldü${ORES?' (kaydedince kesinleşir)':''}.</b>`:''}<small class="k">${ORES&&!allCov?'Kaydedince depodan ayrılır. ':''}Depodan düş: depoda olanı bu siparişe ayırır. Alınacaklara ekle: Depo → Alınacaklar listesinde eksikleri ve tutarı görürsün.</small></div>`
+    const stat=r=>{if(r.rem<=0.5)return `<span class="chip ok">✓ Ayrıldı</span>`;if(!r.inDep)return `<span class="chip late">Depoda yok</span>`;return r.have>=r.rem?`<span class="chip info">Depoda var</span>`:`<span class="chip late">${fmtG(r.rem-r.have)} eksik</span>`};
+    const sub=r=>[r.cov>0.5&&r.rem>0.5?`${fmtG(r.cov)} ayrıldı`:'',r.rem>0.5&&r.inDep?`depoda ${fmtG(r.have)}${r.note}`:'',!r.inDep?`${fmtG(r.rem)} alınmalı`:''].filter(Boolean).join(' · ');
+    box.querySelector('[data-mtot]').innerHTML=(rows.length?`<div class="ftab"><div class="ftab-h"><b>Filament ihtiyacı</b>${plog.length?'<small>üretilenler dahil</small>':''}</div>
+      ${rows.map(r=>`<div class="ftr">${swatch(r.col)}<span class="n"><b>${esc(famForC(r.bn,r.sn)+' '+r.col)}</b><small>${esc(r.bn)}${sub(r)?' · '+sub(r):''}</small></span><span class="g"><small>Gerekli</small><b>${fmtG(r.need)}</b></span>${stat(r)}</div>`).join('')}</div>
+      <div class="ftact${allCov?' done':''}">${canRes?`<button type="button" class="btn primary" data-ores data-amt="${r2(resAmt)}">Depodan düş · ${fmtG(resAmt)}</button>`:allCov?`<span class="chip ok">✓ Filament depodan düşüldü${ORES?' · kaydedince kesinleşir':''}</span>`:''}<button type="button" class="btn" data-obuy aria-pressed="${!!OINBUY}">${OINBUY?'✓ Alınacaklarda':'Eksikleri alınacaklara ekle'}</button></div>
+      <small class="k ftnote">${canRes?'<b>Depodan düş:</b> depodakini bu siparişe ayırır. ':''}${noStock&&!canRes?'Depoda yeterli filament yok. ':''}<b>Alınacaklara ekle:</b> eksikleri Depo → Alınacaklar listesine yazar.${ORES&&!allCov?' Kaydedince depodan ayrılır.':''}</small>`
       :'<span class="k">Renk seçince toplam filament ve depoda olup olmadığı burada görünür.</span>')
       +(miss?'<span class="k">Rengi seçilmemiş satırlar hesaba katılmaz.</span>':'');
     renderFCalc(k,q,plog,prev,rec);return;
@@ -4151,7 +4163,7 @@ function fcalcBuy(k){
       if(!tot){toast('Depoda ayrılacak filament yok');return}
       if(recNow&&recNow.id&&S.orders.some(x=>x.id===recNow.id)){ORES=null;const cur=S.orders.find(x=>x.id===recNow.id);editOrder={...cur,reserved:res};put('orders',editOrder);renderMix('o');toast(`✓ ${fmtG(tot)} filament depodan düşüldü`)}
       else{ORES=res;$('dOrder').dataset.dirty='1';mixTotals('o');toast(`✓ ${fmtG(tot)} ayrıldı · siparişi kaydedince depodan düşer`)}
-      const d=$('oMix').querySelector('.ores');if(d&&!REDUCE())d.animate([{boxShadow:'0 0 0 4px color-mix(in srgb,var(--ok) 35%,transparent)'},{boxShadow:'0 0 0 0 transparent'}],{duration:900});return}
+      const d=$('oMix').querySelector('.ftact');if(d&&!REDUCE())d.animate([{boxShadow:'0 0 0 4px color-mix(in srgb,var(--ok) 35%,transparent)'},{boxShadow:'0 0 0 0 transparent'}],{duration:900});return}
     const pd=e.target.closest('[data-mpdel]');if(pd){const M=MIX[k],pt=M.parts[+pd.dataset.mpdel];if(!pt||M.parts.length<2)return;M.off=[...(M.off||[]),pt.pid];M.parts.splice(+pd.dataset.mpdel,1);renderMix(k);k==='s'?saleLib():orderLib();toast(`${pt.name} çıkarıldı`);(k==='s'?$('dSale'):$('dOrder')).dataset.dirty='1';return}
     const pa=e.target.closest('[data-mpadd]');if(pa){const M=MIX[k],pid=pa.dataset.mpadd;M.off=(M.off||[]).filter(x=>x!==pid);const full=fullParts(k);const extra=M.parts.filter(x=>!full.some(p=>p.pid===x.pid));M.parts=[...full.filter(p=>!M.off.includes(p.pid)).map(p=>M.parts.find(x=>x.pid===p.pid)||p),...extra];renderMix(k);k==='s'?saleLib():orderLib();(k==='s'?$('dSale'):$('dOrder')).dataset.dirty='1';return}
     const fi=e.target.closest('[data-fire]');if(fi){FIRE=+fi.dataset.fire;try{localStorage.setItem('ad-fire',FIRE)}catch(er){}mixTotals(k);return}
