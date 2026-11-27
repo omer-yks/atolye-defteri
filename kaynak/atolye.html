@@ -2663,7 +2663,7 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 <dialog id="dCust" aria-labelledby="dCustT">
   <form method="dialog" id="fCust" novalidate>
     <div class="dlg-h"><div><h3 id="dCustT">Müşteri</h3><p id="dCustTs"></p></div><button type="button" class="x" data-close aria-label="Kapat"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-    <div class="otabs" id="cdTabs" hidden><div class="period seg" role="tablist" aria-label="Müşteri bölümleri"><span class="seg-ind" aria-hidden="true"></span><button type="button" role="tab" data-cdt="info" aria-selected="true">Bilgiler</button><button type="button" role="tab" data-cdt="cost" aria-selected="false">Maliyet</button><button type="button" role="tab" data-cdt="prod" aria-selected="false">Üretim <span id="cdTProd" style="opacity:.7;font-weight:500"></span></button><button type="button" role="tab" data-cdt="pay" aria-selected="false">Ödeme <span id="cdTPay" style="opacity:.7;font-weight:500"></span></button></div></div>
+    <div class="otabs" id="cdTabs" hidden><div class="period seg" role="tablist" aria-label="Müşteri bölümleri"><span class="seg-ind" aria-hidden="true"></span><button type="button" role="tab" data-cdt="cost" aria-selected="false">Maliyet</button><button type="button" role="tab" data-cdt="info" aria-selected="true">Bilgiler</button><button type="button" role="tab" data-cdt="prod" aria-selected="false">Üretim <span id="cdTProd" style="opacity:.7;font-weight:500"></span></button><button type="button" role="tab" data-cdt="pay" aria-selected="false">Ödeme <span id="cdTPay" style="opacity:.7;font-weight:500"></span></button></div></div>
     <div class="dlg-b">
       <div class="cdtop" id="cdTop"></div>
       <div class="cdstats" id="cdStats"></div>
@@ -2818,7 +2818,7 @@ const MAXF=16;
 document.documentElement.lang='tr';
 const VERSION='1.84',VERDATE='14 Kasım 2026';
 const CHANGES=[
-  ['1.84',['Müşteri penceresi: bekleyen siparişlerde sipariş tarihi, adet, teslim, üretim ve ödeme ilk bakışta görünür; toplu siparişlerde aynı ürünler birleşir','Müşteri penceresine Maliyet, Üretim ve Ödeme sekmeleri: sipariş sipariş maliyet ve kâr, parça parça üretim ilerlemesi, ödenen/kalan ve ödeme geçmişi']],
+  ['1.84',['Müşteri penceresi: bekleyen siparişlerde sipariş tarihi, adet, teslim, üretim ve ödeme ilk bakışta görünür; toplu siparişlerde aynı ürünler birleşir','Müşteri penceresinin üstünde sipariş penceresindeki gibi Maliyet · Bilgiler · Üretim · Ödeme sekmeleri; + Satış ve + Sipariş her sekmede altta: sipariş sipariş maliyet ve kâr, parça parça üretim ilerlemesi, ödenen/kalan ve ödeme geçmişi']],
   ['1.83',['Yapay zekâ: hesabında açık olan Gemini modelini kendisi bulur, biri çalışmazsa sıradakini dener','Ayarlar > Yapay zekâ: “Kaydet ve dene”; çalışmazsa Google’ın gerçek hata mesajı görünür']],
   ['1.82',['Ana sayfa: Masraflar kartına baskı maliyeti eklendi; üzerine gelince ne için harcandığı sipariş sipariş, ürün ürün görünür (filament alımı stoğa sayılır, iki kez sayılmaz)','Baskılar grafiği: yeni Çizgi ve Alan türleri, Maliyet ölçüsü, ortalama çizgisi ve özet kutuları, yenilenen görünüm','Grafikte Asistan: ne görmek istediğini yaz ya da boş bırak, grafiği kendisi ayarlar ve kısa bir yorum yazar','Sadeleştirme: grafik türleri simgeyle, özet tek satırda; masraf dökümü daha kısa']],
   ['1.81',['Ayarlar: “Mikrofon ve sesle yazma” bölümü; mikrofonu dene, sorun neyse ve nereden açılacağı yazar']],
@@ -6358,7 +6358,7 @@ function cdPaint(){
   const box=$('cdTabs').querySelector('.seg');box.querySelectorAll('[data-cdt]').forEach(b=>b.setAttribute('aria-selected',b.dataset.cdt===CDTAB));placeInd(box);
   const info=CDTAB==='info';$('dCust').querySelectorAll('.cdinfo').forEach(el=>el.hidden=!info);$('cdPane').hidden=info;
   if(!info&&CUR)$('cdPane').innerHTML=CDTAB==='cost'?cdCostHTML(CUR):CDTAB==='prod'?cdProdHTML(CUR):cdPayHTML(CUR);
-  $('cdStats').hidden=!CUR||!info;
+  $('cdStats').hidden=!CUR||!info;$('cdTop').hidden=!CUR||!info;
   if(info){$('cdOpen').hidden=!$('cdOpen').innerHTML;$('cdFav').hidden=!$('cdFav').innerHTML;$('cdHist').hidden=!$('cdHist').innerHTML}
 }
 function cdOrders(c){return c.orders.slice().sort((a,b)=>(a.status==='done')-(b.status==='done')||((a.created||'')<(b.created||'')?1:-1))}
@@ -6420,7 +6420,7 @@ function openCust(key){
   $('cdEditBtns').hidden=!(c&&c.prof);resetDel('cdDel');$('cdDel').textContent='Kartı sil';
   $('cdSale').hidden=$('cdOrder').hidden=!c;
   CDTAB='info';$('cdTabs').hidden=!c;
-  if(c){const op=c.orders.filter(o=>o.status!=='done');let d=0,tt=0;op.forEach(o=>{const pg=prodProgress(o);d+=pg.done;tt+=pg.target});$('cdTProd').textContent=tt?`${nf.format(d)}/${nf.format(tt)}`:'';$('cdTPay').textContent=!c.free&&c.owed>0.009?'· borç':''}
+  if(c){const op=c.orders.filter(o=>o.status!=='done');let d=0,tt=0;op.forEach(o=>{const pg=prodProgress(o);d+=pg.done;tt+=pg.target});$('cdTProd').textContent=tt?`${nf.format(d)}/${nf.format(tt)}`:'';$('cdTPay').textContent=c.free?'':c.owed>0.009?tl(c.owed):(c.orders.some(o=>+o.price>0)||c.sales.length?'✓':'')}
   $('dCust').showModal();cdPaint();if(!c)$('cdName').focus();
 }
 $('fCust').addEventListener('submit',e=>{
