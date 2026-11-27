@@ -818,6 +818,7 @@ details.pk-sub .pk-ptile{background:var(--soft)}
 .lbx-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px}
 .lbx-g div{background:var(--surface);border-radius:10px;padding:7px 10px}
 .lbx-g small{display:block;font-size:.72rem;color:var(--mute)}.lbx-g b{font-size:.98rem;font-weight:700}.lbx-g b.pos{color:var(--ok)}
+.due-h{display:flex;align-items:center;justify-content:space-between;gap:8px}.due-h .o-urg{margin:0;padding:0;font-size:.8rem}.due-h .o-urg span{font-weight:700}
 .mtot{border-top:0;padding-top:0;gap:10px}
 .mtot .fsec,.fsec{--sc:var(--accent);display:grid;gap:10px;padding:14px;border-radius:16px;background:color-mix(in srgb,var(--sc) 6%,var(--soft));border:1px solid color-mix(in srgb,var(--sc) 18%,transparent);animation:fadeUp .35s both}
 .fsec.s2{--sc:var(--ok)}.fsec.s3{--sc:var(--late)}.fsec.s3.none{--sc:var(--ok)}
@@ -2362,7 +2363,7 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
     <div class="otabs" id="oTabs" hidden><div class="period seg" role="tablist" aria-label="Sipariş bölümleri"><span class="seg-ind" aria-hidden="true"></span><button type="button" role="tab" data-otab="cost" aria-selected="false">Maliyet</button><button type="button" role="tab" data-otab="info" aria-selected="true">Bilgiler</button><button type="button" role="tab" data-otab="prod" aria-selected="false">Üretim <span id="oTabProg" style="opacity:.7;font-weight:500"></span></button><button type="button" role="tab" data-otab="pay" aria-selected="false">Ödeme <span id="oTabPay" style="opacity:.7;font-weight:500"></span></button></div></div>
     <div class="dlg-b" id="oInfo">
       <div class="f"><label for="oCust">Müşteri</label><input id="oCust" list="custList" autocomplete="off" placeholder="ör. Ayşe Demir"></div>
-      <div class="f"><label for="oDue">Teslim tarihi</label><input id="oDue" type="date"><label class="o-urg"><input type="checkbox" id="oUrgent"> <span>Acil sipariş</span> <small>baskı planında öne alınır</small></label></div>
+      <div class="f"><div class="due-h"><label for="oDue">Teslim tarihi</label><label class="o-urg" title="Baskı planında öne alınır"><input type="checkbox" id="oUrgent"> <span>Acil sipariş</span></label></div><input id="oDue" type="date"></div>
       <div class="f w olines" id="oLines">
         <div class="orow orh" aria-hidden="true"><span class="n"></span><span>Ürün</span><span>Adet</span><span></span></div>
         <div class="orow first"><span class="n">1</span><input id="oItem" list="libList" autocomplete="off" placeholder="ör. Kulaklık standı" aria-label="Ürün"><input id="oQty" inputmode="numeric" value="1" aria-label="Adet"><span></span></div>
@@ -2928,14 +2929,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=1.94-1795807058"></script>
+<script src="shim.js?v=1.95-1795807335"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.94',VERDATE='14 Kasım 2026';
+const VERSION='1.95',VERDATE='14 Kasım 2026';
 const CHANGES=[
+  ['1.95',['Siparişte “Acil sipariş” kutucuğu teslim tarihinin üstüne, başlığın yanına taşındı; alttaki boşluk kalktı']],
   ['1.94',['Siparişte filament bölümü baştan: 1) bu siparişte kullanılacak filament, 2) depoda olan, 3) alınması gereken','Alınacaklara ekle: fire payı (%0/%10/%20) ile ne alınacağını gösteren onay penceresi; onaylayınca sipariş Alınacaklar listesine kendi kartıyla eklenir','Siparişteki “Ne almalıyım?” kutusu kaldırıldı (bu bölüme taşındı)','Yeni görünüm: her adım kendi renginde, başlıkta toplamlar, “Depoda olan”da hazır olan miktar için doluluk çubuğu']],
   ['1.93',['Siparişte filament ihtiyacı sade: her renk ayrı satırda gerekli miktar ve tek bir durum (Ayrıldı / Depoda var / … eksik / Depoda yok); düğmeler ve açıklama kısaldı']],
   ['1.92',['Kütüphaneden kutusunda senin belirlediğin fiyat da görünür; kâr ve kâr oranı o fiyata göre hesaplanır']],
