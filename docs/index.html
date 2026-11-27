@@ -818,6 +818,23 @@ details.pk-sub .pk-ptile{background:var(--soft)}
 .lbx-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px}
 .lbx-g div{background:var(--surface);border-radius:10px;padding:7px 10px}
 .lbx-g small{display:block;font-size:.72rem;color:var(--mute)}.lbx-g b{font-size:.98rem;font-weight:700}.lbx-g b.pos{color:var(--ok)}
+.mtot .fsec,.fsec{display:grid;gap:6px;padding:12px;border-radius:14px;background:var(--soft);animation:fadeUp .3s both}
+.mtot .fsec .ftr{display:grid}.mtot .fsec .fsec-h,.mtot .fsec .ftact{display:flex}.mtot .fok{display:block}.mtot{border-top:0;padding-top:0}
+.fsec+.fsec{margin-top:8px}
+.fsec-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px}.fsec-h b{font-size:.92rem}.fsec-h small{font-size:.76rem;color:var(--mute)}
+.fsec-h .no{width:22px;height:22px;border-radius:50%;background:var(--char);color:var(--on-char);display:grid;place-items:center;font-size:.74rem;font-weight:700;flex:none}
+.fsec .ftr{grid-template-columns:22px minmax(0,1fr) auto}
+.ftr .v{text-align:right;white-space:nowrap;font-weight:700}.ftr .v small{display:block;font-size:.72rem;font-weight:500;color:var(--mute)}.ftr .v small.okc{color:var(--ok)}.ftr .v.mute{color:var(--mute);font-weight:600}
+.ftr.short{border-color:color-mix(in srgb,var(--late) 35%,var(--line))}.ftr.short .v{color:var(--late)}
+.fsec>.btn{justify-self:start;margin-top:2px}
+.fok{font-size:.88rem;font-weight:600;color:var(--ok);padding:4px 2px}
+.bok-fire{display:flex;align-items:center;justify-content:space-between;gap:10px;grid-column:1 / -1}.bok-fire span{font-weight:700}
+.bok-seg{display:flex;gap:6px}.bok-seg button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:7px 14px;font-weight:700;color:var(--mute)}.bok-seg button[aria-pressed="true"]{background:var(--char);color:var(--on-char);border-color:var(--char)}
+.bok-l{display:grid;gap:6px;grid-column:1 / -1}
+.bok-r{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--soft);border-radius:12px;padding:10px 12px}
+.bok-r .n b{display:block;font-weight:700}.bok-r .n small{font-size:.74rem;color:var(--mute)}.bok-r .c{font-size:.84rem;color:var(--mute);text-align:right}.bok-r .c b{color:var(--ink)}.bok-r .c b.acc{color:var(--accent);font-size:1rem}.bok-r .c i{font-style:normal;margin:0 2px}
+.bok-t{grid-column:1 / -1;display:flex;justify-content:space-between;align-items:baseline;background:var(--char);color:var(--on-char);border-radius:12px;padding:12px 14px}.bok-t b{font-family:var(--f-display);font-size:1.4rem}
+#bokBody{grid-template-columns:1fr}
 .ftab{display:grid;gap:6px}.ftab-h{display:flex;align-items:baseline;gap:8px}.ftab-h b{font-size:.9rem}.ftab-h small{font-size:.76rem;color:var(--mute)}
 .ftr{display:grid;grid-template-columns:22px minmax(0,1fr) auto auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px;animation:fadeUp .3s both}
 .ftr .swt{width:20px;height:20px}.ftr .n{min-width:0}.ftr .n b{display:block;font-size:.9rem;font-weight:700;overflow-wrap:anywhere}.ftr .n small{display:block;font-size:.74rem;color:var(--mute)}
@@ -2754,6 +2771,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
   </form>
 </dialog>
 
+<!-- Alınacaklara ekle onayı -->
+<dialog id="dBuyOk" aria-labelledby="dBuyOkT">
+  <form method="dialog" id="fBuyOk" novalidate>
+    <div class="dlg-h"><div><h3 id="dBuyOkT">Alınacaklara ekle</h3><p>Fire payıyla birlikte ne alacağını onayla</p></div><button type="button" class="x" data-close aria-label="Kapat"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="dlg-b" id="bokBody"></div>
+    <div class="dlg-f"><div class="l"></div><div class="r"><button type="button" class="btn" data-close>Vazgeç</button><button type="submit" class="btn primary" id="bokOk">Onayla ve ekle</button></div></div>
+  </form>
+</dialog>
+
 <!-- Marka profili -->
 <dialog id="dBrand" aria-labelledby="dBrandT">
   <form method="dialog" id="fBrand" novalidate>
@@ -2882,14 +2908,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=1.93-1795806380"></script>
+<script src="shim.js?v=1.94-1795806715"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.93',VERDATE='14 Kasım 2026';
+const VERSION='1.94',VERDATE='14 Kasım 2026';
 const CHANGES=[
+  ['1.94',['Siparişte filament bölümü baştan: 1) bu siparişte kullanılacak filament, 2) depoda olan, 3) alınması gereken','Alınacaklara ekle: fire payı (%0/%10/%20) ile ne alınacağını gösteren onay penceresi; onaylayınca sipariş Alınacaklar listesine kendi kartıyla eklenir','Siparişteki “Ne almalıyım?” kutusu kaldırıldı (bu bölüme taşındı)']],
   ['1.93',['Siparişte filament ihtiyacı sade: her renk ayrı satırda gerekli miktar ve tek bir durum (Ayrıldı / Depoda var / … eksik / Depoda yok); düğmeler ve açıklama kısaldı']],
   ['1.92',['Kütüphaneden kutusunda senin belirlediğin fiyat da görünür; kâr ve kâr oranı o fiyata göre hesaplanır']],
   ['1.91',['Önerilen fiyat %100 kârla hesaplanır (maliyetin 2 katı); sipariş ve satışta fiyat alanı buna göre dolar, parçaları değiştirince güncellenir']],
@@ -3545,7 +3572,7 @@ function armDelete(btn,fn){
 function resetDel(id){const b=$(id);b.dataset.arm='';b.textContent='Sil'}
 let ORES=null,OINBUY=false;
 function openOrder(o){
-  editOrder=o||null;ORES=null;OINBUY=!!(o&&o.inBuy);
+  editOrder=o||null;ORES=null;OINBUY=!!(o&&o.inBuy);OBUYF=o&&o.buyFire!=null?+o.buyFire:10;
   $('dOrderT').textContent=o?'Siparişi düzenle':'Yeni sipariş';$('dOrderTs').textContent=o?'Bilgileri, ödemeyi ya da teslimi güncelle':'Müşteriyi, ürünü ve teslim tarihini yaz';
   $('oCust').value=o?o.cust||'':'';$('oUrgent').checked=!!(o&&o.urgent);
   if(o&&Array.isArray(o.lines)&&o.lines.length>1){$('oItem').value=o.lines[0].item;$('oQty').value=o.lines[0].qty||1;OLINES=o.lines.slice(1).map(l=>({item:l.item,qty:String(l.qty||1)}))}
@@ -3777,7 +3804,7 @@ function readOrder(){
   const pays=OPAYS.map(p=>({...p}));
   const common={...base,prod:(S.orders.find(x=>x.id===base.id)||base).prod,urgent:$('oUrgent').checked,cust:$('oCust').value.trim(),due:$('oDue').value||'',price,note:$('oNote').value.trim(),pays};
   const mo=MIX.o&&MIX.o.off&&MIX.o.off.length?MIX.o.off:null;
-  common.inBuy=OINBUY;if(ORES)common.reserved=ORES;
+  common.inBuy=OINBUY;common.buyFire=OBUYF;if(ORES)common.reserved=ORES;
   if(multi)return{...common,item:L.map(l=>l.item+(l.qty>1?` ×${l.qty}`:'')).join(' + '),qty:1,lines:L,mixOff:mo,mix:MIX.o&&String(MIX.o.item).startsWith('multi:')?MIX.o.parts:multiParts(L,base.mix||null)};
   return{...common,item:(L[0]||{item:''}).item,qty,lines:null,mixOff:mo,mix:MIX.o&&!String(MIX.o.item).startsWith('multi:')?MIX.o.parts:(libFind($('oItem').value)?null:(base.mix&&!base.lines?base.mix:null))};
 }
@@ -4044,7 +4071,7 @@ function renderMix(k){
     </div>`).join('')}
     ${(()=>{const L=mine('library').filter(x=>!x.set).sort((a,b)=>String(a.name).localeCompare(String(b.name),'tr'));return L.length?`<label class="mpnew"><span class="sr">Parça ekle</span><select data-mpnew data-nodirty><option value="">+ Parça ekle (kütüphaneden)</option>${L.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}${+x.g?` · ${fmtG(+x.g)}`:''}</option>`).join('')}</select></label>`:''})()}
     <div class="mtot" data-mtot></div>
-    <div class="fcw"><button type="button" class="fcalc-btn" data-fcalc aria-expanded="${!!FCALC[k]}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h2M14 10h2M8 14h2M14 14h2M8 18h2M14 18h2"/></svg>Filament hesapla</button><div data-fcbox></div></div>`;
+    ${k==='o'?'':`<div class="fcw"><button type="button" class="fcalc-btn" data-fcalc aria-expanded="${!!FCALC[k]}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h2M14 10h2M8 14h2M14 14h2M8 18h2M14 18h2"/></svg>Filament hesapla</button><div data-fcbox></div></div>`}`;
   mixTotals(k);
 }
 function mixTotals(k){
@@ -4080,15 +4107,24 @@ function mixTotals(k){
     const pend=ORES?sumByGroup(ORES):{},own=ORES?sumByGroup(resOwn):{};
     const rows=need.map(r=>{const c=Math.min(r.need,cov[r.gk]||0),inDep=groupCids(r.gk).length>0,have=Math.max(0,groupStock(r.gk,st)+(own[r.gk]||0)-(pend[r.gk]||0));return{...r,cov:c,have,inDep,note:groupNote(r.gk,st),rem:Math.max(0,r.need-c)}});
     const canRes=rows.some(r=>r.rem>0.5&&r.have>0.5),resAmt=rows.reduce((a,r)=>a+(r.inDep?Math.min(r.rem,r.have):0),0),allCov=rows.some(r=>r.cov>0.5)&&rows.every(r=>!r.inDep||r.rem<=0.5),noStock=!canRes&&rows.some(r=>r.rem>0.5);
-    const stat=r=>{if(r.rem<=0.5)return `<span class="chip ok">✓ Ayrıldı</span>`;if(!r.inDep)return `<span class="chip late">Depoda yok</span>`;return r.have>=r.rem?`<span class="chip info">Depoda var</span>`:`<span class="chip late">${fmtG(r.rem-r.have)} eksik</span>`};
-    const sub=r=>[r.cov>0.5&&r.rem>0.5?`${fmtG(r.cov)} ayrıldı`:'',r.rem>0.5&&r.inDep?`depoda ${fmtG(r.have)}${r.note}`:'',!r.inDep?`${fmtG(r.rem)} alınmalı`:''].filter(Boolean).join(' · ');
-    box.querySelector('[data-mtot]').innerHTML=(rows.length?`<div class="ftab"><div class="ftab-h"><b>Filament ihtiyacı</b>${plog.length?'<small>üretilenler dahil</small>':''}</div>
-      ${rows.map(r=>`<div class="ftr">${swatch(r.col)}<span class="n"><b>${esc(famForC(r.bn,r.sn)+' '+r.col)}</b><small>${esc(r.bn)}${sub(r)?' · '+sub(r):''}</small></span><span class="g"><small>Gerekli</small><b>${fmtG(r.need)}</b></span>${stat(r)}</div>`).join('')}</div>
-      <div class="ftact${allCov?' done':''}">${canRes?`<button type="button" class="btn primary" data-ores data-amt="${r2(resAmt)}">Depodan düş · ${fmtG(resAmt)}</button>`:allCov?`<span class="chip ok">✓ Filament depodan düşüldü${ORES?' · kaydedince kesinleşir':''}</span>`:''}<button type="button" class="btn" data-obuy aria-pressed="${!!OINBUY}">${OINBUY?'✓ Alınacaklarda':'Eksikleri alınacaklara ekle'}</button></div>
-      <small class="k ftnote">${canRes?'<b>Depodan düş:</b> depodakini bu siparişe ayırır. ':''}${noStock&&!canRes?'Depoda yeterli filament yok. ':''}<b>Alınacaklara ekle:</b> eksikleri Depo → Alınacaklar listesine yazar.${ORES&&!allCov?' Kaydedince depodan ayrılır.':''}</small>`
-      :'<span class="k">Renk seçince toplam filament ve depoda olup olmadığı burada görünür.</span>')
+    rows.forEach(r=>{r.short=r.inDep?Math.max(0,r.rem-r.have):r.rem});
+    const shortRows=rows.filter(r=>r.short>0.5),nm=r=>`<span class="n"><b>${esc(famForC(r.bn,r.sn)+' '+r.col)}</b><small>${esc(r.bn)}</small></span>`;
+    const qtxt=oMulti()?'bu sipariş için toplam':`${nf.format(q)} ${esc(($('oItem').value||'adet').trim())} için toplam`;
+    box.querySelector('[data-mtot]').innerHTML=(rows.length?`
+      <div class="fsec"><div class="fsec-h"><span class="no">1</span><b>Bu siparişte kullanılacak filament</b><small>${qtxt}</small></div>
+        ${rows.map(r=>`<div class="ftr">${swatch(r.col)}${nm(r)}<b class="v">${fmtG(r.need)}</b></div>`).join('')}</div>
+      <div class="fsec"><div class="fsec-h"><span class="no">2</span><b>Depoda olan</b></div>
+        ${rows.map(r=>`<div class="ftr">${swatch(r.col)}${nm(r)}<b class="v ${r.inDep&&r.have+r.cov>0.5?'':'mute'}">${r.inDep?fmtG(r.have):'depoda yok'}${r.cov>0.5?`<small class="okc">+ ${fmtG(r.cov)} bu siparişe ayrıldı</small>`:''}${r.note?`<small>${r.note.replace(/^ \\(|\\)$/g,'')}</small>`:''}</b></div>`).join('')}
+        ${canRes?`<button type="button" class="btn" data-ores data-amt="${r2(resAmt)}">Depodakini bu siparişe ayır · ${fmtG(resAmt)}</button>`:''}</div>
+      <div class="fsec"><div class="fsec-h"><span class="no">3</span><b>Alınması gereken</b></div>
+        ${shortRows.length?shortRows.map(r=>`<div class="ftr short">${swatch(r.col)}${nm(r)}<b class="v">${fmtG(r.short)}</b></div>`).join('')
+          +`<div class="ftact">${OINBUY?`<span class="chip ok">✓ Alınacaklarda · %${nf.format(OBUYF)} fire payıyla</span><button type="button" class="lnk" data-obuyoff>Listeden çıkar</button>`:`<button type="button" class="btn primary" data-obuyask>Alınacaklara ekle</button>`}</div>`
+          :`<div class="fok">✓ Hepsi depoda var, bir şey alman gerekmiyor.</div>${OINBUY?`<div class="ftact"><span class="chip ok">Alınacaklarda</span><button type="button" class="lnk" data-obuyoff>Listeden çıkar</button></div>`:''}`}
+      </div>`
+      :'<span class="k">Renk seçince bu siparişte ne kadar filament kullanılacağı, depoda ne olduğu ve ne alman gerektiği burada görünür.</span>')
       +(miss?'<span class="k">Rengi seçilmemiş satırlar hesaba katılmaz.</span>':'');
-    renderFCalc(k,q,plog,prev,rec);return;
+    BOK=shortRows.map(r=>({col:r.col,bn:r.bn,sn:r.sn,short:r.short}));
+    return;
   }
   box.querySelector('[data-mtot]').innerHTML=(uses.length?`<span class="k">${k==='o'&&plog.length?'Teslimde depodan düşecek (üretilenler zaten düştü)':'Depodan düşecek'}</span>`+uses.map(u=>{const own=k==='s'||(rec&&rec.status==='done')?prev.filter(x=>x.c===u.c).reduce((a,x)=>a+(+x.g||0),0):0,left=(st[u.c]||0)+own-u.g,c=invGet(u.c);
       return `<div>${c?swatch(c.name):''}<b>${fmtG(u.g)}</b> ${esc(filName(u.c))} <span class="${left<0?'bad':'k'}">· ${left<0?`depoda ${fmtG(-left)} eksik`:`kalan ${fmtG(left)}`}</span></div>`}).join(''):'<span class="k">Renk seçince depodan ne kadar düşeceği burada görünür.</span>')
@@ -4097,7 +4133,7 @@ function mixTotals(k){
   renderFCalc(k,q,plog,prev,rec);
 }
 /* Filament hesapla */
-const FCALC={s:false,o:false};
+const FCALC={s:false,o:false};let OBUYF=10,BOK=null;
 let FIRE=10;try{const v=+localStorage.getItem('ad-fire');if([0,10,20].includes(v)&&localStorage.getItem('ad-fire')!==null)FIRE=v}catch(e){}
 function fcalcRows(k,q,plog,prev,rec){
   const M=MIX[k],st=stockMap(),rows=new Map();let un=0;
@@ -4120,6 +4156,17 @@ function fcalcRows(k,q,plog,prev,rec){
   return{list,un};
 }
 let FCLAST={s:null,o:null};
+function bokPaint(){const f=OBUYF/100,L=BOK||[];
+  $('bokBody').innerHTML=`<div class="bok-fire"><span>Fire payı</span><div class="bok-seg">${[0,10,20].map(v=>`<button type="button" data-bokf="${v}" aria-pressed="${OBUYF===v}">%${v}</button>`).join('')}</div></div>
+    <p class="help" style="margin:0">Baskıda bozulan parçalar için eksik filamentin üstüne pay eklenir.</p>
+    <div class="bok-l">${L.map(r=>`<div class="bok-r">${swatch(r.col)}<span class="n"><b>${esc(famForC(r.bn,r.sn)+' '+r.col)}</b><small>${esc(r.bn)}</small></span><span class="c">normalde <b>${fmtG(r.short)}</b>${f?` <i>→</i> %${OBUYF} payla <b class="acc">${fmtG(r.short*(1+f))}</b>`:''}</span></div>`).join('')}</div>
+    <div class="bok-t"><span>Toplam alınacak</span><b>${fmtG(L.reduce((a,r)=>a+r.short*(1+f),0))}</b></div>`}
+function bokOpen(){if(!BOK||!BOK.length){toast('Alınması gereken filament yok');return}bokPaint();$('dBuyOk').showModal()}
+$('bokBody').addEventListener('click',e=>{const b=e.target.closest('[data-bokf]');if(b){OBUYF=+b.dataset.bokf;bokPaint()}});
+$('fBuyOk').addEventListener('submit',e=>{e.preventDefault();OINBUY=true;$('dBuyOk').close();
+  if(editOrder&&S.orders.some(x=>x.id===editOrder.id)){const cur=S.orders.find(x=>x.id===editOrder.id);editOrder={...cur,inBuy:true,buyFire:OBUYF};put('orders',editOrder);toast(`✓ Alınacaklara eklendi · %${OBUYF} fire payıyla`)}
+  else{$('dOrder').dataset.dirty='1';toast(`Kaydedince Alınacaklar'a eklenir · %${OBUYF} fire payıyla`)}
+  mixTotals('o')});
 function renderFCalc(k,q,plog,prev,rec){
   const box=$(k+'Mix');const wrap=box.querySelector('[data-fcbox]'),btn=box.querySelector('[data-fcalc]');if(!wrap)return;
   btn.setAttribute('aria-expanded',!!FCALC[k]);
@@ -4153,6 +4200,8 @@ function fcalcBuy(k){
   box.addEventListener('click',e=>{
     const pk=e.target.closest('[data-pick]');if(pk){const [kk,i,j]=pk.dataset.pick.split(':');mixPick(kk,+i,+j);return}
     if(e.target.closest('[data-fcalc]')){FCALC[k]=!FCALC[k];mixTotals(k);return}
+    if(k==='o'&&e.target.closest('[data-obuyask]')){bokOpen();return}
+    if(k==='o'&&e.target.closest('[data-obuyoff]')){OINBUY=false;$('dOrder').dataset.dirty='1';if(editOrder&&S.orders.some(x=>x.id===editOrder.id)){const cur=S.orders.find(x=>x.id===editOrder.id);editOrder={...cur,inBuy:false};put('orders',editOrder)}mixTotals('o');toast('Alınacaklardan çıkarıldı');return}
     if(k==='o'&&e.target.closest('[data-obuy]')){OINBUY=!OINBUY;$('dOrder').dataset.dirty='1';mixTotals('o');toast(OINBUY?'Kaydedince Alınacaklar listesine eklenir':'Alınacaklardan çıkarılacak');return}
     if(k==='o'&&e.target.closest('[data-ores]')){const btn=e.target.closest('[data-ores]');
       if(!btn.dataset.arm){btn.dataset.arm='1';btn.classList.add('arm');btn.textContent=`Emin misin? ${fmtG(+btn.dataset.amt||0)} depodan düşecek`;setTimeout(()=>{if(btn.isConnected){btn.dataset.arm='';btn.classList.remove('arm');btn.textContent=`Depodan düş · ${fmtG(+btn.dataset.amt||0)}`}},4000);return}
@@ -7603,14 +7652,14 @@ function needItemNeeds(n){const m=new Map();(n.fils||[]).forEach(f=>addNeed(m,f.
 function orderWhat(o){return Array.isArray(o.lines)&&o.lines.length>1?o.lines.map(l=>`${nf.format(l.qty)} ${l.item}`).join(' · '):`${nf.format(+o.qty||1)} ${o.item||'ürün'}`}
 function buyJobs(){
   const jobs=[];
-  mine('orders').filter(o=>o.status!=='done'&&o.inBuy).forEach(o=>{const cov=orderCovered(o);jobs.push({type:'o',rec:o,title:o.cust||'Müşterisiz',sub:orderWhat(o),due:o.due||'',rows:[...orderNeeds(o).values()].map(r=>({...r,cov:Math.min(r.need,cov[r.gk]||0)}))})});
+  mine('orders').filter(o=>o.status!=='done'&&o.inBuy).forEach(o=>{const cov=orderCovered(o);jobs.push({type:'o',rec:o,fire:o.buyFire!=null?+o.buyFire:0,title:o.cust||'Müşterisiz',sub:orderWhat(o),due:o.due||'',rows:[...orderNeeds(o).values()].map(r=>({...r,cov:Math.min(r.need,cov[r.gk]||0)}))})});
   invOf('need').forEach(n=>{const res=sumByGroup(n.reserved);jobs.push({type:'n',rec:n,title:n.name,sub:`${nf.format(+n.qty||1)} adet · Hesapla'dan`,due:'',rows:[...needItemNeeds(n).values()].map(r=>({...r,cov:Math.min(r.need,+res[r.gk]||0)}))})});
   return jobs.sort((a,b)=>(a.due||'9999')<(b.due||'9999')?-1:(a.due||'9999')>(b.due||'9999')?1:0);
 }
 function buyTotals(jobs){
   const st=stockMap(),m=new Map();
-  jobs.forEach(j=>j.rows.forEach(r=>{let t=m.get(r.key);if(!t){t={...r,need:0,cov:0,rem:0};m.set(r.key,t)}t.need+=r.need;t.cov+=r.cov;t.rem+=Math.max(0,r.need-r.cov)}));
-  return [...m.values()].map(t=>{const have=groupStock(t.gk,st),inDep=groupCids(t.gk).length>0,buy=Math.max(0,t.rem-have),sp=spoolOf(t.bn,t.sn,t.col),spools=buy>0.5?Math.ceil(buy/sp.w-1e-9):0;return{...t,have,inDep,note:groupNote(t.gk,st),buy,spools,...sp,cost:spools*sp.unit}}).sort((a,b)=>b.buy-a.buy||b.rem-a.rem);
+  jobs.forEach(j=>j.rows.forEach(r=>{let t=m.get(r.key);if(!t){t={...r,need:0,cov:0,rem:0,remF:0};m.set(r.key,t)}const rm=Math.max(0,r.need-r.cov);t.need+=r.need;t.cov+=r.cov;t.rem+=rm;t.remF+=rm*(1+(j.fire||0)/100)}));
+  return [...m.values()].map(t=>{const have=groupStock(t.gk,st),inDep=groupCids(t.gk).length>0,buy=Math.max(0,t.rem-have)*(t.rem>0?t.remF/t.rem:1),sp=spoolOf(t.bn,t.sn,t.col),spools=buy>0.5?Math.ceil(buy/sp.w-1e-9):0;return{...t,have,inDep,note:groupNote(t.gk,st),buy,spools,...sp,cost:spools*sp.unit}}).sort((a,b)=>b.buy-a.buy||b.rem-a.rem);
 }
 function reserveJobs(jobs){
   const st=stockMap(),availC={};let total=0;
@@ -7635,7 +7684,7 @@ function renderBuy(anim){
   const rowH=(r)=>{const rem=Math.max(0,r.need-r.cov);return `<div class="by-r">${swatch(r.col)}<span class="nm"><b>${esc(r.col)}</b><small>${esc(r.bn+' '+famForC(r.bn,r.sn))}</small></span><span class="v">${fmtG(r.need)}<small>${r.cov>0.5?`<em class="okc">${fmtG(r.cov)} ayrıldı</em>`:''}${rem>0.5&&r.cov>0.5?` · ${fmtG(rem)} kaldı`:''}</small></span></div>`};
   const tot=T.reduce((a,r)=>a+r.cost,0),sp=T.reduce((a,r)=>a+r.spools,0),canRes=T.some(r=>r.rem>0.5&&r.have>0.5),canBuy=T.some(r=>r.spools>0);
   $('byBody').innerHTML=`<div class="by-jobs">${jobs.map((j,i)=>{const n=j.due?diffDays(j.due,t):null;return `<div class="by-job" style="--i:${anim?i:0}">
-      <div class="by-h"><div><b>${esc(j.title)}</b><small>${esc(j.sub)}</small></div>${j.due?`<span class="chip ${n<0?'late':n<=2?'today':'info'}">${fmtDay(j.due)} · ${n<0?`${-n} gün geçti`:n===0?'bugün':`${n} gün`}</span>`:''}</div>
+      <div class="by-h"><div><b>${esc(j.title)}</b><small>${esc(j.sub)}${j.fire?` · %${j.fire} fire payı`:''}</small></div>${j.due?`<span class="chip ${n<0?'late':n<=2?'today':'info'}">${fmtDay(j.due)} · ${n<0?`${-n} gün geçti`:n===0?'bugün':`${n} gün`}</span>`:''}</div>
       ${j.rows.length?j.rows.map(rowH).join(''):'<p class="ct-note">Renk seçilmemiş; siparişte renkleri seçince burada görünür.</p>'}
       <div class="by-a">${j.type==='o'?`<button type="button" class="lnk" data-byopen="${j.rec.id}">Siparişi aç</button>`:''}<button type="button" class="lnk del" data-byrm="${j.type}:${j.rec.id}">Listeden çıkar</button></div>
     </div>`}).join('')}</div>
