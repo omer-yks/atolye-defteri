@@ -1119,6 +1119,21 @@ table:has(.exb){min-width:560px}
 .cdord.done{opacity:.75}
 @media (max-width:640px){.cdord-g{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .cdpane .cdback{justify-self:start;font-size:.84rem}
+.cdstats.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cdc{background:var(--soft);border-radius:16px;padding:12px 14px;display:grid;gap:10px;animation:fadeUp .3s both;animation-delay:calc(var(--i) * 50ms)}
+.cdc-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;cursor:pointer}.cdc-h b{font-size:1rem;font-weight:700;flex:1;min-width:0}.cdc-m{font-size:.78rem;color:var(--mute)}
+.cdc-t{display:grid;background:var(--surface);border-radius:12px;padding:4px 10px}
+.cdc-r{display:grid;grid-template-columns:minmax(0,1fr) 56px 96px 96px;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:.86rem}
+.cdc-r:first-child{border-top:0}.cdc-r>span:not(:first-child){text-align:right;white-space:nowrap}
+.cdc-r small{display:block;font-size:.72rem;color:var(--mute);font-weight:400}
+.cdc-r.hd{font-size:.7rem;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;font-weight:700;padding:6px 0}
+.cdc-f{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cdc-f span{background:var(--surface);border-radius:10px;padding:8px 10px;font-size:.76rem;color:var(--mute);min-width:0}
+.cdc-f b{display:block;font-size:.95rem;color:var(--ink);font-weight:700}.cdc-f small{display:block;font-size:.72rem}.cdc-f em{font-style:normal;font-weight:700}
+.cdc-f .tot{background:var(--char);color:var(--on-char)}.cdc-f .tot b{color:var(--on-char);font-size:1.05rem}.cdc-f .tot small{opacity:.8}
+.cdp{display:grid;gap:8px;margin-bottom:6px}
+#cdPane .pnote{font-size:.78rem;color:var(--mute);margin:2px 0 0}
+@media (max-width:640px){.cdc-r{grid-template-columns:minmax(0,1fr) 40px 80px 84px}.cdc-f{grid-template-columns:1fr 1fr}.cdc-f .tot{grid-column:1 / -1}}
 .cdpane .cdstats{margin-bottom:4px}
 .cdpane h4{margin-top:6px}
 .favs2{display:flex;flex-wrap:wrap;gap:6px}
@@ -2821,14 +2836,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=1.84-1795799481"></script>
+<script src="shim.js?v=1.85-1795799930"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.84',VERDATE='14 Kasım 2026';
+const VERSION='1.85',VERDATE='14 Kasım 2026';
 const CHANGES=[
+  ['1.85',['Müşteri > Maliyet: sipariş penceresindeki gibi parça parça (ör. Kurumsal Set: kalemlik, 2 logo, telefon standı), adet, 1 adetin ve toplamın maliyeti; altta filament, baskı ve kâr','Müşteri > Üretim: baskı buradan da girilir; siparişin Üretim sekmesiyle aynı kayıt, anında eşitlenir','Üretimde tabla adedi her kayıttan sonra 1’e döner, son girilen sayıda takılı kalmaz','Müşteri > Ödeme: sadece ödeme tarihleri, ödediği ve kalan borç (fazla ödediyse vereceğin)']],
   ['1.84',['Müşteri penceresi: adın ve telefonun altında “Siparişler”: her sipariş için ürün ve adet (ör. 30 × Kurumsal Set), sipariş alınma tarihi, istenen teslim tarihi, üretim ve ödeme','Müşteri penceresinin üstünde Maliyet · Üretim · Ödeme sekmeleri (açılış sayfası bilgiler; seçili sekmeye tekrar basınca geri döner); + Satış ve + Sipariş her sekmede altta: sipariş sipariş maliyet ve kâr, parça parça üretim ilerlemesi, ödenen/kalan ve ödeme geçmişi']],
   ['1.83',['Yapay zekâ: hesabında açık olan Gemini modelini kendisi bulur, biri çalışmazsa sıradakini dener','Ayarlar > Yapay zekâ: “Kaydet ve dene”; çalışmazsa Google’ın gerçek hata mesajı görünür']],
   ['1.82',['Ana sayfa: Masraflar kartına baskı maliyeti eklendi; üzerine gelince ne için harcandığı sipariş sipariş, ürün ürün görünür (filament alımı stoğa sayılır, iki kez sayılmaz)','Baskılar grafiği: yeni Çizgi ve Alan türleri, Maliyet ölçüsü, ortalama çizgisi ve özet kutuları, yenilenen görünüm','Grafikte Asistan: ne görmek istediğini yaz ya da boş bırak, grafiği kendisi ayarlar ve kısa bir yorum yazar','Sadeleştirme: grafik türleri simgeyle, özet tek satırda; masraf dökümü daha kısa']],
@@ -3653,7 +3669,7 @@ function renderProd(pop){
       <div class="pbar"><i style="width:${pct}%"></i></div>
       <div class="fire">${fails.length?`<span>Hatalı baskı: <b>${fails.length} kez · ${nf.format(fn)} adet</b></span><span>Fire: <b>${fmtG(fg)}${fc?` · ~${tl(fc)}`:''}</b></span>`:'<span>Hatalı baskı yok</span>'}${eta!=null?`<span>Bu hızla ~${eta} günde biter${daysLeft!=null&&eta>daysLeft?' <b>(teslime yetişmeyebilir)</b>':''}</span>`:''}</div>
     </div>
-    ${parts.map((p,pi)=>{const d=doneOf(p.pid),full=d>=p.target,sp=step[p.pid]||Math.min(p.target,Math.max(1,Math.min(3,p.target)));
+    ${parts.map((p,pi)=>{const d=doneOf(p.pid),full=d>=p.target,sp=1;
       return `<div class="ppart${full?' full':''}${pop===p.pid?' pop':''}" data-pp="${esc(p.pid)}">
         <div class="ppart-h"><b>${esc(p.name)}</b>${full?'<span class="chip ok">Tamamlandı</span>':''}<span class="cnt">${nf.format(Math.min(d,p.target))}<small> / ${nf.format(p.target)}${d>p.target?` · +${d-p.target} fazla`:''}</small></span></div>
         <div class="bar2"><i style="width:${Math.min(100,p.target?d/p.target*100:0).toFixed(1)}%"></i></div>
@@ -6386,38 +6402,70 @@ function cdPaint(){
 }
 function cdOrders(c){return c.orders.slice().sort((a,b)=>(a.status==='done')-(b.status==='done')||((a.created||'')<(b.created||'')?1:-1))}
 function cdCostHTML(c){
-  const t=todayISO();let tc=0,tp=0,unk=0;
-  const rows=cdOrders(c).map(o=>{const C=orderCost(o),cost=C?C.cost:null,price=c.free?0:+o.price||0;if(cost==null)unk++;else tc+=cost;tp+=price;const pr=price-(cost||0);
-    return `<div class="cdrow" data-cdo="${o.id}"><span class="chip">${o.created?fmtDay(o.created):'—'}</span><span class="w">${esc(ordTitle(o))}<span class="meta"><span>${nf.format(ordQty(o))} adet</span>${C?`<span>${fmtG(C.g)} filament</span><span>${hm(C.hrs)} baskı</span>`:''}<span>${o.status==='done'?'teslim edildi':'bekliyor'}</span></span></span><span class="a">${cost==null?'—':tl(cost)}${!c.free&&price?`<small>fiyat ${tl(price)} · <span class="${pr>=0?'ok':'late'}" style="color:var(--${pr>=0?'ok':'late'})">${pr>=0?'+':'−'}${tl(Math.abs(pr))}</span></small>`:''}</span></div>`});
-  const sr=c.sales.slice().sort((a,b)=>a.date<b.date?1:-1).map(x=>{const cost=+x.cost||0,amt=c.free?0:+x.amt||0;tc+=cost;tp+=amt;const pr=amt-cost;
-    return `<div class="cdrow" data-cdr="s:${x.id}"><span class="chip">${fmtDay(x.date)}</span><span class="w">${esc(x.item||'Satış')}<span class="meta"><span>${nf.format(+x.qty||1)} adet</span><span>satış</span></span></span><span class="a">${tl(cost)}${amt?`<small>tutar ${tl(amt)} · <span style="color:var(--${pr>=0?'ok':'late'})">${pr>=0?'+':'−'}${tl(Math.abs(pr))}</span></small>`:''}</span></div>`});
-  if(!rows.length&&!sr.length)return '<p class="help">Bu müşterinin henüz siparişi ya da satışı yok.</p>';
+  const os=cdOrders(c);let tc=0,tp=0,unk=0;
+  const cards=os.map((o,i)=>{const C=orderCost(o),price=c.free?0:+o.price||0;tp+=price;
+    if(!C){unk++;return `<div class="cdc" style="--i:${i}"><div class="cdc-h" data-cdo="${o.id}"><b>${esc(ordTitle(o))}</b><span class="cdc-m">maliyet hesaplanamadı</span></div><p class="help" style="margin:0">Ürün kütüphanede yok; Hesaplayıcı'da hesaplayıp kaydedince burada görünür.</p></div>`}
+    tc+=C.cost;const pr=price-C.cost,set=C.rows.length>1||(C.rows[0]&&+C.rows[0].p.per>1);
+    return `<div class="cdc" style="--i:${i}">
+      <div class="cdc-h" data-cdo="${o.id}"><b>${esc(ordTitle(o))}</b><span class="cdc-m">${o.status==='done'?'teslim edildi':'bekliyor'} · ${fmtDay(o.created||todayISO())}</span></div>
+      <div class="cdc-t"><div class="cdc-r hd"><span>Parça</span><span>Adet</span><span>1 adet</span><span>Toplam</span></div>
+        ${C.rows.map(x=>`<div class="cdc-r"><span><b>${esc(x.p.name)}</b>${set?`<small>her sette ${nf.format(+x.p.per||1)}</small>`:''}</span><span>${nf.format(x.cnt)}</span><span>${tl(x.pc.cost)}<small>${fmtG(x.pc.g)}${x.pc.hrs?' · '+hm(x.pc.hrs):''}</small></span><span><b>${tl(x.tot)}</b></span></div>`).join('')}</div>
+      <div class="cdc-f"><span>Filament <b>${tl(C.fil)}</b><small>${fmtG(C.g)}</small></span><span>Baskı, elektrik, aşınma <b>${tl(C.cost-C.fil)}</b><small>${hm(C.hrs)}</small></span><span class="tot">Maliyet <b>${tl(C.cost)}</b>${price?`<small>fiyat ${tl(price)} · kâr <em style="color:var(--${pr>=0?'ok':'late'})">${pr<0?'−':''}${tl(Math.abs(pr))}</em></small>`:''}</span></div>
+    </div>`});
+  c.sales.forEach(x=>{tc+=+x.cost||0;tp+=c.free?0:+x.amt||0});
+  if(!os.length&&!c.sales.length)return '<p class="help">Bu müşterinin henüz siparişi ya da satışı yok.</p>';
   const pr=tp-tc;
-  return `<div class="cdstats">${c.free?`<div><small>Toplam maliyet</small><b>${tl(tc)}</b></div><div><small>İş</small><b>${rows.length+sr.length}</b></div><div><small>Ortalama</small><b>${tl(tc/Math.max(1,rows.length+sr.length))}</b></div><div><small>Alınan para</small><b>0 ₺</b></div>`
+  return `<div class="cdstats">${c.free?`<div><small>Toplam maliyet</small><b>${tl(tc)}</b></div><div><small>Sipariş</small><b>${os.length}</b></div><div><small>Satış</small><b>${c.sales.length}</b></div><div><small>Alınan para</small><b>0 ₺</b></div>`
     :`<div><small>Toplam maliyet</small><b>${tl(tc)}</b></div><div><small>Toplam tutar</small><b>${tl(tp)}</b></div><div><small>Kâr</small><b style="color:var(--${pr>=0?'ok':'late'})">${pr<0?'−':''}${tl(Math.abs(pr))}</b></div><div><small>Kâr oranı</small><b>${tp?'%'+Math.round(pr/tp*100):'—'}</b></div>`}</div>
-    ${unk?`<p class="help" style="margin:0">${unk} siparişte ürün kütüphanede olmadığı için maliyet hesaplanamadı.</p>`:''}
-    ${rows.length?`<h4>Siparişler</h4>${rows.join('')}`:''}${sr.length?`<h4>Satışlar</h4>${sr.join('')}`:''}`;
+    ${cards.join('')}${c.sales.length?`<h4>Satışlar</h4>${c.sales.slice().sort((a,b)=>a.date<b.date?1:-1).map(x=>`<div class="cdrow" data-cdr="s:${x.id}"><span class="chip">${fmtDay(x.date)}</span><span class="w">${nf.format(+x.qty||1)} × ${esc(x.item||'Satış')}<small>maliyet ${tl(+x.cost||0)}${c.free?'':` · tutar ${tl(+x.amt||0)}`}</small></span><span class="a">${tl(+x.cost||0)}</span></div>`).join('')}`:''}`;
 }
+let CPFAIL=null;
 function cdProdHTML(c){
   const t=todayISO(),os=c.orders.filter(o=>o.status!=='done').sort((a,b)=>(a.due||'9999')<(b.due||'9999')?-1:1);
   if(!os.length)return '<p class="help">Bu müşterinin üretimde bekleyen siparişi yok.</p>';
-  let D=0,T=0,F=0;
-  const rows=os.map(o=>{const pg=prodProgress(o),parts=prodPartsOf(o),log=(o.prod&&o.prod.log)||[];D+=pg.done;T+=pg.target;F+=pg.fails;const pct=pg.target?pg.done/pg.target*100:0;
-    const pl=parts.length>1||parts[0].pid!=='_'?`<div class="cdparts">${parts.map(p=>{const d=Math.min(p.target,log.filter(l=>l.ok&&l.part===p.pid).reduce((a,l)=>a+l.n,0));return `<div><span>${esc(p.name)}</span><span><b>${nf.format(d)}</b> / ${nf.format(p.target)}</span></div>`}).join('')}</div>`:'';
-    return `<div class="cdrow" data-cdo="${o.id}">${dueChip(o,t)}<span class="w">${esc(ordTitle(o))}<span class="meta"><span>Sipariş ${o.created?fmtDay(o.created):'—'}</span><span><b>${nf.format(pg.done)}</b> / ${nf.format(pg.target)} parça</span>${pg.fails?`<span style="color:var(--late)">${pg.fails} hatalı baskı · ${fmtG(pg.fg)} fire</span>`:''}</span><div class="cdbar${pct>=99.95?' ok':''}"><i style="width:${pct.toFixed(1)}%"></i></div>${pl}</span><span class="a">%${Math.floor(pct)}</span></div>`});
-  return `<div class="cdstats"><div><small>Üretilen</small><b>${nf.format(D)} / ${nf.format(T)}</b></div><div><small>Kalan parça</small><b>${nf.format(Math.max(0,T-D))}</b></div><div><small>Bekleyen sipariş</small><b>${os.length}</b></div><div><small>Hatalı baskı</small><b style="color:${F?'var(--late)':'inherit'}">${F}</b></div></div><h4>Bekleyen siparişler</h4>${rows.join('')}`;
+  return os.map(o0=>{const o=S.orders.find(x=>x.id===o0.id)||o0,parts=prodPartsOf(o),log=(o.prod&&o.prod.log)||[];
+    const doneOf=pid=>log.filter(l=>l.ok&&l.part===pid).reduce((a,l)=>a+l.n,0);let D=0,T=0;parts.forEach(p=>{D+=Math.min(doneOf(p.pid),p.target);T+=p.target});
+    const pct=T?Math.round(D/T*100):0,dl=o.due?diffDays(o.due,t):null,fails=log.filter(l=>!l.ok),fg=fails.reduce((a,l)=>a+(l.uses||[]).reduce((x,u)=>x+(+u.g||0),0),0);
+    const last=[...log].sort((a,b)=>(b.t||0)-(a.t||0))[0];
+    return `<div class="cdp" data-cpo="${o.id}">
+      <div class="psum"><div class="psum-t"><b>%${pct}</b><span>${esc(ordTitle(o))} · ${nf.format(D)} / ${nf.format(T)} adet${dl!=null?` · teslime ${dl<0?`${-dl} gün gecikti`:dl===0?'bugün':`${dl} gün`}`:''}</span></div><div class="pbar"><i style="width:${pct}%"></i></div>
+        <div class="fire">${fails.length?`<span>Hatalı baskı: <b>${fails.length} kez · ${fmtG(fg)} fire</b></span>`:'<span>Hatalı baskı yok</span>'}${last?`<span>Son kayıt: ${last.d===t?'bugün':fmtDay(last.d)} · ${esc(last.name||'')} ${last.ok?'+':'✕ '}${nf.format(last.n)}</span>`:''}</div></div>
+      ${parts.map(p=>{const d=doneOf(p.pid),full=d>=p.target,k=o.id+'|'+p.pid;
+        return `<div class="ppart${full?' full':''}"><div class="ppart-h"><b>${esc(p.name)}</b>${full?'<span class="chip ok">Tamamlandı</span>':''}<span class="cnt">${nf.format(Math.min(d,p.target))}<small> / ${nf.format(p.target)}</small></span></div>
+          <div class="bar2"><i style="width:${Math.min(100,p.target?d/p.target*100:0).toFixed(1)}%"></i></div>
+          <div class="pctl"><span class="step-l">Tabla</span><span class="step"><button type="button" data-cps="${esc(k)}" data-d="-1" aria-label="Azalt">−</button><input data-nodirty data-cpn="${esc(k)}" inputmode="numeric" value="1" aria-label="${esc(p.name)} tabla adedi"><button type="button" data-cps="${esc(k)}" data-d="1" aria-label="Artır">+</button></span>
+            <button type="button" class="btn ok" data-cpok="${esc(k)}">✓ Başarılı</button><button type="button" class="btn bad" data-cpbad="${esc(k)}">✕ Hatalı</button></div>
+          ${CPFAIL&&CPFAIL.k===k?`<div class="pfail"><span class="pfh">Hatalı baskı: kaç adet bozuldu, ne kadar filament gitti?</span><div class="f"><label for="cpfN">Adet</label><input id="cpfN" data-nodirty inputmode="numeric" value="${CPFAIL.n}"></div><div class="f"><label for="cpfG">Harcanan (g)</label><input id="cpfG" data-nodirty inputmode="decimal" value="${inStr(r2((p.lines||[]).reduce((a,l)=>a+(+l.g||0),0)*CPFAIL.n))}"></div><div class="f"><label for="cpfW">Not</label><input id="cpfW" data-nodirty placeholder="ör. tabladan koptu"></div><button type="button" class="btn primary" data-cpfok="${esc(k)}">Kaydet</button></div>`:''}
+        </div>`}).join('')}
+    </div>`}).join('')+'<p class="pnote">Buradan girdiğin baskılar siparişin Üretim sekmesine aynı anda kaydedilir; filament depodan düşer.</p>';
+}
+function cpSave(oid,mut){const o=S.orders.find(x=>x.id===oid);if(!o)return null;const prod=JSON.parse(JSON.stringify(o.prod||{log:[],step:{}}));if(!prod.log)prod.log=[];mut(prod);const rec={...o,prod};put('orders',rec);return rec}
+function cpRefresh(){if(!CUR)return;const c=custAll().find(x=>x.key===CUR.key);if(c)CUR=c;$('cdPane').innerHTML=`<button type="button" class="lnk cdback" data-cdback>← Müşteri bilgileri</button>`+cdProdHTML(CUR);
+  const op=CUR.orders.filter(o=>o.status!=='done');let d=0,tt=0;op.forEach(o=>{const pg=prodProgress(S.orders.find(x=>x.id===o.id)||o);d+=pg.done;tt+=pg.target});$('cdTProd').textContent=tt?`${nf.format(d)}/${nf.format(tt)}`:''}
+function cpPart(k){const [oid,pid]=k.split('|'),o=S.orders.find(x=>x.id===oid);return{o,oid,pid,p:o&&prodPartsOf(o).find(x=>x.pid===pid)}}
+function cpClick(e){
+  const st=e.target.closest('[data-cps]');if(st){const inp=$('cdPane').querySelector(`[data-cpn="${CSS.escape(st.dataset.cps)}"]`);inp.value=Math.max(1,(num(inp.value)||1)+(+st.dataset.d));return true}
+  const ok=e.target.closest('[data-cpok]');
+  if(ok){const k=ok.dataset.cpok,{o,oid,pid,p}=cpPart(k);if(!o||!p)return true;const n=Math.max(1,Math.round(num($('cdPane').querySelector(`[data-cpn="${CSS.escape(k)}"]`).value)||1));
+    const uses=splitUses((p.lines||[]).filter(l=>l.c&&+l.g>0).map(l=>({c:l.c,g:r2((+l.g)*n)})));
+    const rec=cpSave(oid,pr=>pr.log.push({id:uid(),t:Date.now(),d:todayISO(),part:pid,name:p.name,n,ok:true,uses}));CPFAIL=null;cpRefresh();
+    const pg=rec?prodProgress(rec):null,g=uses.reduce((a,u)=>a+u.g,0);toast(pg&&pg.target&&pg.done>=pg.target?'Üretim tamamlandı, teslime hazır':`${p.name}: +${n} adet${g?` · ${fmtG(g)} depodan düştü`:''}`);return true}
+  const bad=e.target.closest('[data-cpbad]');
+  if(bad){const k=bad.dataset.cpbad;CPFAIL=CPFAIL&&CPFAIL.k===k?null:{k,n:Math.max(1,Math.round(num($('cdPane').querySelector(`[data-cpn="${CSS.escape(k)}"]`).value)||1))};cpRefresh();const f=$('cpfN');if(f)f.focus();return true}
+  const fo=e.target.closest('[data-cpfok]');
+  if(fo){const k=fo.dataset.cpfok,{o,oid,pid,p}=cpPart(k);if(!o||!p)return true;const n=num($('cpfN').value),g=num($('cpfG').value);
+    if(isNaN(n)||n<=0||isNaN(g)||g<0){toast('Adet ve gram için sayı yaz');return true}
+    const lines=(p.lines||[]).filter(l=>l.c),sum=lines.reduce((a,l)=>a+(+l.g||0),0),uses=lines.length?lines.map(l=>({c:l.c,g:r2(g*(sum?(+l.g||0)/sum:1/lines.length))})):[];
+    cpSave(oid,pr=>pr.log.push({id:uid(),t:Date.now(),d:todayISO(),part:pid,name:p.name,n,ok:false,uses,g,note:$('cpfW').value.trim()}));CPFAIL=null;cpRefresh();toast(lines.length?`Hatalı baskı kaydedildi, ${fmtG(g)} depodan düştü`:'Hatalı baskı kaydedildi');return true}
+  return false;
 }
 function cdPayHTML(c){
-  if(c.free)return '<p class="help">Bu müşteriden ücret alınmıyor; ödeme takibi yok. Maliyetler Maliyet sekmesinde.</p>';
-  const os=cdOrders(c).filter(o=>+o.price>0);let B=0,P=0;
-  const rows=os.map(o=>{const pr=+o.price||0,pd=Math.min(pr,paidOf(o)),rest=pr-pd;B+=pr;P+=pd;const pct=pr?pd/pr*100:0;
-    return `<div class="cdrow" data-cdo="${o.id}"><span class="chip ${rest<=0.009?'ok':pd>0?'today':'late'}">${rest<=0.009?'Ödendi':pd>0?'Kısmen':'Ödenmedi'}</span><span class="w">${esc(ordTitle(o))}<span class="meta"><span>Sipariş ${o.created?fmtDay(o.created):'—'}</span><span>Ödenen <b>${tl(pd)}</b> / ${tl(pr)}</span></span><div class="cdbar${pct>=99.95?' ok':''}"><i style="width:${pct.toFixed(1)}%"></i></div></span><span class="a ${rest>0.009?'late':'ok'}">${rest>0.009?tl(rest):'✓'}${rest>0.009?'<small>kalan</small>':''}</span></div>`});
-  c.sales.forEach(x=>{B+=+x.amt||0;P+=+x.amt||0});
-  const hist=[...c.orders.flatMap(o=>(o.pays||[]).map(p=>({d:p.d,a:+p.a||0,w:ordTitle(o),k:'Sipariş ödemesi',ref:'o',id:o.id}))),...c.sales.map(x=>({d:x.date,a:+x.amt||0,w:x.item||'Satış',k:'Satış',ref:'s',id:x.id}))].filter(h=>h.a>0).sort((a,b)=>(a.d||'')<(b.d||'')?1:-1);
-  const rest=B-P,pct=B?P/B*100:0;
-  return `<div class="cdstats"><div><small>Toplam tutar</small><b>${tl(B)}</b></div><div><small>Ödenen</small><b style="color:var(--ok)">${tl(P)}</b></div><div><small>Kalan</small><b style="color:${rest>0.009?'var(--late)':'inherit'}">${tl(rest)}</b></div><div><small>Ödeme oranı</small><b>%${Math.floor(pct)}</b></div></div>
-    ${rows.length?`<h4>Siparişler</h4>${rows.join('')}`:''}
-    <h4>Ödeme geçmişi</h4>${hist.length?hist.map(h=>`<div class="cdrow" ${h.ref==='o'?`data-cdo="${h.id}"`:`data-cdr="s:${h.id}"`}><span class="chip">${h.d?fmtDay(h.d):'—'}</span><span class="w">${esc(h.w)}<small>${h.k}</small></span><span class="a ok">+${tl(h.a)}</span></div>`).join(''):'<p class="help" style="margin:0">Henüz ödeme alınmadı.</p>'}`;
+  if(c.free)return '<p class="help">Bu müşteriden ücret alınmıyor; ödeme takibi yok.</p>';
+  const B=c.orders.reduce((a,o)=>a+(+o.price||0),0)+c.sales.reduce((a,x)=>a+(+x.amt||0),0);
+  const P=c.orders.reduce((a,o)=>a+paidOf(o),0)+c.sales.reduce((a,x)=>a+(+x.amt||0),0),rest=B-P;
+  const hist=[...c.orders.flatMap(o=>(o.pays||[]).map(p=>({d:p.d,a:+p.a||0,w:ordTitle(o),id:o.id,o:1}))),...c.sales.map(x=>({d:x.date,a:+x.amt||0,w:`${nf.format(+x.qty||1)} × ${x.item||'Satış'}`,id:x.id,o:0}))].filter(h=>h.a>0).sort((a,b)=>(a.d||'')<(b.d||'')?1:-1);
+  return `<div class="cdstats three"><div><small>Ödediği</small><b style="color:var(--ok)">${tl(P)}</b></div><div><small>${rest<-0.009?'Fazla ödeme (vereceğin)':'Kalan borcu (alacağın)'}</small><b style="color:${Math.abs(rest)>0.009?'var(--late)':'inherit'}">${tl(Math.abs(rest))}</b></div><div><small>Toplam tutar</small><b>${tl(B)}</b></div></div>
+    <h4>Ödemeler</h4>${hist.length?hist.map(h=>`<div class="cdrow" ${h.o?`data-cdo="${h.id}"`:`data-cdr="s:${h.id}"`}><span class="chip">${h.d?fmtLong(h.d):'—'}</span><span class="w">${esc(h.w)}</span><span class="a ok">+${tl(h.a)}</span></div>`).join(''):'<p class="help" style="margin:0">Henüz ödeme alınmadı.</p>'}`;
 }
 function openCust(key){
   const t=todayISO(),c=key?custAll().find(x=>x.key===key):null;CUR=c;
@@ -6466,9 +6514,10 @@ $('cdCopy').addEventListener('click',()=>{const v=$('cdPhone').value.trim();if(!
 $('cdDel').addEventListener('click',e=>armDelete(e.currentTarget,()=>{if(CUR&&CUR.prof)remove('customers',CUR.prof.id);$('dCust').close();toast('Müşteri kartı silindi; satış ve siparişler duruyor')}));
 $('cdSale').addEventListener('click',()=>{const n=CUR&&CUR.name;$('dCust').close();openSale();$('sCust').value=n||'';saleOrdHint()});
 $('cdOrder').addEventListener('click',()=>{const n=CUR&&CUR.name;$('dCust').close();openOrder();$('oCust').value=n||'';$('oItem').focus()});
-$('cdTabs').addEventListener('click',e=>{const b=e.target.closest('[data-cdt]');if(!b)return;CDTAB=b.dataset.cdt===CDTAB?'info':b.dataset.cdt;cdPaint();if(CDTAB!=='info')stagger($('cdPane').querySelectorAll('.cdrow'),60)});
+$('cdTabs').addEventListener('click',e=>{const b=e.target.closest('[data-cdt]');if(!b)return;CPFAIL=null;CDTAB=b.dataset.cdt===CDTAB?'info':b.dataset.cdt;cdPaint();if(CDTAB!=='info')stagger($('cdPane').querySelectorAll('.cdrow'),60)});
 $('dCust').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.cdord')){$('dCust').close();openOrderById(e.target.dataset.cdo)}});
 $('dCust').addEventListener('click',e=>{
+  if(CDTAB==='prod'&&cpClick(e))return;
   if(e.target.closest('[data-cdback]')){CDTAB='info';cdPaint();return}
   const o=e.target.closest('[data-cdo]');if(o){$('dCust').close();openOrderById(o.dataset.cdo);return}
   const r=e.target.closest('[data-cdr]');if(r){$('dCust').close();openSlRef(r.dataset.cdr)}
