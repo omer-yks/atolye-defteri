@@ -818,6 +818,20 @@ details.pk-sub .pk-ptile{background:var(--soft)}
 .lbx-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px}
 .lbx-g div{background:var(--surface);border-radius:10px;padding:7px 10px}
 .lbx-g small{display:block;font-size:.72rem;color:var(--mute)}.lbx-g b{font-size:.98rem;font-weight:700}.lbx-g b.pos{color:var(--ok)}
+.otl{grid-column:1 / -1;position:relative;display:grid;gap:12px;padding-left:30px;--tl1:var(--accent);--tl2:#E8865B;--tl3:#2F80ED;--tl4:var(--ok)}
+.otl:before{content:'';position:absolute;left:10px;top:18px;bottom:18px;width:2px;border-radius:2px;background:linear-gradient(var(--tl1),var(--tl2),var(--tl3),var(--tl4));opacity:.35}
+.tls{position:relative;display:grid;gap:10px;padding:12px 14px;border-radius:16px;background:color-mix(in srgb,var(--c) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 26%,transparent);box-shadow:0 6px 18px color-mix(in srgb,var(--c) 8%,transparent);animation:fadeUp .35s both}
+.tls:nth-child(2){animation-delay:50ms}.tls:nth-child(3){animation-delay:100ms}.tls:nth-child(4){animation-delay:150ms}
+.tls:before{content:'';position:absolute;left:-26px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:3px solid var(--c);box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 16%,transparent)}
+.tls-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tls-h b{font-size:.95rem;color:color-mix(in srgb,var(--c) 55%,var(--ink))}.tls-h small{font-size:.78rem;color:var(--mute)}
+.tls-h .o-urg,.tls-h .chip{margin-left:auto}.tls-h .o-urg{margin-top:0!important;font-size:.82rem}
+.tls .f{margin:0}.tls input:not([type=checkbox]){background:var(--surface)}
+.tlchip{background:color-mix(in srgb,var(--c) 16%,var(--surface));color:color-mix(in srgb,var(--c) 70%,var(--ink))}
+.tlpay{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.tlgo{display:flex;align-items:center;gap:8px;font-size:.84rem;font-weight:700;color:var(--ink);white-space:nowrap;background:transparent;border:0;padding:0}
+.tlbar{height:6px;border-radius:99px;background:color-mix(in srgb,var(--c) 14%,var(--surface));overflow:hidden}.tlbar i{display:block;height:100%;width:0;border-radius:99px;background:var(--c);transition:width .6s cubic-bezier(.2,.9,.3,1)}
+.otl .olines .oadd{background:transparent}
+@media (max-width:640px){.otl{padding-left:24px}.tls:before{left:-21px}.otl:before{left:7px}.tlpay{grid-template-columns:1fr}}
 .due-h{display:flex;align-items:center;justify-content:space-between;gap:8px}.due-h .o-urg{margin:0;padding:0;font-size:.8rem}.due-h .o-urg span{font-weight:700}
 .mtot{border-top:0;padding-top:0;gap:10px}
 .mtot .fsec,.fsec{--sc:var(--accent);display:grid;gap:10px;padding:14px;border-radius:16px;background:color-mix(in srgb,var(--sc) 6%,var(--soft));border:1px solid color-mix(in srgb,var(--sc) 18%,transparent);animation:fadeUp .35s both}
@@ -2362,16 +2376,23 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
     <div class="dlg-h"><div><h3 id="dOrderT">Yeni sipariş</h3><p id="dOrderTs">Müşteriyi, ürünü ve teslim tarihini yaz</p></div><button type="button" class="x" data-close aria-label="Kapat"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="otabs" id="oTabs" hidden><div class="period seg" role="tablist" aria-label="Sipariş bölümleri"><span class="seg-ind" aria-hidden="true"></span><button type="button" role="tab" data-otab="cost" aria-selected="false">Maliyet</button><button type="button" role="tab" data-otab="info" aria-selected="true">Bilgiler</button><button type="button" role="tab" data-otab="prod" aria-selected="false">Üretim <span id="oTabProg" style="opacity:.7;font-weight:500"></span></button><button type="button" role="tab" data-otab="pay" aria-selected="false">Ödeme <span id="oTabPay" style="opacity:.7;font-weight:500"></span></button></div></div>
     <div class="dlg-b" id="oInfo">
-      <div class="f"><label for="oCust">Müşteri</label><input id="oCust" list="custList" autocomplete="off" placeholder="ör. Ayşe Demir"></div>
-      <div class="f"><div class="due-h"><label for="oDue">Teslim tarihi</label><label class="o-urg" title="Baskı planında öne alınır"><input type="checkbox" id="oUrgent"> <span>Acil sipariş</span></label></div><input id="oDue" type="date"></div>
-      <div class="f w olines" id="oLines">
+      <div class="otl" id="oTL">
+        <section class="tls" style="--c:var(--tl1)"><div class="tls-h"><b>Sipariş alındı</b><small id="oTlCr"></small></div>
+          <div class="f"><label for="oCust" class="sr">Müşteri</label><input id="oCust" list="custList" autocomplete="off" placeholder="Müşteri adı, ör. Ayşe Demir"></div></section>
+        <section class="tls" style="--c:var(--tl2)"><div class="tls-h"><b>Ne yapılacak</b><span class="chip tlchip" id="oTlQty" hidden></span></div>
+      <div class="f olines" id="oLines">
         <div class="orow orh" aria-hidden="true"><span class="n"></span><span>Ürün</span><span>Adet</span><span></span></div>
         <div class="orow first"><span class="n">1</span><input id="oItem" list="libList" autocomplete="off" placeholder="ör. Kulaklık standı" aria-label="Ürün"><input id="oQty" inputmode="numeric" value="1" aria-label="Adet"><span></span></div>
         <div class="omore" id="oMore"></div>
         <button type="button" class="oadd" id="oAddItem"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Ürün ekle<span style="font-weight:500;color:var(--mute);font-size:.8rem">aynı siparişe başka ürün</span></button>
       </div>
-      <div class="f"><label for="oPrice">Toplam fiyat (₺)</label><input id="oPrice" inputmode="decimal" placeholder="0"></div>
-      <div class="f"><span class="lab">Ödeme</span><button type="button" class="btn" id="oPayGo" style="justify-content:flex-start;min-height:44px"></button></div>
+        </section>
+        <section class="tls" style="--c:var(--tl3)"><div class="tls-h"><b>Teslim</b><small id="oTlDue"></small><label class="o-urg" title="Baskı planında öne alınır"><input type="checkbox" id="oUrgent"> <span>Acil</span></label></div>
+          <div class="f"><label for="oDue" class="sr">Teslim tarihi</label><input id="oDue" type="date"></div></section>
+        <section class="tls" style="--c:var(--tl4)"><div class="tls-h"><b>Ödeme</b><small id="oTlPaid"></small><span class="chip" id="oTlRest" hidden></span></div>
+          <div class="tlpay"><div class="f"><label for="oPrice" class="sr">Toplam fiyat (₺)</label><input id="oPrice" inputmode="decimal" placeholder="Toplam fiyat (₺)"></div><button type="button" class="lnk tlgo" id="oPayGo"></button></div>
+          <div class="tlbar"><i id="oTlBar"></i></div></section>
+      </div>
       <div class="f w"><label for="oNote">Not</label><input id="oNote" autocomplete="off" placeholder="Renk, ölçü, kargo adresi…"></div>
       <div class="libhint" id="oLib" hidden></div>
       <span id="oMixHome" hidden></span><div class="mix" id="oMix" hidden></div>
@@ -2933,8 +2954,9 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.95',VERDATE='14 Kasım 2026';
+const VERSION='1.96',VERDATE='14 Kasım 2026';
 const CHANGES=[
+  ['1.96',['Sipariş > Bilgiler yeni tasarım: zaman çizgisi; Sipariş alındı → Ne yapılacak → Teslim → Ödeme, her adım kendi renginde kart; adet, kalan gün ve ödeme durumu başlıklarda']],
   ['1.95',['Siparişte “Acil sipariş” kutucuğu teslim tarihinin üstüne, başlığın yanına taşındı; alttaki boşluk kalktı']],
   ['1.94',['Siparişte filament bölümü baştan: 1) bu siparişte kullanılacak filament, 2) depoda olan, 3) alınması gereken','Alınacaklara ekle: fire payı (%0/%10/%20) ile ne alınacağını gösteren onay penceresi; onaylayınca sipariş Alınacaklar listesine kendi kartıyla eklenir','Siparişteki “Ne almalıyım?” kutusu kaldırıldı (bu bölüme taşındı)','Yeni görünüm: her adım kendi renginde, başlıkta toplamlar, “Depoda olan”da hazır olan miktar için doluluk çubuğu']],
   ['1.93',['Siparişte filament ihtiyacı sade: her renk ayrı satırda gerekli miktar ve tek bir durum (Ayrıldı / Depoda var / … eksik / Depoda yok); düğmeler ve açıklama kısaldı']],
@@ -3711,10 +3733,18 @@ function renderCost(){
 /* Sipariş: ödeme sekmesi */
 let OPAYS=[];
 const opaid=()=>OPAYS.reduce((a,p)=>a+(+p.a||0),0);
+function paintTL(){if(!$('oTL'))return;const t=todayISO(),cr=editOrder&&editOrder.created||t;
+  $('oTlCr').textContent=cr===t?'bugün':new Intl.DateTimeFormat('tr-TR',{day:'numeric',month:'long',year:'numeric'}).format(D(cr));
+  let q=0;try{const L=orderLines();q=L.length>1?L.reduce((a,l)=>a+(+l.qty||0),0):(num($('oQty').value)||0)}catch(e){q=num($('oQty').value)||0}
+  $('oTlQty').hidden=!q||!$('oItem').value.trim();$('oTlQty').textContent=`${nf.format(q)} adet`;
+  const d=$('oDue').value,n=d?diffDays(d,t):null;$('oTlDue').textContent=n==null?'':n<0?`${-n} gün gecikti`:n===0?'bugün':`${n} gün kaldı`;$('oTlDue').style.color=n!=null&&n<0?'var(--late)':'';
+  const price=num($('oPrice').value)||0,paid=opaid(),rest=price-paid;$('oTlPaid').textContent=paid>0?`${tl(paid)} alındı`:price?'henüz alınmadı':'';
+  const rs=$('oTlRest');rs.hidden=!price;rs.className='chip '+(rest<=0.009?'ok':'late');rs.textContent=rest<=0.009?'✓ ödendi':`${tl(rest)} kaldı`;
+  $('oTlBar').style.width=(price?Math.min(100,paid/price*100):0).toFixed(1)+'%'}
 function paintPayTab(){
   const price=num($('oPrice').value)||0,paid=opaid(),rest=price-paid;
-  $('oTabPay').textContent=price?(rest<=0.009?'✓':tl(rest)):'';
-  $('oPayGo').innerHTML=price||paid?`${paid>=price-0.009&&price?'✓ Tamamı alındı':`${tl(paid)} alındı · ${tl(Math.max(0,rest))} kaldı`} <span style="margin-left:auto;color:var(--accent)">Ödeme →</span>`:'Ödeme yok <span style="margin-left:auto;color:var(--accent)">Ödeme ekle →</span>';
+  $('oTabPay').textContent=price?(rest<=0.009?'✓':tl(rest)):'';try{paintTL()}catch(e){}
+  $('oPayGo').innerHTML=`<span style="color:var(--accent)">${paid>0?'Ödemeler →':'Ödeme ekle →'}</span>`;
 }
 function renderPay(anim){
   const price=num($('oPrice').value)||0,paid=opaid(),rest=price-paid,t=todayISO(),done=editOrder&&editOrder.status==='done';
@@ -3865,7 +3895,7 @@ function oLibCost(){const box=$('oLib');if(!OLB||box.hidden)return;const P=oDlgP
   if(hasMy)rows.push(['Senin fiyatın',tl(my),'mine']);
   if(C){const pr=(hasMy?my:(OLB.price||0))-C.cost;rows.push([hasMy?`Kâr · %${C.cost>0?Math.round(pr/C.cost*100):0}`:'Tahmini kâr',`${pr<0?'−':''}${tl(Math.abs(pr))}`,pr<0?'neg':'pos'])}
   box.innerHTML=libBoxHTML({title:OLB.title,tag:OLB.tag,rows,parts:P.map(p=>[p.target,p.name]),note:`Fiyat alanı önerilen fiyatla doldurulur; elle değiştirebilirsin. Parçaları ve filamenti Maliyet sekmesinden düzenleyebilirsin.${OLB.miss?` ${OLB.miss} ürün kütüphanede yok, hesaba katılmadı.`:''}`})}
-$('oItem').addEventListener('input',orderLib);$('oQty').addEventListener('input',orderLib);$('oPrice').addEventListener('input',()=>{OAUTO=false;oLibCost()});
+$('oItem').addEventListener('input',orderLib);$('oQty').addEventListener('input',orderLib);['oDue','oQty','oItem'].forEach(id=>$(id).addEventListener('input',()=>{try{paintTL()}catch(e){}}));$('oLines').addEventListener('input',()=>{try{paintTL()}catch(e){}});$('oPrice').addEventListener('input',()=>{OAUTO=false;oLibCost()});
 $('fOrder').addEventListener('submit',e=>{e.preventDefault();const o=readOrder();if(!o)return;put('orders',o);$('dOrder').close();toast(editOrder?'Sipariş güncellendi':'Sipariş eklendi')});
 $('oDeliverBtn').addEventListener('click',()=>{
   const o=readOrder();if(!o)return;
