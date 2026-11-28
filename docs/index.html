@@ -1013,6 +1013,10 @@ details.pk-sub .pk-ptile{background:var(--soft)}
 .pay-m span{display:inline-flex;align-items:center;gap:6px}.pay-m .ic{width:16px;height:16px;opacity:.85}
 .pay-f{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .pay-f .f input{background:var(--surface);min-height:42px}
+.pay-f .f.warn input{border-color:var(--late);box-shadow:0 0 0 3px var(--late-bg);animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+.pay-n input{background:var(--surface);min-height:40px}.pay-n label small{font-weight:500;color:var(--mute)}
+.pyt small i{font-style:normal;color:var(--ink);opacity:.75}
 .pmb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .pmb button{display:grid;justify-items:center;gap:5px;border:0;border-radius:14px;padding:12px 6px;background:var(--surface);color:var(--accent);font-weight:700;font-size:.84rem;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 25%,var(--line));transition:transform .15s,box-shadow .2s,background .2s}
 .pmb button .ic{width:20px;height:20px}
@@ -3093,14 +3097,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=2.06-1795866704"></script>
+<script src="shim.js?v=2.07-1795867013"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='2.06',VERDATE='27 Kasım 2026';
+const VERSION='2.07',VERDATE='27 Kasım 2026';
 const CHANGES=[
+  ['2.07',['Ödeme: tutar yazılmadan eklenmez, “Tutarı girmediniz” uyarısı çıkar','Ödemelere isteğe bağlı not; listede görünür','Listede “Kapora / ilk ödeme” yerine “Ödeme · Nakit” gibi yazar']],
   ['2.06',['Ödeme sekmesi yenilendi: üstte mor özet kartı (yüzde, alınan / kalan, ödeme şekillerine göre toplam); açılınca %0’dan dolar','Ödeme şekli: tutarı yaz, “Nakit ile ekle”, “Havale ile ekle” ya da “Kredi kartı ile ekle”ye bas; en son kullandığın öne çıkar','Listede her ödemenin şekli simgeyle görünür; simgeye dokunarak değiştirilir (eski ödemeler için de)','Müşteri penceresindeki Ödeme de aynı tasarımda']],
   ['2.05',['Üretim: parça değiştirince o parçanın sayısı ve çizgisi sıfırdan dolar','Hedefin üstünde üretilen adet “fazla” değil “hatalı” sayılır; özetteki hatalı sayısına ve fireye eklenir']],
   ['2.04',['Güncellemeler daha çabuk gelir: yeni sürüm her dakika denetlenir ve önbellek atlanarak yüklenir; bir pencere açıkken bekler, kapanınca yenilenir']],
@@ -3910,6 +3915,7 @@ const PAYIC={n:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentC
   k:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20M6 15h4"/></svg>',
   x:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 9a2.5 2.5 0 114 2c-.9.6-1.5 1.1-1.5 2.2M12 17h.01"/></svg>'};
 let LASTPM='n';try{const v=localStorage.getItem('ad-paym');if(PAYM[v])LASTPM=v}catch(e){}
+function payWarn(inp,msg){toast(msg);if(!inp)return;inp.focus();const f=inp.closest('.f');if(f){f.classList.remove('warn');f.offsetWidth;f.classList.add('warn');setTimeout(()=>f.classList.remove('warn'),1600)}}
 function payBlockHTML(c){
   const {key,price,pays,A}=c,t=todayISO(),paid=pays.reduce((a,p)=>a+(+p.a||0),0),rest=price-paid,pct=price?Math.min(100,Math.round(paid/price*100)):0;
   const byM={};pays.forEach(p=>{const m=PAYM[p.m]?p.m:'x';byM[m]=(byM[m]||0)+(+p.a||0)});
@@ -3917,17 +3923,18 @@ function payBlockHTML(c){
   const right=!price?'Fiyat girilmemiş':`${tl(paid)} / ${tl(price)} alındı<br>${rest>0.009?`<b class="rk">${tl(rest)} kaldı</b>`:rest<-0.009?`<b class="rk">${tl(-rest)} fazla alındı</b>`:'<b class="rok">✓ Hepsi alındı</b>'}`;
   const hero=`<div class="phero pay" data-phk="${esc(key)}" data-pct="${pct}"><div class="ph-t"><b class="ph-pct">%${pct}</b><span>${right}</span></div>
     <div class="ph-seg"><i style="flex:1"><b data-w="${pct}" style="width:${pct}%"></b></i></div><div class="pay-m">${mline}</div></div>`;
-  const list=pays.length?`<div class="pyl"><h4>Alınan ödemeler</h4>${pays.map((p,i)=>({p,i})).sort((a,b)=>a.p.d<b.p.d?-1:a.p.d>b.p.d?1:a.i-b.i).map(({p,i},k)=>{const m=PAYM[p.m]?p.m:'x';return `<div class="pyr" style="--i:${k}"><button type="button" class="pym ${m}" data-${A.cyc}="${i}" title="Ödeme şeklini değiştir" aria-label="Ödeme şekli: ${m==='x'?'belirtilmemiş':PAYM[m]}, değiştir">${PAYIC[m]}</button><span class="pyt"><b>${p.d===t?'Bugün':fmtLong(p.d)}</b><small>${c.doneAt&&p.d===c.doneAt?'Teslimde':k===0?'Kapora / ilk ödeme':'Ödeme'} · ${m==='x'?'şekil yok, dokun':PAYM[m]}</small></span><b class="pya">+${tl(+p.a||0)}</b><button type="button" class="ldel" data-${A.del}="${i}" aria-label="Ödemeyi sil">${DELSVG}</button></div>`}).join('')}</div>`:'';
+  const list=pays.length?`<div class="pyl"><h4>Alınan ödemeler</h4>${pays.map((p,i)=>({p,i})).sort((a,b)=>a.p.d<b.p.d?-1:a.p.d>b.p.d?1:a.i-b.i).map(({p,i},k)=>{const m=PAYM[p.m]?p.m:'x';return `<div class="pyr" style="--i:${k}"><button type="button" class="pym ${m}" data-${A.cyc}="${i}" title="Ödeme şeklini değiştir" aria-label="Ödeme şekli: ${m==='x'?'belirtilmemiş':PAYM[m]}, değiştir">${PAYIC[m]}</button><span class="pyt"><b>${p.d===t?'Bugün':fmtLong(p.d)}</b><small>${c.doneAt&&p.d===c.doneAt?'Teslimde':'Ödeme'} · ${m==='x'?'şekil yok, dokun':PAYM[m]}${p.note?` · <i>${esc(p.note)}</i>`:''}</small></span><b class="pya">+${tl(+p.a||0)}</b><button type="button" class="ldel" data-${A.del}="${i}" aria-label="Ödemeyi sil">${DELSVG}</button></div>`}).join('')}</div>`:'';
   const panel=`<div class="pnew pay"><div class="pa-h"><b>Ödeme ekle</b><span>${rest>0.009?`${tl(rest)} kaldı`:'ödeme tamam'}</span></div>
-    <div class="pay-f"><div class="f"><label for="${c.ids.a}">Tutar (₺)</label><input id="${c.ids.a}" data-nodirty inputmode="decimal" placeholder="${rest>0.009?esc(inStr(r2(rest))):'0'}"></div><div class="f"><label for="${c.ids.d}">Tarih</label><input id="${c.ids.d}" data-nodirty type="date" value="${t}"></div></div>
+    <div class="pay-f"><div class="f"><label for="${c.ids.a}">Tutar (₺)</label><input id="${c.ids.a}" data-nodirty inputmode="decimal" placeholder="Tutar yaz"></div><div class="f"><label for="${c.ids.d}">Tarih</label><input id="${c.ids.d}" data-nodirty type="date" value="${t}"></div></div>
     ${rest>0.009?`<div class="pa-q"><button type="button" data-${A.q}="${r2(rest)}">Kalanın hepsi · ${tl(rest)}</button>${rest>=2?`<button type="button" data-${A.q}="${r2(rest/2)}">Yarısı · ${tl(rest/2)}</button>`:''}</div>`:''}
-    <div class="pmb">${['n','h','k'].map(m=>`<button type="button" class="${m===LASTPM?'pri':''}" data-${A.add}="${m}">${PAYIC[m]}<span>${PAYM[m]} ile ekle</span></button>`).join('')}</div></div>`;
+    <div class="pmb">${['n','h','k'].map(m=>`<button type="button" class="${m===LASTPM?'pri':''}" data-${A.add}="${m}">${PAYIC[m]}<span>${PAYM[m]} ile ekle</span></button>`).join('')}</div>
+    <div class="f pay-n"><label for="${c.ids.n}">Not <small>(isteğe bağlı)</small></label><input id="${c.ids.n}" data-nodirty placeholder="ör. kaporayı eşi getirdi, dekont WhatsApp’ta"></div></div>`;
   return hero+panel+list;
 }
 function renderPay(anim,fresh,bump){
   const price=num($('oPrice').value)||0,paid=opaid(),rest=price-paid,t=todayISO(),done=editOrder&&editOrder.status==='done';
   const pkey='pay:'+(editOrder&&editOrder.id||'new');
-  $('oPay').innerHTML=payBlockHTML({key:pkey,price,pays:OPAYS,doneAt:done&&editOrder.doneAt,A:{add:'payadd',del:'paydel',q:'payq',cyc:'paycy'},ids:{a:'payA',d:'payD'}})+`
+  $('oPay').innerHTML=payBlockHTML({key:pkey,price,pays:OPAYS,doneAt:done&&editOrder.doneAt,A:{add:'payadd',del:'paydel',q:'payq',cyc:'paycy'},ids:{a:'payA',d:'payD',n:'payN'}})+`
     ${editOrder&&!done&&rest<=0.009&&price>0&&(()=>{const pg=prodProgress(editOrder);return pg.target>0&&pg.done>=pg.target})()?`<div class="rdy" style="grid-column:1 / -1"><span><b>Üretim bitti, ödeme tamam.</b><small>Teslim ettiysen siparişi kapat; bekleyenlerden çıkar, müşteride tamamlanmış görünür.</small></span><button type="button" class="btn primary" data-rdy>Teslim edildi</button></div>`:''}
     <p class="help" style="grid-column:1 / -1;margin:0">Eklediğin ödeme o günün kazancına (kasaya giren para) yazılır.${editOrder?' Hemen kaydedilir.':' Siparişi kaydedince kaydedilir.'}</p>`;
   paintPayTab();
@@ -3942,16 +3949,16 @@ function savePays(msg,bump){
 }
 $('oPay').addEventListener('click',e=>{
   const q=e.target.closest('[data-payq]');if(q){$('payA').value=inStr(q.dataset.payq);$('payA').focus();return}
-  const pa=e.target.closest('[data-payadd]');if(pa){const m=pa.dataset.payadd,raw=$('payA').value.trim(),price=num($('oPrice').value)||0,rest=price-opaid(),a=raw?num(raw):r2(rest);
-    if(isNaN(a)||a<=0){toast('Tutar için sayı yaz, ör. 2000');$('payA').focus();return}
+  const pa=e.target.closest('[data-payadd]');if(pa){const m=pa.dataset.payadd,raw=$('payA').value.trim(),a=num(raw);
+    if(!raw||isNaN(a)||a<=0){payWarn($('payA'),raw?'Tutar için sayı yaz, ör. 2000':'Tutarı girmediniz');return}
     LASTPM=m;try{localStorage.setItem('ad-paym',m)}catch(er){}
-    const d=$('payD').value||todayISO();OPAYS.push({d,a:r2(a),m});savePays(`✓ ${tl(a)} ${PAYM[m].toLocaleLowerCase('tr')} ödeme kaydedildi${d===todayISO()?' · bugünün kazancına eklendi':''}`,'+'+tl(a));return}
+    const d=$('payD').value||todayISO(),note=($('payN').value||'').trim();OPAYS.push({d,a:r2(a),m,...(note?{note}:{})});savePays(`✓ ${tl(a)} ${PAYM[m].toLocaleLowerCase('tr')} ödeme kaydedildi${d===todayISO()?' · bugünün kazancına eklendi':''}`,'+'+tl(a));return}
   const cy=e.target.closest('[data-paycy]');if(cy){const p=OPAYS[+cy.dataset.paycy];if(!p)return;const ord=['n','h','k'];p.m=ord[(ord.indexOf(p.m)+1)%3];savePays(`Ödeme şekli: ${PAYM[p.m]}`);return}
   if(e.target.closest('[data-rdy]')){OTAB='info';paintOTab();$('oDeliverBtn').click();return}
   const dl=e.target.closest('[data-paydel]');if(dl){if(!dl.classList.contains('arm')){dl.classList.add('arm');toast('Silmek için tekrar dokun');setTimeout(()=>dl.classList.remove('arm'),3000);return}
     const p=OPAYS.splice(+dl.dataset.paydel,1)[0];savePays(`${tl(p?p.a:0)} ödeme silindi`)}
 });
-$('oPay').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.target.id==='payA'||e.target.id==='payD')){e.preventDefault();($('oPay').querySelector('[data-payadd].pri')||$('oPay').querySelector('[data-payadd]')).click()}});
+$('oPay').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.target.id==='payA'||e.target.id==='payD'||e.target.id==='payN')){e.preventDefault();($('oPay').querySelector('[data-payadd].pri')||$('oPay').querySelector('[data-payadd]')).click()}});
 $('oPayGo').addEventListener('click',()=>{OTAB='pay';paintOTab()});
 $('oPrice').addEventListener('input',paintPayTab);
 $('oTabs').addEventListener('click',e=>{const b=e.target.closest('[data-otab]');if(!b||b.dataset.otab===OTAB)return;OTAB=b.dataset.otab;PFAIL=null;paintOTab();if(OTAB==='prod')stagger($('oProd').children)});
@@ -6948,7 +6955,7 @@ function cdPayView(it,c){
     <div class="paylist"><div class="payr"><span class="dt">${x.date===t?'Bugün':fmtDay(x.date)}</span><small>Satış anında alındı</small><b>+${tl(+x.amt||0)}</b><span></span></div></div>
     <div class="payadd"><div class="f"><label for="cdSA">Satış tutarı (₺)</label><input id="cdSA" data-nodirty inputmode="decimal" value="${esc(inStr(r2(+x.amt||0)))}"></div><div class="f"><label for="cdSD">Tarih</label><input id="cdSD" data-nodirty type="date" value="${esc(x.date||t)}"></div><button type="button" class="btn primary" data-cdsale>Kaydet</button></div>`}
   const o=it.o,price=+o.price||0,pays=o.pays||[],done=o.status==='done';
-  return payBlockHTML({key:'cpay:'+o.id,price,pays,doneAt:done&&o.doneAt,A:{add:'cdpadd',del:'cdpdel',q:'cdpq',cyc:'cdpcy'},ids:{a:'cdPA',d:'cdPD'}})+`
+  return payBlockHTML({key:'cpay:'+o.id,price,pays,doneAt:done&&o.doneAt,A:{add:'cdpadd',del:'cdpdel',q:'cdpq',cyc:'cdpcy'},ids:{a:'cdPA',d:'cdPD',n:'cdPN'}})+`
     <p class="help" style="margin:0">Eklediğin ödeme o günün kazancına yazılır ve siparişe hemen kaydedilir.</p>`;
 }
 function cpSave(oid,mut){const o=S.orders.find(x=>x.id===oid);if(!o)return null;const prod=JSON.parse(JSON.stringify(o.prod||{log:[],step:{}}));if(!prod.log)prod.log=[];mut(prod);const rec={...o,prod};put('orders',rec);return rec}
@@ -6983,10 +6990,10 @@ function cpClick(e){
     const [oid,lid]=ld.dataset.cplogdel.split('|');cpSave(oid,pr=>{pr.log=pr.log.filter(l=>l.id!==lid)});cpRefresh();toast('Kayıt silindi');return true}
   const q=e.target.closest('[data-cdpq]');if(q){$('cdPA').value=inStr(q.dataset.cdpq);$('cdPA').focus();return true}
   const cy2=e.target.closest('[data-cdpcy]');if(cy2){const {o}=cdCurItem();if(!o)return true;const pays=(o.pays||[]).map(x=>({...x})),p=pays[+cy2.dataset.cdpcy];if(!p)return true;const ord=['n','h','k'];p.m=ord[(ord.indexOf(p.m)+1)%3];put('orders',{...o,pays});cpRefresh({});toast(`Ödeme şekli: ${PAYM[p.m]}`);return true}
-  const cpa=e.target.closest('[data-cdpadd]');if(cpa){const {o}=cdCurItem();if(!o)return true;const m=PAYM[cpa.dataset.cdpadd]?cpa.dataset.cdpadd:'n',pr=+o.price||0,rest=pr-paidOf(o),raw=$('cdPA').value.trim(),a=raw?num(raw):r2(rest);
-    if(isNaN(a)||a<=0){toast('Tutar için sayı yaz, ör. 2000');$('cdPA').focus();return true}
+  const cpa=e.target.closest('[data-cdpadd]');if(cpa){const {o}=cdCurItem();if(!o)return true;const m=PAYM[cpa.dataset.cdpadd]?cpa.dataset.cdpadd:'n',raw=$('cdPA').value.trim(),a=num(raw);
+    if(!raw||isNaN(a)||a<=0){payWarn($('cdPA'),raw?'Tutar için sayı yaz, ör. 2000':'Tutarı girmediniz');return true}
     LASTPM=m;try{localStorage.setItem('ad-paym',m)}catch(er){}
-    const d=$('cdPD').value||todayISO();put('orders',{...o,pays:[...(o.pays||[]),{d,a:r2(a),m}]});cpRefresh({bumpTxt:'+'+tl(a)});toast(`✓ ${tl(a)} ödeme kaydedildi${d===todayISO()?' · bugünün kazancına eklendi':''}`);return true}
+    const d=$('cdPD').value||todayISO(),note=($('cdPN').value||'').trim();put('orders',{...o,pays:[...(o.pays||[]),{d,a:r2(a),m,...(note?{note}:{})}]});cpRefresh({bumpTxt:'+'+tl(a)});toast(`✓ ${tl(a)} ödeme kaydedildi${d===todayISO()?' · bugünün kazancına eklendi':''}`);return true}
   const pd=e.target.closest('[data-cdpdel]');
   if(pd){if(!pd.classList.contains('arm')){pd.classList.add('arm');toast('Silmek için tekrar dokun');setTimeout(()=>pd.classList.remove('arm'),3000);return true}
     const {o}=cdCurItem();if(!o)return true;const pays=(o.pays||[]).slice(),rm=pays.splice(+pd.dataset.cdpdel,1)[0];put('orders',{...o,pays});cpRefresh();toast(`${tl(rm?rm.a:0)} ödeme silindi`);return true}
@@ -7047,7 +7054,7 @@ $('cdSale').addEventListener('click',()=>{const n=CUR&&CUR.name;$('dCust').close
 $('cdOrder').addEventListener('click',()=>{const n=CUR&&CUR.name;$('dCust').close();openOrder();$('oCust').value=n||'';$('oItem').focus()});
 $('cdTabs').addEventListener('click',e=>{const b=e.target.closest('[data-cdt]');if(!b)return;CPFAIL=null;CDTAB=b.dataset.cdt===CDTAB?'info':b.dataset.cdt;cdPaint();if(CDTAB!=='info')stagger($('cdPane').querySelectorAll('.cdrow'),60)});
 $('dCust').addEventListener('change',e=>{if(e.target.matches('[data-cdprice]'))cdPriceSave(e.target)});
-$('dCust').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('[data-cdprice]')){e.preventDefault();cdPriceSave(e.target);return}if(e.key==='Enter'&&e.target.matches('#cdPA')){e.preventDefault();($('cdPane').querySelector('[data-cdpadd].pri')||$('cdPane').querySelector('[data-cdpadd]')).click();return}if(e.key==='Enter'&&e.target.matches('.cdord')){$('dCust').close();openOrderById(e.target.dataset.cdo)}});
+$('dCust').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('[data-cdprice]')){e.preventDefault();cdPriceSave(e.target);return}if(e.key==='Enter'&&e.target.matches('#cdPA,#cdPN')){e.preventDefault();($('cdPane').querySelector('[data-cdpadd].pri')||$('cdPane').querySelector('[data-cdpadd]')).click();return}if(e.key==='Enter'&&e.target.matches('.cdord')){$('dCust').close();openOrderById(e.target.dataset.cdo)}});
 $('dCust').addEventListener('click',e=>{
   if(CDTAB!=='info'&&cpClick(e))return;
   if(e.target.closest('[data-cdback]')){CDTAB='info';cdPaint();return}
