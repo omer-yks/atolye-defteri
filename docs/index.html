@@ -672,6 +672,8 @@ dialog[open] .dlg-b>*:nth-child(n+7){animation-delay:.4s}
 .mix-h b{font-weight:700}
 .mix-h span{font-size:.78rem;color:var(--mute)}
 .mpart{background:var(--soft);border-radius:18px;padding:12px;display:grid;gap:10px;animation:fadeUp .35s calc(var(--i,0)*50ms) both}
+.mpart.alt{background:color-mix(in srgb,var(--accent) 9%,var(--soft))}
+.mpart.alt .maddt{border-color:color-mix(in srgb,var(--accent) 28%,var(--line-2))}
 .mph{display:flex;align-items:center;gap:8px;padding:2px 2px 0 4px}
 .mph .nm{flex:1;min-width:0;display:grid;line-height:1.25}.mph .nm b{font-weight:700;overflow-wrap:anywhere}
 .mph .msum{margin:0;font-size:.76rem;color:var(--mute)}.mph .msum .w{color:var(--today);font-weight:600;white-space:nowrap}
@@ -712,7 +714,7 @@ button.mqty:hover{box-shadow:0 0 0 1.5px var(--accent)}
 .mnums .ar{color:var(--line-2);text-align:center;padding-bottom:9px}
 .mst{margin:0 12px 12px;border-radius:10px;padding:6px 9px;font-size:.74rem;line-height:1.35;font-weight:700;display:flex;gap:6px;align-items:flex-start;background:var(--soft);color:var(--mute);transition:background .25s,color .25s}
 .mst:before{content:'';width:7px;height:7px;margin-top:.33em;border-radius:50%;background:currentColor;flex:none}
-.mst.ok{color:var(--ok);background:var(--ok-bg)}.mst.no{color:var(--late);background:var(--late-bg)}
+.mst.ok{color:var(--ok);background:var(--ok-bg)}.mst.done:before{content:'✓';width:auto;height:auto;margin-top:0;background:none;font-weight:800}.mst.no{color:var(--late);background:var(--late-bg)}
 .maddt{display:grid;place-items:center;align-content:center;gap:2px;border:1.5px dashed var(--line-2);border-radius:16px;background:transparent;color:var(--accent);font-weight:700;font-size:.88rem;min-height:150px;transition:border-color .2s,background .2s}
 .maddt small{color:var(--mute);font-weight:600;font-size:.72rem}
 .maddt:hover{border-color:var(--accent);background:var(--accent-soft)}
@@ -3020,14 +3022,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=1.99-1795811166"></script>
+<script src="shim.js?v=2.00-1795861690"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='1.99',VERDATE='27 Kasım 2026';
+const VERSION='2.00',VERDATE='27 Kasım 2026';
 const CHANGES=[
+  ['2.00',['Renk kartları: parçanın istenen adedi üretildiyse “Tamamlandı · 30 adet üretildi” yazar, depo uyarısı çıkmaz','Parça kutuları sırayla iki farklı zemin renginde; birbirinden kolay ayrılır']],
   ['1.99',['Renk kartları: depoda varsa yeşil, yoksa kırmızı','Parça başlığındaki “kütüphanede … g” notu kaldırıldı']],
   ['1.98',['Renk ve filament yeniden tasarlandı: her parça kendi kutusunda, her renk makara renginde ayrı bir kart','Kartta “1 adette 15,61 g → 60 adette 937 g” yan yana; altında depoda yetip yetmediği tek cümleyle','Set sayacı kalktı: parçanın adedi “60 adet ✎” ile değişir; yüzde yok','“Renk ekle” kartların yanında boş bir kutucuk; çıkarılan parçalar altta ↺ ile geri eklenir']],
   ['1.97',['Yeni ürün seçici: resimli, “Setler” ve “Ürünler” diye gruplu; setin parçaları, gram, süre ve maliyet görünür; yazdıkça süzülür, ok tuşları ve Enter ile seçilir (sipariş, satış, hesaplayıcı)']],
@@ -4197,7 +4200,7 @@ function renderMix(k){
   box.innerHTML=`<div class="mix-h"><b>Renk ve filament</b><span>gramı 1 adet için yaz</span></div>
     ${noDepot?'<span class="k" style="font-size:.84rem;color:var(--mute)">Depoda henüz filament yok. Renk seçerken “Depoda yok · alınacak” ile fiyat listendeki ürünlerden seçebilirsin.</span>':''}
     ${M.parts.map((pt,i)=>{const multi=M.parts.length>1||(+pt.per||1)>1,ed=MQE[k]===i,inFull=full.some(p=>p.pid===pt.pid);
-      return `<div class="mpart" data-mi="${i}" style="--i:${i}">
+      return `<div class="mpart${i%2?' alt':''}" data-mi="${i}" style="--i:${i}">
       <div class="mph"><span class="nm"><b>${esc(pt.name)}</b><small class="msum" data-msum="${i}"></small></span>
         ${multi?(ed?`<span class="mqty ed"><button type="button" data-mper="${i}" data-d="-1" aria-label="Azalt">−</button><b data-mcount="${i}"></b><button type="button" data-mper="${i}" data-d="1" aria-label="Artır">+</button><button type="button" class="ok" data-mqe="${i}" aria-label="Tamam">✓</button></span>`
           :`<button type="button" class="mqty" data-mqe="${i}" title="Adedi değiştir"><b data-mcount="${i}"></b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/></svg></button>`)
@@ -4249,10 +4252,12 @@ function mixTotals(k){
   {const prv=rec?(k==='o'?[]:(rec.deduct===false?[]:[rec.use,...(rec.uses||[])])).filter(Boolean):[],ls=mixLineStock(k,q,plog,prv,recNow);
     Object.entries(ls).forEach(([key,r])=>{const [i,j]=key.split(':').map(Number),l=M.parts[i]&&M.parts[i].lines[j];if(!l)return;
       const lt=box.querySelector(`[data-mlt="${key}"]`),lv=box.querySelector(`[data-mlv="${key}"]`),ms=box.querySelector(`[data-mst="${key}"]`);
-      if(lt)lt.textContent=r.rest<r.cnt?`kalan ${nf.format(r.rest)} adette`:`${nf.format(r.cnt)} adette`;
-      if(lv)lv.innerHTML=fmtG((+l.g||0)*r.rest).replace(/ (k?g)$/,' <small>$1</small>');
+      const done=r.cnt>0&&r.rest<=0;
+      if(lt)lt.textContent=!done&&r.rest<r.cnt?`kalan ${nf.format(r.rest)} adette`:`${nf.format(r.cnt)} adette`;
+      if(lv)lv.innerHTML=fmtG((+l.g||0)*(done?r.cnt:r.rest)).replace(/ (k?g)$/,' <small>$1</small>');
       if(!ms)return;let cls='mute',t;
-      if(r.kind==='none')t='Önce filament seç';
+      if(done){cls='ok done';t=`Tamamlandı · ${nf.format(r.cnt)} adet üretildi`}
+      else if(r.kind==='none')t='Önce filament seç';
       else if(r.kind==='want'){cls='no';t=r.need>0.5?`${fmtG(r.need)} eksik · depoda yok`:'Depoda yok · alınacak'}
       else if(r.need<=0.5){cls=r.dep>0.5?'ok':'no';t=r.dep>0.5?`Depoda ${fmtG(r.dep)} var`:'Depoda yok'}
       else if(r.short<=0.5){cls='ok';t=`Yeter · depoda ${fmtG(r.tot)} var`}
