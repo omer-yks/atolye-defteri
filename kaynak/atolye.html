@@ -989,6 +989,12 @@ details.pk-sub .pk-ptile{background:var(--soft)}
 @keyframes paddR{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
 @keyframes paddL{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
 .pa-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}.pa-h b{font-size:1rem;font-weight:700}.pa-h span{font-size:.82rem;color:var(--mute)}
+.pa-p{display:grid;gap:6px}
+.pa-pn{font-size:.8rem;color:var(--mute)}.pa-pn b{color:var(--ink);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.pa-bar{display:block;height:7px;border-radius:99px;background:color-mix(in srgb,var(--accent) 12%,var(--surface));overflow:hidden}
+.pa-bar i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+.pnew.done .pa-bar{margin-top:6px;background:color-mix(in srgb,var(--ok) 15%,var(--surface))}.pnew.done .pa-bar i{background:var(--ok)}
+.pa-x{font-style:normal;color:var(--late);font-weight:700}
 .pa-l{font-size:.76rem;font-weight:700;color:var(--mute);margin-bottom:-4px}
 .pa-c{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px;align-items:center}
 .pa-c .btn{justify-content:center;min-height:42px}
@@ -3066,8 +3072,9 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='2.04',VERDATE='27 Kasım 2026';
+const VERSION='2.05',VERDATE='27 Kasım 2026';
 const CHANGES=[
+  ['2.05',['Üretim: parça değiştirince o parçanın sayısı ve çizgisi sıfırdan dolar','Hedefin üstünde üretilen adet “fazla” değil “hatalı” sayılır; özetteki hatalı sayısına ve fireye eklenir']],
   ['2.04',['Güncellemeler daha çabuk gelir: yeni sürüm her dakika denetlenir ve önbellek atlanarak yüklenir; bir pencere açıkken bekler, kapanınca yenilenir']],
   ['2.03',['Üretim sekmesi her açılışta canlanır: yüzde %0’dan sayarak çıkar, parça çizgileri sırayla dolar']],
   ['2.02',['Üretim sekmesi yenilendi: üstte mor özet kartı (yüzde, parça çizgileri, teslim günü, hatalı baskı)','Özetteki parçaya dokun → altında o parçanın ekleme kutusu açılır; 5, 10 ve “Kalanın hepsi” kısayolları','Animasyonlar: parça geçişinde kayan seçim ve ok, eklenince yükselen “+6”, dolan çizgiler ve sayan yüzde; biten parçadan sonrakine kendiliğinden geçer','Müşteri penceresindeki Üretim de aynı tasarımda']],
@@ -3913,7 +3920,10 @@ function prodBlockHTML(c){
   let sel=parts.find(p=>p.pid===PSEL[key]);if(!sel)sel=parts.find(p=>!fullOf(p))||parts[0];PSEL[key]=sel.pid;
   const D=parts.reduce((a,p)=>a+(c.locked?p.target:Math.min(doneOf(p.pid),p.target)),0),T=parts.reduce((a,p)=>a+p.target,0),pct=c.locked?100:T?Math.round(D/T*100):0;
   const pre=(()=>{if(parts.length<2)return '';const ws=parts.map(p=>String(p.name).split(' '));let n=0;while(ws.every(w=>w.length>n+1&&w[n]===ws[0][n]))n++;return n?ws[0].slice(0,n).join(' ')+' ':''})(),short=nm=>pre&&String(nm).startsWith(pre)?String(nm).slice(pre.length):nm;
-  const failTxt=c.fails?`<span class="bad2">${nf.format(c.fn)} hatalı (${fmtG(c.fg)}${c.fc?` · ~${tl(c.fc)}`:''})</span>`:'hatalı baskı yok';
+  const perG=p=>(p.lines||[]).reduce((a,l)=>a+(+l.g||0),0),extraOf=p=>c.locked?0:Math.max(0,doneOf(p.pid)-p.target);
+  const xN=parts.reduce((a,p)=>a+extraOf(p),0),xG=parts.reduce((a,p)=>a+extraOf(p)*perG(p),0),xC=parts.reduce((a,p)=>a+(p.lines||[]).reduce((b,l)=>b+(+l.g||0)*extraOf(p)/1000*(l.c?colorKg(l.c):0),0),0);
+  const hN=c.fn+xN,hG=c.fg+xG,hC=(c.fc||0)+xC;
+  const failTxt=hN?`<span class="bad2">${nf.format(hN)} hatalı (${fmtG(hG)}${hC?` · ~${tl(hC)}`:''})</span>`:'hatalı baskı yok';
   const hero=`<div class="phero" data-phk="${esc(key)}" data-pct="${pct}">
     <div class="ph-t"><b class="ph-pct">%${pct}</b><span>${nf.format(D)} / ${nf.format(T)} adet üretildi<br>${c.daysTxt?c.daysTxt+' · ':''}${failTxt}</span></div>
     <div class="ph-seg">${parts.map(p=>{const w=c.locked?100:p.target?Math.min(100,doneOf(p.pid)/p.target*100):0;return `<i style="flex:${Math.max(1,p.target)}" title="${esc(p.name)}"><b data-w="${w.toFixed(1)}" style="width:${w.toFixed(1)}%"></b></i>`}).join('')}</div>
@@ -3923,9 +3933,10 @@ function prodBlockHTML(c){
   const p=sel,k=c.kOf(p.pid),d=doneOf(p.pid),rest=Math.max(0,p.target-d),f=fullOf(p);
   let panel;
   if(c.locked)panel=`<div class="pnew done"><span class="pa-ok">✓</span><span class="pa-tx"><b>${esc(p.name)}</b><small>Sipariş teslim edildi · ${nf.format(p.target)} adet</small></span></div>`;
-  else if(f&&PMORE[key]!==p.pid)panel=`<div class="pnew done"><span class="pa-ok">✓</span><span class="pa-tx"><b>${esc(p.name)} tamamlandı</b><small>${nf.format(d)} / ${nf.format(p.target)} adet üretildi${d>p.target?` · +${nf.format(d-p.target)} fazla`:''}</small></span><button type="button" class="lnk" data-pmore="${esc(p.pid)}">Fazladan baskı ekle</button></div>`;
+  else if(f&&PMORE[key]!==p.pid)panel=`<div class="pnew done"><span class="pa-ok">✓</span><span class="pa-tx"><b>${esc(p.name)} tamamlandı</b><small><span class="pa-n" data-to="${Math.min(d,p.target)}">${nf.format(Math.min(d,p.target))}</span> / ${nf.format(p.target)} adet üretildi${d>p.target?` · <em class="pa-x">${nf.format(d-p.target)} hatalı</em>`:''}</small><span class="pa-bar"><i data-w="100" style="width:100%"></i></span></span><button type="button" class="lnk" data-pmore="${esc(p.pid)}">Fazladan baskı ekle</button></div>`;
   else panel=`<div class="pnew">
       <div class="pa-h"><b>Baskı ekle · ${esc(p.name)}</b><span>${rest?`${nf.format(rest)} adet kaldı`:'tamamlandı'}</span></div>
+      <div class="pa-p"><span class="pa-pn"><b class="pa-n" data-to="${Math.min(d,p.target)}">${nf.format(Math.min(d,p.target))}</b> / ${nf.format(p.target)} üretildi</span><span class="pa-bar"><i data-w="${p.target?Math.min(100,d/p.target*100).toFixed(1):0}" style="width:${p.target?Math.min(100,d/p.target*100).toFixed(1):0}%"></i></span></div>
       <span class="pa-l">Bu tablada kaç adet?</span>
       <div class="pa-c"><span class="step"><button type="button" data-${A.step}="${esc(k)}" data-d="-1" aria-label="Azalt">−</button><input data-nodirty data-${A.n}="${esc(k)}" inputmode="numeric" value="1" aria-label="${esc(p.name)}: bu tablada kaç adet"><button type="button" data-${A.step}="${esc(k)}" data-d="1" aria-label="Artır">+</button></span>
         <button type="button" class="btn ok" data-${A.ok}="${esc(k)}">✓ Başarılı</button><button type="button" class="btn bad" data-${A.bad}="${esc(k)}">✕ Hatalı</button></div>
@@ -3957,6 +3968,12 @@ function prodAnimate(box,key,o){
   const from=prev?prev.pct:0,el=hero.querySelector('.ph-pct');
   if(el&&from!==pct){const t0=performance.now()+(prev?0:150),dur=prev?700:1100;const tick=t=>{const k=Math.max(0,Math.min(1,(t-t0)/dur)),e=1-Math.pow(1-k,3);el.textContent='%'+Math.round(from+(pct-from)*e);if(k<1)requestAnimationFrame(tick)};el.textContent='%'+from;requestAnimationFrame(tick)}
   const pan=wrap&&wrap.firstElementChild;
+  if(pan&&!red&&(o.dir||o.fresh||!prev||o.bump)){
+    const pn=pan.querySelector('.pa-n'),pb=pan.querySelector('.pa-bar i');
+    const to=pn?+pn.dataset.to:0,fromN=o.bump&&!o.dir?Math.max(0,to-o.bump.n):0;
+    if(pb){const w=+pb.dataset.w,w0=o.bump&&!o.dir&&to?Math.max(0,w*fromN/Math.max(1,to)):0;pb.style.transition='none';pb.style.width=w0+'%';pb.offsetWidth;requestAnimationFrame(()=>{pb.style.transition='width .9s cubic-bezier(.2,.9,.3,1) .08s';pb.style.width=w+'%'})}
+    if(pn&&to!==fromN){const t0=performance.now()+80,dur=800;pn.textContent=nf.format(fromN);const tick=t=>{const k=Math.max(0,Math.min(1,(t-t0)/dur)),e=1-Math.pow(1-k,3);pn.textContent=nf.format(Math.round(fromN+(to-fromN)*e));if(k<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)}
+  }
   if(pan&&o.dir)pan.classList.add(o.dir<0?'in-l':'in-r');
   if(o.bump&&chips){const b=chips.querySelector(`[data-${o.attr||'psel'}="${CSS.escape(o.bump.pid)}"]`)||selB;if(b){const s=document.createElement('span');s.className='ph-bub';s.textContent='+'+nf.format(o.bump.n);s.style.left=(b.offsetLeft+b.offsetWidth/2)+'px';s.style.top=b.offsetTop+'px';chips.appendChild(s);setTimeout(()=>s.remove(),1200)}}
   else if(o.bump&&!chips){const s=document.createElement('span');s.className='ph-bub solo';s.textContent='+'+nf.format(o.bump.n);hero.appendChild(s);setTimeout(()=>s.remove(),1200)}
