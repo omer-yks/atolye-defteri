@@ -668,6 +668,9 @@ dialog[open] .dlg-b>*:nth-child(n+7){animation-delay:.4s}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cprofit b.pos{color:#13804A}:root:not([data-theme="light"]) .cprofit b.neg{color:#C9353B}}
 .ctot{font-size:.8rem;opacity:.75}
 .mix{grid-column:1 / -1;border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:10px;animation:rise .35s cubic-bezier(.2,.9,.3,1) both}
+.mix.mixinfo{border:0;padding:0;animation:none}
+.mix.mixinfo>.mix-h,.mix.mixinfo>.mpart,.mix.mixinfo>.mfoot,.mix.mixinfo>.k{display:none}
+.mix-go{display:none;justify-self:start;font-size:.84rem}.mix.mixinfo>.mix-go{display:inline-flex}
 .mix-h{display:flex;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;align-items:baseline}
 .mix-h b{font-weight:700}
 .mix-h span{font-size:.78rem;color:var(--mute)}
@@ -3097,14 +3100,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=2.07-1795867013"></script>
+<script src="shim.js?v=2.08-1795888768"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='2.07',VERDATE='27 Kasım 2026';
+const VERSION='2.08',VERDATE='27 Kasım 2026';
 const CHANGES=[
+  ['2.08',['Sipariş > Bilgiler: “Renk ve filament” düzenleyicisi artık yalnızca Maliyet sekmesinde; Bilgiler’de kütüphane önerisi ve kullanılacak / depoda olan / alınacak filament kalır']],
   ['2.07',['Ödeme: tutar yazılmadan eklenmez, “Tutarı girmediniz” uyarısı çıkar','Ödemelere isteğe bağlı not; listede görünür','Listede “Kapora / ilk ödeme” yerine “Ödeme · Nakit” gibi yazar']],
   ['2.06',['Ödeme sekmesi yenilendi: üstte mor özet kartı (yüzde, alınan / kalan, ödeme şekillerine göre toplam); açılınca %0’dan dolar','Ödeme şekli: tutarı yaz, “Nakit ile ekle”, “Havale ile ekle” ya da “Kredi kartı ile ekle”ye bas; en son kullandığın öne çıkar','Listede her ödemenin şekli simgeyle görünür; simgeye dokunarak değiştirilir (eski ödemeler için de)','Müşteri penceresindeki Ödeme de aynı tasarımda']],
   ['2.05',['Üretim: parça değiştirince o parçanın sayısı ve çizgisi sıfırdan dolar','Hedefin üstünde üretilen adet “fazla” değil “hatalı” sayılır; özetteki hatalı sayısına ve fireye eklenir']],
@@ -3848,7 +3852,7 @@ function paintOTab(){
   const box=$('oTabs').querySelector('.seg');
   box.querySelectorAll('[data-otab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.otab===OTAB));placeInd(box);
   $('oInfo').hidden=OTAB!=='info';$('oProd').hidden=OTAB!=='prod';$('oPay').hidden=OTAB!=='pay';$('oCost').hidden=OTAB!=='cost';paintPayTab();
-  {const mx=$('oMix');if(OTAB==='cost'){if(!$('oCostBody'))$('oCost').innerHTML='<div id="oCostMixSlot" class="cmixslot"></div><div id="oCostBody" style="display:contents"></div>';$('oCostMixSlot').appendChild(mx);mixTotals('o')}
+  {const mx=$('oMix');mx.classList.toggle('mixinfo',OTAB!=='cost');if(OTAB==='cost'){if(!$('oCostBody'))$('oCost').innerHTML='<div id="oCostMixSlot" class="cmixslot"></div><div id="oCostBody" style="display:contents"></div>';$('oCostMixSlot').appendChild(mx);mixTotals('o')}
    else if(mx.parentElement&&mx.parentElement.id==='oCostMixSlot')$('oMixHome').after(mx)}
   const pg=editOrder?prodProgress(editOrder):null;
   $('oTabProg').textContent=pg&&pg.target?`${nf.format(pg.done)}/${nf.format(pg.target)}`:'';
@@ -4395,6 +4399,7 @@ function renderMix(k){
     <div class="mfoot">${L.length?`<label class="mpnew"><span class="sr">Parça ekle</span><span class="mpn-l" aria-hidden="true">＋ Parça ekle</span><select data-mpnew data-nodirty><option value="">Kütüphaneden parça seç</option>${L.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}${+x.g?` · ${fmtG(+x.g)}`:''}</option>`).join('')}</select></label>`:''}
       ${rem.map(p=>`<button type="button" class="mback" data-mpadd="${esc(p.pid)}" title="${k==='s'?'Bu satışa':'Bu siparişe'} geri ekle">↺ ${esc(p.name)}</button>`).join('')}</div>
     <div class="mtot" data-mtot></div>
+    ${k==='o'?'<button type="button" class="lnk mix-go" data-gocost>Renk ve filamenti düzenle · Maliyet sekmesi →</button>':''}
     ${k==='o'?'':`<div class="fcw"><button type="button" class="fcalc-btn" data-fcalc aria-expanded="${!!FCALC[k]}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h2M14 10h2M8 14h2M14 14h2M8 18h2M14 18h2"/></svg>Filament hesapla</button><div data-fcbox></div></div>`}`;
   mixTotals(k);
 }
@@ -4556,6 +4561,7 @@ function fcalcBuy(k){
   box.addEventListener('click',e=>{
     const pk=e.target.closest('[data-pick]');if(pk){const [kk,i,j]=pk.dataset.pick.split(':');mixPick(kk,+i,+j);return}
     if(e.target.closest('[data-fcalc]')){FCALC[k]=!FCALC[k];mixTotals(k);return}
+    if(k==='o'&&e.target.closest('[data-gocost]')){OTAB='cost';paintOTab();return}
     if(k==='o'&&e.target.closest('[data-obuyask]')){bokOpen();return}
     if(k==='o'&&e.target.closest('[data-obuyoff]')){OINBUY=false;$('dOrder').dataset.dirty='1';if(editOrder&&S.orders.some(x=>x.id===editOrder.id)){const cur=S.orders.find(x=>x.id===editOrder.id);editOrder={...cur,inBuy:false};put('orders',editOrder)}mixTotals('o');toast('Alınacaklardan çıkarıldı');return}
     if(k==='o'&&e.target.closest('[data-obuy]')){OINBUY=!OINBUY;$('dOrder').dataset.dirty='1';mixTotals('o');toast(OINBUY?'Kaydedince Alınacaklar listesine eklenir':'Alınacaklardan çıkarılacak');return}
