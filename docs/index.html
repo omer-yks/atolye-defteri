@@ -3022,14 +3022,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=2.00-1795861690"></script>
+<script src="shim.js?v=2.01-1795862529"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='2.00',VERDATE='27 Kasım 2026';
+const VERSION='2.01',VERDATE='27 Kasım 2026';
 const CHANGES=[
+  ['2.01',['Sipariş filament hesabı: üretilen parçalar için üretim kaydındaki gerçek gram kullanılır; üretim bitince “Alınması gereken”de yanlışlıkla eksik görünmez']],
   ['2.00',['Renk kartları: parçanın istenen adedi üretildiyse “Tamamlandı · 30 adet üretildi” yazar, depo uyarısı çıkmaz','Parça kutuları sırayla iki farklı zemin renginde; birbirinden kolay ayrılır']],
   ['1.99',['Renk kartları: depoda varsa yeşil, yoksa kırmızı','Parça başlığındaki “kütüphanede … g” notu kaldırıldı']],
   ['1.98',['Renk ve filament yeniden tasarlandı: her parça kendi kutusunda, her renk makara renginde ayrı bir kart','Kartta “1 adette 15,61 g → 60 adette 937 g” yan yana; altında depoda yetip yetmediği tek cümleyle','Set sayacı kalktı: parçanın adedi “60 adet ✎” ile değişir; yüzde yok','“Renk ekle” kartların yanında boş bir kutucuk; çıkarılan parçalar altta ↺ ile geri eklenir']],
@@ -7825,7 +7826,14 @@ function spoolOf(bn,sn,col){const pe=findPrice(bn,sn),w=pe&&+pe.w?+pe.w:1000,cu=
 function addNeed(m,cid,want,g){if(g<=0||(!cid&&!want))return;const k=cid?gkeyCid(cid):gkeyOf(want.b,want.s,want.col);let r=m.get(k);if(!r){r={key:k,gk:k,...fInfo(cid,cid?null:want),need:0};m.set(k,r)}else if(cid&&!r.cid)Object.assign(r,fInfo(cid,null));r.need+=g}
 function orderNeeds(o,parts,qty){
   const ps=parts?resolveParts(parts).map(p=>({...p,target:(+p.per||1)*(qty||1)})):prodPartsOf(o);
-  const m=new Map();ps.forEach(p=>(p.lines||[]).forEach(l=>addNeed(m,lineCid(l),l.want,(+l.g||0)*p.target)));return m;
+  const m=new Map(),log=(o&&o.prod&&o.prod.log)||[];
+  ps.forEach(p=>{
+    /* Üretilenler için gerçekte kaydedilen gram, kalanlar için bugünkü gram */
+    const oks=log.filter(l=>l.ok&&l.part===p.pid),made=oks.reduce((a,l)=>a+(+l.n||0),0),rest=oks.length?Math.max(0,p.target-made):p.target;
+    (p.lines||[]).forEach(l=>addNeed(m,lineCid(l),l.want,(+l.g||0)*rest));
+    oks.forEach(l=>logUses(o,l).forEach(u=>addNeed(m,u.c,null,+u.g||0)));
+  });
+  return m;
 }
 function orderCovered(o,resOverride){const ok=sumByGroup(o&&o.id&&o.prod?okLogUses(o):{}),res=sumByGroup(resOverride||(o&&o.reserved)||{}),out={};new Set([...Object.keys(ok),...Object.keys(res)]).forEach(k=>{out[k]=Math.max(+ok[k]||0,+res[k]||0)});return out}
 function needItemNeeds(n){const m=new Map();(n.fils||[]).forEach(f=>addNeed(m,f.c||wantCid(f.want),f.want,(+f.g||0)*(+n.qty||1)));return m}
