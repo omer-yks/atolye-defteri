@@ -668,6 +668,38 @@ dialog[open] .dlg-b>*:nth-child(n+7){animation-delay:.4s}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cprofit b.pos{color:#13804A}:root:not([data-theme="light"]) .cprofit b.neg{color:#C9353B}}
 .ctot{font-size:.8rem;opacity:.75}
 .mix{grid-column:1 / -1;border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:10px;animation:rise .35s cubic-bezier(.2,.9,.3,1) both}
+.mcw{display:grid}.mix.mixinfo>.mcw,.mix.mixinfo>.mshown{display:none}
+.mpart[hidden],.mfoot[hidden]{display:none!important}
+.mcard{gap:14px}
+.mcard .ph-t>span:first-child{display:flex;align-items:baseline;gap:6px}
+.mcd-hz{font-size:.95rem;font-weight:700;opacity:.85}
+.mcard .ok2{color:#9FF0C2;font-weight:700}
+.mcd-mix{display:flex;gap:2px;height:12px;border-radius:99px;overflow:hidden}
+.mcd-mix i{min-width:6px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);transition:flex .6s cubic-bezier(.2,.9,.3,1)}
+.mcd-rows{display:grid;gap:8px}
+.mcd-r{display:grid;grid-template-columns:16px minmax(80px,auto) 1fr auto;gap:10px;align-items:center;font-size:.82rem}
+.mcd-sw{width:16px;height:16px;border-radius:50%;box-shadow:0 0 0 1.5px rgba(255,255,255,.55)}
+.mcd-n{opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+.mcd-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}
+.mcd-bar b{display:block;height:100%;border-radius:99px;background:#FFB4B7;transition:width .8s cubic-bezier(.2,.9,.3,1)}.mcd-bar b.ok{background:#9FF0C2}
+.mcd-v{opacity:.92;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mchips{display:flex;flex-wrap:wrap;gap:6px}
+.mch{position:relative;display:inline-flex}
+.mch>button[role=tab]{display:inline-flex;align-items:center;gap:7px;border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:11px;padding:7px 11px;font-weight:600;font-size:.84rem;transition:background .3s,color .3s,box-shadow .3s}
+.mch>button[role=tab]:hover{background:rgba(255,255,255,.18)}
+.mch>button[role=tab] small{font-size:.74rem;opacity:.75;font-weight:700}
+.mch.sel>button[role=tab]{background:#fff;color:#2A2550;font-weight:800;box-shadow:0 6px 16px rgba(0,0,0,.22)}
+.mset{font-size:.8rem;opacity:.9}
+.mring{width:16px;height:16px;border-radius:50%;background:conic-gradient(var(--rc) var(--p),rgba(160,160,200,.35) 0);display:inline-grid;place-items:center;flex:none}
+.mring>i{width:10px;height:10px;border-radius:50%;background:var(--rb)}
+.mch-go{position:absolute;left:50%;top:calc(100% + 6px);transform:translate(-50%,-4px);z-index:5;white-space:nowrap;border:0;border-radius:10px;padding:7px 12px;background:var(--surface);color:var(--accent);font-weight:700;font-size:.8rem;box-shadow:0 10px 26px rgba(20,25,60,.25),0 0 0 1px var(--line);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
+.mch-go:before{content:'';position:absolute;top:-5px;left:50%;width:10px;height:10px;margin-left:-5px;background:inherit;transform:rotate(45deg);border-radius:2px}
+.mch:hover .mch-go,.mch:focus-within .mch-go{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.mch:after{content:'';position:absolute;left:0;right:0;top:100%;height:8px}
+@media (hover:none){.mch.sel .mch-go{position:static;transform:none;opacity:1;pointer-events:auto;margin-left:6px;box-shadow:none;background:rgba(255,255,255,.9)}.mch-go:before{display:none}}
+.mpx[data-mhide]:hover{background:var(--soft);color:var(--ink)}
+.mshown{display:flex;align-items:center;gap:10px;font-size:.8rem;color:var(--mute);padding:0 4px}
+.mshown .lnk{font-size:.8rem}
 .mix.mixinfo{border:0;padding:0;animation:none}
 .mix.mixinfo>.mix-h,.mix.mixinfo>.mpart,.mix.mixinfo>.mfoot,.mix.mixinfo>.k{display:none}
 .mix-go{display:none;justify-self:start;font-size:.84rem}.mix.mixinfo>.mix-go{display:inline-flex}
@@ -3100,14 +3132,15 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="shim.js?v=2.08-1795888768"></script>
+<script src="shim.js?v=2.09-1795889826"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='2.08',VERDATE='27 Kasım 2026';
+const VERSION='2.09',VERDATE='27 Kasım 2026';
 const CHANGES=[
+  ['2.09',['Sipariş > Maliyet > Renk ve filament: tek özet kartı. “Kurumsal Set”, “Kalemlik”, “Logo”… etiketine dokununca kart o seçimin filament dağılımını gösterir (gereken, depoda, eksik; renk renk)','Etiketin üstüne gelince “Ürünleri göster” / “Renk ve filamenti göster” çıkar; açılan parçalar eskisi gibi düzenlenir, her biri göz simgesiyle ayrı ayrı gizlenir']],
   ['2.08',['Sipariş > Bilgiler: “Renk ve filament” düzenleyicisi artık yalnızca Maliyet sekmesinde; Bilgiler’de kütüphane önerisi ve kullanılacak / depoda olan / alınacak filament kalır']],
   ['2.07',['Ödeme: tutar yazılmadan eklenmez, “Tutarı girmediniz” uyarısı çıkar','Ödemelere isteğe bağlı not; listede görünür','Listede “Kapora / ilk ödeme” yerine “Ödeme · Nakit” gibi yazar']],
   ['2.06',['Ödeme sekmesi yenilendi: üstte mor özet kartı (yüzde, alınan / kalan, ödeme şekillerine göre toplam); açılınca %0’dan dolar','Ödeme şekli: tutarı yaz, “Nakit ile ekle”, “Havale ile ekle” ya da “Kredi kartı ile ekle”ye bas; en son kullandığın öne çıkar','Listede her ödemenin şekli simgeyle görünür; simgeye dokunarak değiştirilir (eski ödemeler için de)','Müşteri penceresindeki Ödeme de aynı tasarımda']],
@@ -3846,9 +3879,10 @@ function colorKg(cid){
   if(x&&b){const cu=colorUnit(b.name,x.name,c.name);if(cu){const pe=findPrice(b.name,x.name);return cu/((pe&&+pe.w)||1000)*1000}}
   return seriesPrice(c.series)||listKg(c.series);
 }
-let OLASTT=null;
+let OLASTT=null,OLASTT_C=null;
 function paintOTab(){
   const pFresh=OTAB==='prod'&&OLASTT!=='prod',yFresh=OTAB==='pay'&&OLASTT!=='pay';OLASTT=OTAB;
+  if(OTAB==='cost'&&OLASTT_C!=='cost')MCFRESH=true;OLASTT_C=OTAB;
   const box=$('oTabs').querySelector('.seg');
   box.querySelectorAll('[data-otab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.otab===OTAB));placeInd(box);
   $('oInfo').hidden=OTAB!=='info';$('oProd').hidden=OTAB!=='prod';$('oPay').hidden=OTAB!=='pay';$('oCost').hidden=OTAB!=='cost';paintPayTab();
@@ -4009,7 +4043,7 @@ function prodBlockHTML(c){
 function prodAnimate(box,key,o){
   o=o||{};const hero=box.querySelector(`.phero[data-phk="${CSS.escape(key)}"]`);if(!hero)return;
   if(o.fresh){delete PPREV[key];delete PIND[key]}
-  const prev=PPREV[key],red=REDUCE(),segs=[...hero.querySelectorAll('.ph-seg b')],pct=+hero.dataset.pct||0;
+  const prev=PPREV[key],red=REDUCE(),segs=[...hero.querySelectorAll('.ph-seg b,.mcd-bar b')],pct=+hero.dataset.pct||0;
   PPREV[key]={pct,w:segs.map(b=>+b.dataset.w)};
   const chips=hero.querySelector('.ph-chips'),ind=chips&&chips.querySelector('.ph-ind'),selB=chips&&chips.querySelector('[aria-selected="true"]'),wrap=box.querySelector(`.padd-w[data-pdk="${CSS.escape(key)}"]`);
   const rectOf=()=>selB?{l:selB.offsetLeft,t:selB.offsetTop,w:selB.offsetWidth,h:selB.offsetHeight}:null;
@@ -4369,6 +4403,35 @@ function mtopHTML(k,i,j,pt,l){
   if(l.want&&l.want.col)return `<button type="button" class="mtop" ${at} aria-label="${esc(pt.name)} ${j+1}. renk: ${esc(l.want.col)}, alınacak"><i class="mspool"></i><span class="ft"><b>${esc(l.want.col)}</b><small>${esc([l.want.b,l.want.s].filter(Boolean).join(' '))} · alınacak</small></span>${chev}</button>`;
   return `<button type="button" class="mtop empty" ${at} aria-label="${esc(pt.name)} ${j+1}. renk: filament seçilmedi"><i class="mspool"></i><span class="ft"><b>Filament seç</b><small>seçmek için dokun</small></span>${chev}</button>`;
 }
+/* Sipariş > Maliyet: tek özet kartı (set ya da parça seçilir) + istenen parçaların düzenleyicisi */
+const MST={};let MCFRESH=true;
+function mstOf(){const key=editOrder&&editOrder.id||'new';if(!MST[key])MST[key]={sel:'set',show:new Set()};return MST[key]}
+const EYE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8M9.9 5.1A9.8 9.8 0 0112 5c5 0 9 4.5 10 7-.4 1-1.2 2.4-2.4 3.6M6.6 6.6C4.4 8 3 10.2 2 12c1 2.5 5 7 10 7 1.6 0 3.1-.4 4.4-1.1"/></svg>';
+function mixCardHTML(setRows,q,plog,recNow){
+  const M=MIX.o,st=mstOf(),k='o';
+  const ls=mixLineStock(k,q,plog,[],recNow);
+  const parts=M.parts.map((pt,i)=>{const cnt=(+pt.per||1)*q,rows=pt.lines.map((l,j)=>{const r=ls[i+':'+j]||{},g=+l.g||0,tot=g*cnt,doneG=g*Math.max(0,cnt-(r.rest!=null?r.rest:cnt)),rdy=r.kind==='c'?doneG+Math.max(0,(r.need||0)-(r.short||0)):doneG,c=l.c&&invGet(l.c),x=c&&invGet(c.series),b=x&&invGet(x.brand);
+      return{hx:hexOfCid(l.c,l.want)||'#B9BEC7',col:c?c.name:(l.want&&l.want.col)||'Renk seçilmedi',fam:c?famForC(b?b.name:'',x?x.name:''):(l.want?famForC(l.want.b||'',l.want.s||''):''),need:tot,ready:Math.min(tot,rdy),none:!c&&!(l.want&&l.want.col)}}).filter(r=>r.need>0||r.none);
+    const need=rows.reduce((a,r)=>a+r.need,0),ready=rows.reduce((a,r)=>a+r.ready,0);return{pid:pt.pid,name:pt.name,cnt,rows,need,ready}});
+  const sRows=setRows.map(r=>{const rdy=Math.min(r.need,(r.inDep?r.have:0)+r.cov);return{hx:nameHex(r.col)||'#B9BEC7',col:r.col,fam:famForC(r.bn,r.sn),need:r.need,ready:rdy}});
+  const sNeed=sRows.reduce((a,r)=>a+r.need,0),sReady=sRows.reduce((a,r)=>a+r.ready,0);
+  if(st.sel!=='set'&&!parts.some(p=>p.pid===st.sel))st.sel='set';
+  const multi=parts.length>1,setName=oMulti()?'Tüm sipariş':(($('oItem').value||'').trim()||'Sipariş');
+  const pre=(()=>{if(parts.length<2)return '';const ws=parts.map(p=>String(p.name).split(' '));let n=0;while(ws.every(w=>w.length>n+1&&w[n]===ws[0][n]))n++;return n?ws[0].slice(0,n).join(' ')+' ':''})(),short=nm=>pre&&String(nm).startsWith(pre)?String(nm).slice(pre.length):nm;
+  const cur=st.sel==='set'||!multi?{name:multi?setName:(parts[0]?parts[0].name:setName),sub:multi?`${nf.format(q)} ${esc(setName)} için`:`${nf.format(parts[0]?parts[0].cnt:q)} adet için`,rows:multi?sRows:(parts[0]?parts[0].rows:[]),need:multi?sNeed:(parts[0]?parts[0].need:0),ready:multi?sReady:(parts[0]?parts[0].ready:0)}:(()=>{const p=parts.find(x=>x.pid===st.sel);return{name:p.name,sub:`${esc(short(p.name))} · ${nf.format(p.cnt)} adet için`,rows:p.rows,need:p.need,ready:p.ready}})();
+  const pct=cur.need>0?Math.round(cur.ready/cur.need*100):0,miss=Math.max(0,cur.need-cur.ready),noSel=!cur.rows.length||cur.rows.every(r=>r.none);
+  const ring=(p,on)=>`<i class="mring" style="--p:${p}%;--rc:${p>=100?'#2FAE66':'#FF8A8F'};--rb:${on?'#fff':'#40369F'}"><i></i></i>`;
+  const showAll=multi&&parts.every(p=>st.show.has(p.pid));
+  const chip=(id,label,p,on,isSet)=>{const shown=isSet?showAll:st.show.has(id);return `<span class="mch${on?' sel':''}"><button type="button" role="tab" aria-selected="${on}" data-msel="${esc(id)}">${isSet?'<span class="mset">▦</span>':''}${ring(p,on)}<span>${esc(label)}</span><small>%${p}</small></button><button type="button" class="mch-go" data-mshow="${esc(id)}">${isSet?(shown?'Ürünleri gizle':'Ürünleri göster'):(shown?'Renkleri gizle':'Renk ve filamenti göster')}</button></span>`};
+  const pp=p=>p.need>0?Math.round(p.ready/p.need*100):0;
+  const chips=`<div class="mchips" role="tablist" aria-label="Neyin dağılımı görünsün">${multi?chip('set',setName,sNeed>0?Math.round(sReady/sNeed*100):0,st.sel==='set',true):''}${parts.map(p=>chip(p.pid,multi?short(p.name):p.name,pp(p),multi?st.sel===p.pid:true,!multi)).join('')}</div>`;
+  const rows=cur.rows.filter(r=>!r.none);
+  const mix=rows.length?`<div class="mcd-mix">${rows.map(r=>`<i style="flex:${Math.max(r.need,1)};background:${r.hx}" title="${esc(r.col)}"></i>`).join('')}</div>`:'';
+  const list=rows.length?`<div class="mcd-rows">${rows.map(r=>{const w=r.need?Math.min(100,r.ready/r.need*100):0;return `<div class="mcd-r"><i class="mcd-sw" style="background:${r.hx}"></i><span class="mcd-n">${esc(r.fam?r.fam+' ':'')}${esc(r.col)}</span><span class="mcd-bar"><b data-w="${w.toFixed(1)}" class="${w>=99.5?'ok':''}" style="width:${w.toFixed(1)}%"></b></span><span class="mcd-v">${w>=99.5?`✓ ${fmtG(r.need)}`:`${fmtG(r.ready)} / ${fmtG(r.need)}`}</span></div>`}).join('')}</div>`:'';
+  return `<div class="phero mcard" data-phk="mixc:${esc(editOrder&&editOrder.id||'new')}" data-pct="${pct}">
+    <div class="ph-t"><span><b class="ph-pct">%${pct}</b> <small class="mcd-hz">hazır</small></span><span>${noSel?'Renk seçilince dağılım burada görünür':`${cur.sub}<br><b>${fmtG(cur.need)}</b> gerekiyor · ${fmtG(cur.ready)} depoda<br>${miss>0.5?`<span class="bad2">${fmtG(miss)} eksik</span>`:'<span class="ok2">✓ Hepsi depoda</span>'}`}</span></div>
+    ${mix}${list}${chips}</div>`;
+}
 function renderMix(k){
   const box=$(k+'Mix'),M=MIX[k];
   if(!M||!M.parts.length){box.hidden=true;box.innerHTML='';return}
@@ -4378,14 +4441,20 @@ function renderMix(k){
   box.hidden=false;
   const off=(M.off||[]),rem=off.length?full.filter(p=>off.includes(p.pid)):[];
   const L=mine('library').filter(x=>!x.set).sort((a,b)=>String(a.name).localeCompare(String(b.name),'tr'));
+  const MS=k==='o'?mstOf():null;
+  if(MS&&!MS.init){MS.init=true;if(!M.parts.some(pt=>pt.lines.some(l=>l.c||(l.want&&l.want.col))))M.parts.forEach(pt=>MS.show.add(pt.pid))}
+  const shownN=MS?M.parts.filter(pt=>MS.show.has(pt.pid)).length:M.parts.length;
   box.innerHTML=`<div class="mix-h"><b>Renk ve filament</b><span>gramı 1 adet için yaz</span></div>
+    ${k==='o'?'<div class="mcw" data-mcard></div>':''}
+    ${k==='o'&&shownN?`<div class="mshown"><span>${nf.format(shownN)} parça açık</span><button type="button" class="lnk" data-mhideall>Hepsini gizle</button></div>`:''}
     ${noDepot?'<span class="k" style="font-size:.84rem;color:var(--mute)">Depoda henüz filament yok. Renk seçerken “Depoda yok · alınacak” ile fiyat listendeki ürünlerden seçebilirsin.</span>':''}
     ${M.parts.map((pt,i)=>{const multi=M.parts.length>1||(+pt.per||1)>1,ed=MQE[k]===i,inFull=full.some(p=>p.pid===pt.pid);
-      return `<div class="mpart${i%2?' alt':''}" data-mi="${i}" style="--i:${i}">
+      return `<div class="mpart${i%2?' alt':''}" data-mi="${i}" data-mpid="${esc(pt.pid)}" style="--i:${i}"${MS&&!MS.show.has(pt.pid)?' hidden':''}>
       <div class="mph"><span class="nm"><b>${esc(pt.name)}</b><small class="msum" data-msum="${i}"></small></span>
         ${multi?(ed?`<span class="mqty ed"><button type="button" data-mper="${i}" data-d="-1" aria-label="Azalt">−</button><b data-mcount="${i}"></b><button type="button" data-mper="${i}" data-d="1" aria-label="Artır">+</button><button type="button" class="ok" data-mqe="${i}" aria-label="Tamam">✓</button></span>`
           :`<button type="button" class="mqty" data-mqe="${i}" title="Adedi değiştir"><b data-mcount="${i}"></b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/></svg></button>`)
           :`<span class="mqty st"><b data-mcount="${i}"></b></span>`}
+        ${MS?`<button type="button" class="mpx" data-mhide="${esc(pt.pid)}" title="Bu parçayı gizle" aria-label="${esc(pt.name)} parçasını gizle">${EYE}</button>`:''}
         ${M.parts.length>1?`<button type="button" class="mpx" ${inFull?`data-mpdel="${i}"`:`data-mprm="${i}"`} title="Bu parçayı çıkar" aria-label="${esc(pt.name)} parçasını çıkar">${XIC}</button>`:''}
       </div>
       <div class="mtiles">${pt.lines.map((l,j)=>{const hx=hexOfCid(l.c,l.want);return `<div class="mtile${hx?'':' nohex'}" style="--h:${hx||'#B9BEC7'}">
@@ -4396,7 +4465,7 @@ function renderMix(k){
       </div>`}).join('')}
       ${pt.lines.length<MAXF?`<button type="button" class="maddt${pt.lines.length%2===0?' wide':''}" data-madd="${i}"><span>＋ Renk ekle</span><small>bu parçaya başka renk</small></button>`:''}</div>
     </div>`}).join('')}
-    <div class="mfoot">${L.length?`<label class="mpnew"><span class="sr">Parça ekle</span><span class="mpn-l" aria-hidden="true">＋ Parça ekle</span><select data-mpnew data-nodirty><option value="">Kütüphaneden parça seç</option>${L.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}${+x.g?` · ${fmtG(+x.g)}`:''}</option>`).join('')}</select></label>`:''}
+    <div class="mfoot"${MS&&!shownN?' hidden':''}>${L.length?`<label class="mpnew"><span class="sr">Parça ekle</span><span class="mpn-l" aria-hidden="true">＋ Parça ekle</span><select data-mpnew data-nodirty><option value="">Kütüphaneden parça seç</option>${L.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}${+x.g?` · ${fmtG(+x.g)}`:''}</option>`).join('')}</select></label>`:''}
       ${rem.map(p=>`<button type="button" class="mback" data-mpadd="${esc(p.pid)}" title="${k==='s'?'Bu satışa':'Bu siparişe'} geri ekle">↺ ${esc(p.name)}</button>`).join('')}</div>
     <div class="mtot" data-mtot></div>
     ${k==='o'?'<button type="button" class="lnk mix-go" data-gocost>Renk ve filamenti düzenle · Maliyet sekmesi →</button>':''}
@@ -4485,6 +4554,7 @@ function mixTotals(k){
       :'<span class="k">Renk seçince bu siparişte ne kadar filament kullanılacağı, depoda ne olduğu ve ne alman gerektiği burada görünür.</span>')
       +(miss?'<span class="k">Rengi seçilmemiş satırlar hesaba katılmaz.</span>':'');
     BOK=shortRows.map(r=>({col:r.col,bn:r.bn,sn:r.sn,short:r.short}));
+    {const cw=box.querySelector('[data-mcard]');if(cw){cw.innerHTML=mixCardHTML(rows,q,plog,recNow);prodAnimate(cw,'mixc:'+(editOrder&&editOrder.id||'new'),{fresh:MCFRESH});MCFRESH=false}}
     return;
   }
   box.querySelector('[data-mtot]').innerHTML=(uses.length?`<span class="k">${k==='o'&&plog.length?'Teslimde depodan düşecek (üretilenler zaten düştü)':'Depodan düşecek'}</span>`+uses.map(u=>{const own=k==='s'||(rec&&rec.status==='done')?prev.filter(x=>x.c===u.c).reduce((a,x)=>a+(+x.g||0),0):0,left=(st[u.c]||0)+own-u.g,c=invGet(u.c);
@@ -4562,6 +4632,15 @@ function fcalcBuy(k){
     const pk=e.target.closest('[data-pick]');if(pk){const [kk,i,j]=pk.dataset.pick.split(':');mixPick(kk,+i,+j);return}
     if(e.target.closest('[data-fcalc]')){FCALC[k]=!FCALC[k];mixTotals(k);return}
     if(k==='o'&&e.target.closest('[data-gocost]')){OTAB='cost';paintOTab();return}
+    if(k==='o'){const st=mstOf();
+      const ms=e.target.closest('[data-msel]');if(ms){if(st.sel!==ms.dataset.msel){st.sel=ms.dataset.msel;mixTotals('o')}return}
+      const sh=e.target.closest('[data-mshow]');if(sh){const id=sh.dataset.mshow,M=MIX.o;let first=null;
+        if(id==='set'){const all=M.parts.every(p=>st.show.has(p.pid));if(all)st.show.clear();else{M.parts.forEach(p=>st.show.add(p.pid));first=M.parts[0]&&M.parts[0].pid}}
+        else if(st.show.has(id))st.show.delete(id);else{st.show.add(id);first=id}
+        renderMix('o');if(first){const el=box.querySelector(`[data-mpid="${CSS.escape(first)}"]`);if(el){el.scrollIntoView({behavior:REDUCE()?'auto':'smooth',block:'nearest'});if(!REDUCE())el.animate([{boxShadow:'0 0 0 3px var(--accent)'},{boxShadow:'0 0 0 0 transparent'}],{duration:900})}}return}
+      const hd=e.target.closest('[data-mhide]');if(hd){st.show.delete(hd.dataset.mhide);renderMix('o');return}
+      if(e.target.closest('[data-mhideall]')){st.show.clear();renderMix('o');return}
+    }
     if(k==='o'&&e.target.closest('[data-obuyask]')){bokOpen();return}
     if(k==='o'&&e.target.closest('[data-obuyoff]')){OINBUY=false;$('dOrder').dataset.dirty='1';if(editOrder&&S.orders.some(x=>x.id===editOrder.id)){const cur=S.orders.find(x=>x.id===editOrder.id);editOrder={...cur,inBuy:false};put('orders',editOrder)}mixTotals('o');toast('Alınacaklardan çıkarıldı');return}
     if(k==='o'&&e.target.closest('[data-obuy]')){OINBUY=!OINBUY;$('dOrder').dataset.dirty='1';mixTotals('o');toast(OINBUY?'Kaydedince Alınacaklar listesine eklenir':'Alınacaklardan çıkarılacak');return}
