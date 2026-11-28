@@ -689,12 +689,13 @@ dialog[open] .dlg-b>*:nth-child(n+7){animation-delay:.4s}
 .mcd-kg{font-family:var(--f-display);font-size:2.3rem;font-weight:700;line-height:1;letter-spacing:-.02em;white-space:nowrap}.mcd-kg small{font-size:1rem;opacity:.85}
 .mcd-w{font-size:.84rem;opacity:.85;margin-top:4px}
 .mcd-m{font-size:.86rem;font-weight:700;color:#FFB4B7}.mcd-ok{font-size:.86rem;font-weight:700;color:#9FF0C2}
-.mcd-rows{display:grid;gap:9px;min-width:0}
-.mcd-r{display:grid;grid-template-columns:18px minmax(50px,1fr) auto;gap:10px;align-items:center;font-size:.82rem}
+.mcd-rows{display:grid;grid-template-columns:18px minmax(50px,1fr) auto auto;gap:9px 10px;align-items:center;min-width:0;font-size:.82rem}
+.mcd-r{display:contents}
+.mcd-x{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}.mcd-x .ms{color:#FFB4B7}.mcd-x .ok{color:#9FF0C2}
 .mcd-sw{width:18px;height:18px;border-radius:50%;box-shadow:0 0 0 1.5px rgba(255,255,255,.6)}
 .mcd-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}
 .mcd-bar b{display:block;height:100%;border-radius:99px;background:#FFB4B7;transition:width .8s cubic-bezier(.2,.9,.3,1)}.mcd-bar b.ok{background:#9FF0C2}
-.mcd-v{white-space:nowrap;text-align:right;opacity:.95}.mcd-v small{opacity:.7}.mcd-v .ms{color:#FFB4B7}.mcd-v .ok{color:#9FF0C2}
+.mcd-v{white-space:nowrap;text-align:left;opacity:.95}.mcd-v small{opacity:.7}.mcd-v .ms{color:#FFB4B7}.mcd-v .ok{color:#9FF0C2}
 .mchips{display:flex;flex-wrap:nowrap;gap:5px}
 .mch{position:relative;display:flex;flex:1 1 auto;min-width:0}
 .mch>button[role=tab]{width:100%;min-width:0;justify-content:center}.mch>button[role=tab]>span:not(.mset){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -3149,8 +3150,9 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='2.12',VERDATE='27 Kasım 2026';
+const VERSION='2.13',VERDATE='27 Kasım 2026';
 const CHANGES=[
+  ['2.13',['Renk ve filament kartı: renk satırları hizalı; bütün çubuklar aynı uzunlukta, ad ve eksik miktarı alt alta aynı hizada']],
   ['2.12',['Renk ve filament kartı: Kurumsal Set, Kalemlik, Logo, Telefon Standı tek satırda yan yana']],
   ['2.11',['Renk ve filament kartı yeni düzende: solda gereken toplam ve eksik, sağda her rengin depo çubuğu (eksik olan yazıyla); altta yan yana Kurumsal Set / parça etiketleri, üstüne gelince “Göster”']],
   ['2.10',['Renk ve filament kartı: Kurumsal Set, Kalemlik, Logo… alt alta bir liste; Kurumsal Set satırı daha büyük ve ayrı','Kartta “Depoda eksik olan” kutusu: hangi renk ve seri, ne kadar eksik (ör. Beyaz Smart Pla · 1,73 kg eksik)','Satırın üstüne gelince sağında “Göster” düğmesi çıkar']],
@@ -4439,7 +4441,7 @@ function mixCardHTML(setRows,q,plog,recNow){
   const okP=p=>p.need-p.ready<=0.5;
   const chips=`<div class="mchips" role="tablist" aria-label="Neyin dağılımı görünsün">${multi?chip('set',setName,sNeed-sReady<=0.5,st.sel==='set',true):''}${parts.map(p=>chip(p.pid,multi?short(p.name):p.name,okP(p),multi?st.sel===p.pid:true,!multi)).join('')}</div>`;
   const rows=cur.rows.filter(r=>!r.none);
-  const dist=rows.length?`<div class="mcd-rows">${rows.map(r=>{const w=r.need?Math.min(100,r.ready/r.need*100):0,ms=r.need-r.ready;return `<div class="mcd-r"><i class="mcd-sw" style="background:${r.hx}"></i><span class="mcd-bar"><b data-w="${w.toFixed(1)}" class="${w>=99.5?'ok':''}" style="width:${w.toFixed(1)}%"></b></span><span class="mcd-v">${esc(r.col)} <small>${esc(r.fam||'')}</small> ${ms>0.5?`· <b class="ms">${fmtG(ms)} eksik</b>`:`<b class="ok">✓ ${fmtG(r.need)}</b>`}</span></div>`}).join('')}</div>`:'<div class="mcd-rows"><span class="mcd-v" style="opacity:.8">Renk seçilince dağılım burada görünür</span></div>';
+  const dist=rows.length?`<div class="mcd-rows">${rows.map(r=>{const w=r.need?Math.min(100,r.ready/r.need*100):0,ms=r.need-r.ready;return `<div class="mcd-r"><i class="mcd-sw" style="background:${r.hx}"></i><span class="mcd-bar"><b data-w="${w.toFixed(1)}" class="${w>=99.5?'ok':''}" style="width:${w.toFixed(1)}%"></b></span><span class="mcd-v">${esc(r.col)} <small>${esc(r.fam||'')}</small></span><span class="mcd-x">${ms>0.5?`<b class="ms">${fmtG(ms)} eksik</b>`:`<b class="ok">✓ ${fmtG(r.need)}</b>`}</span></div>`}).join('')}</div>`:'<div class="mcd-rows"><span class="mcd-v" style="opacity:.8">Renk seçilince dağılım burada görünür</span></div>';
   const who=esc(st.sel==='set'||!multi?(multi?setName:cur.name):short(cur.name)),cn=st.sel==='set'||!multi?(multi?q:(parts[0]?parts[0].cnt:q)):((parts.find(x=>x.pid===st.sel)||{}).cnt||q);
   return `<div class="phero mcard" data-phk="mixc:${esc(editOrder&&editOrder.id||'new')}" data-pct="${pct}">
     <div class="mcd-top"><div class="mcd-l"><span class="mcd-kg">${(cur.need>=1000?nf.format(Math.round(cur.need/10)/100):nf.format(Math.round(cur.need)))} <small>${cur.need>=1000?'kg':'g'}</small></span><span class="mcd-w">${multi&&st.sel==='set'?`${nf.format(cn)} ${who}`:`${who} · ${nf.format(cn)} adet`}</span>${noSel?'':miss>0.5?`<span class="mcd-m">${fmtG(miss)} eksik</span>`:'<span class="mcd-ok">✓ hepsi depoda</span>'}</div>${dist}</div>
