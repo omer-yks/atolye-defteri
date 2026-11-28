@@ -695,11 +695,12 @@ dialog[open] .dlg-b>*:nth-child(n+7){animation-delay:.4s}
 .mcd-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}
 .mcd-bar b{display:block;height:100%;border-radius:99px;background:#FFB4B7;transition:width .8s cubic-bezier(.2,.9,.3,1)}.mcd-bar b.ok{background:#9FF0C2}
 .mcd-v{white-space:nowrap;text-align:right;opacity:.95}.mcd-v small{opacity:.7}.mcd-v .ms{color:#FFB4B7}.mcd-v .ok{color:#9FF0C2}
-.mchips{display:flex;flex-wrap:wrap;gap:6px}
-.mch{position:relative;display:inline-flex}
-.mch>button[role=tab]{display:inline-flex;align-items:center;gap:7px;border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:11px;padding:8px 13px;font-weight:600;font-size:.86rem;transition:background .3s,color .3s,box-shadow .3s}
+.mchips{display:flex;flex-wrap:nowrap;gap:5px}
+.mch{position:relative;display:flex;flex:1 1 auto;min-width:0}
+.mch>button[role=tab]{width:100%;min-width:0;justify-content:center}.mch>button[role=tab]>span:not(.mset){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mch>button[role=tab]{display:inline-flex;align-items:center;gap:6px;border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:11px;padding:8px 9px;font-weight:600;font-size:.82rem;transition:background .3s,color .3s,box-shadow .3s}
 .mch>button[role=tab]:hover{background:rgba(255,255,255,.18)}
-.mch.mset-c>button[role=tab]{font-weight:800;padding:8px 15px;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+.mch.mset-c{flex:1.25 1 auto}.mch.mset-c>button[role=tab]{font-weight:800;padding:8px 11px;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
 .mch.sel>button[role=tab]{background:#fff;color:#2A2550;font-weight:800;box-shadow:0 6px 16px rgba(0,0,0,.22)}
 .mset{font-size:.85rem}
 .mck{font-style:normal;font-weight:800;color:#9FF0C2}.mch.sel .mck{color:#1F8A4C}
@@ -3148,8 +3149,9 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='2.11',VERDATE='27 Kasım 2026';
+const VERSION='2.12',VERDATE='27 Kasım 2026';
 const CHANGES=[
+  ['2.12',['Renk ve filament kartı: Kurumsal Set, Kalemlik, Logo, Telefon Standı tek satırda yan yana']],
   ['2.11',['Renk ve filament kartı yeni düzende: solda gereken toplam ve eksik, sağda her rengin depo çubuğu (eksik olan yazıyla); altta yan yana Kurumsal Set / parça etiketleri, üstüne gelince “Göster”']],
   ['2.10',['Renk ve filament kartı: Kurumsal Set, Kalemlik, Logo… alt alta bir liste; Kurumsal Set satırı daha büyük ve ayrı','Kartta “Depoda eksik olan” kutusu: hangi renk ve seri, ne kadar eksik (ör. Beyaz Smart Pla · 1,73 kg eksik)','Satırın üstüne gelince sağında “Göster” düğmesi çıkar']],
   ['2.09',['Sipariş > Maliyet > Renk ve filament: tek özet kartı. “Kurumsal Set”, “Kalemlik”, “Logo”… etiketine dokununca kart o seçimin filament dağılımını gösterir (gereken, depoda, eksik; renk renk)','Etiketin üstüne gelince “Ürünleri göster” / “Renk ve filamenti göster” çıkar; açılan parçalar eskisi gibi düzenlenir, her biri göz simgesiyle ayrı ayrı gizlenir']],
