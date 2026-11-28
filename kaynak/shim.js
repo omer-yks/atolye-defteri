@@ -284,10 +284,15 @@ function settingsUI(){
 }
 document.addEventListener('DOMContentLoaded',()=>{settingsUI();const pg=document.getElementById('pg-settings');if(pg)new MutationObserver(()=>settingsUI()).observe(pg,{childList:true})});
 /* ---------- Güncelleme: yeni sürüm yayınlanınca kendiliğinden yenile ---------- */
-let VER0=null;
-async function verCheck(){try{const r=await fetch('version.json?'+Date.now(),{cache:'no-store'});if(!r.ok)return;const j=await r.json();if(VER0===null){VER0=j.v;return}
-  if(j.v!==VER0){const busy=document.querySelector('dialog[open]')||document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
-    if(busy){window.__atlUpd=true;return}location.reload()}}catch(e){}}
-verCheck();setInterval(verCheck,5*60000);
+/* Sayfanın kendi sürümü shim.js?v=… adresinde; version.json daha yeniyse önbelleği atlayarak yeniden yükle */
+const VER0=(()=>{try{const sc=document.currentScript||[...document.scripts].find(x=>/shim\.js/.test(x.src));return new URL(sc.src).searchParams.get('v')}catch(e){return null}})();
+let VERNEW=null;
+const busyNow=()=>!!(document.querySelector('dialog[open]')||document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName));
+function goNew(){if(!VERNEW)return;if(busyNow()){window.__atlUpd=true;return}
+  try{if(sessionStorage.getItem('atl-upd')===VERNEW)return;sessionStorage.setItem('atl-upd',VERNEW)}catch(e){}
+  location.replace(location.pathname+'?v='+encodeURIComponent(VERNEW)+location.hash)}
+async function verCheck(){try{if(!VER0||/__V__/.test(VER0))return;const r=await fetch('version.json?'+Date.now(),{cache:'no-store'});if(!r.ok)return;const j=await r.json();
+  if(j.v&&j.v!==VER0){VERNEW=j.v;goNew()}}catch(e){}}
+verCheck();setInterval(verCheck,60000);setInterval(()=>{if(VERNEW&&window.__atlUpd&&!busyNow())goNew()},10000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')verCheck()});
 })();
