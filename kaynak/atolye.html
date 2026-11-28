@@ -1007,6 +1007,31 @@ details.pk-sub .pk-ptile{background:var(--soft)}
 .pa-tx b{display:block;color:var(--ok);font-weight:700}.pa-tx small{color:var(--mute);font-size:.8rem}
 .pnew.done .lnk{font-size:.8rem}
 @media (max-width:520px){.pa-c{grid-template-columns:1fr 1fr}.pa-c .step{grid-column:1/-1;justify-self:start}.pnew.done{grid-template-columns:auto 1fr}.pnew.done .lnk{grid-column:1/-1;justify-self:start}}
+.phero.pay .ph-seg{height:12px}
+.phero .rk{color:#FFD58A}.phero .rok{color:#9FF0C2}
+.pay-m{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.8rem;opacity:.9}
+.pay-m span{display:inline-flex;align-items:center;gap:6px}.pay-m .ic{width:16px;height:16px;opacity:.85}
+.pay-f{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pay-f .f input{background:var(--surface);min-height:42px}
+.pmb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pmb button{display:grid;justify-items:center;gap:5px;border:0;border-radius:14px;padding:12px 6px;background:var(--surface);color:var(--accent);font-weight:700;font-size:.84rem;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 25%,var(--line));transition:transform .15s,box-shadow .2s,background .2s}
+.pmb button .ic{width:20px;height:20px}
+.pmb button:hover{box-shadow:inset 0 0 0 1.5px var(--accent);transform:translateY(-1px)}
+.pmb button:active{transform:scale(.97)}
+.pmb button.pri{background:var(--accent);color:var(--on-accent);box-shadow:0 6px 16px color-mix(in srgb,var(--accent) 30%,transparent)}
+.pyl{display:grid;gap:6px}
+.pyl h4{margin:4px 0 0;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);font-weight:700}
+.pyr{display:grid;grid-template-columns:auto minmax(0,1fr) auto 32px;gap:12px;align-items:center;padding:8px 10px;border-radius:14px;background:var(--soft);animation:fadeUp .3s both;animation-delay:calc(var(--i) * 40ms)}
+.pym{width:36px;height:36px;border:0;border-radius:11px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);transition:transform .15s}
+.pym:hover{transform:scale(1.06)}.pym .ic{width:18px;height:18px}
+.pym.x{background:var(--surface);color:var(--mute);box-shadow:inset 0 0 0 1.5px var(--line-2)}
+.pyt{display:grid;line-height:1.25}.pyt b{font-weight:700}.pyt small{font-size:.76rem;color:var(--mute)}
+.pya{font-weight:800;color:var(--ok);white-space:nowrap}
+.pyr .ldel{width:32px;height:32px}.pyr .ldel.arm{background:var(--late);color:#fff}
+#oPay.live>*{animation:none}
+#oPay>.phero,#oPay>.pnew,#oPay>.pyl,#cdPane .phero.pay,#cdPane .pnew.pay{grid-column:1 / -1}
+.phero .ph-pct{color:#fff}.phero .ph-t>span{color:#fff}
+@media (max-width:520px){.pmb button span{font-size:.76rem}}
 .psum{background:var(--char);color:var(--on-char);border-radius:16px;padding:14px 16px;display:grid;gap:10px}
 .psum-t{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
 .psum-t b{font-family:var(--f-display);font-weight:600;font-size:1.6rem;line-height:1}
@@ -3072,8 +3097,9 @@ ul.colors{list-style:none;margin:0;padding:0 18px 12px 74px;display:grid;gap:2px
 const $=id=>document.getElementById(id);
 const MAXF=16;
 document.documentElement.lang='tr';
-const VERSION='2.05',VERDATE='27 Kasım 2026';
+const VERSION='2.06',VERDATE='27 Kasım 2026';
 const CHANGES=[
+  ['2.06',['Ödeme sekmesi yenilendi: üstte mor özet kartı (yüzde, alınan / kalan, ödeme şekillerine göre toplam); açılınca %0’dan dolar','Ödeme şekli: tutarı yaz, “Nakit ile ekle”, “Havale ile ekle” ya da “Kredi kartı ile ekle”ye bas; en son kullandığın öne çıkar','Listede her ödemenin şekli simgeyle görünür; simgeye dokunarak değiştirilir (eski ödemeler için de)','Müşteri penceresindeki Ödeme de aynı tasarımda']],
   ['2.05',['Üretim: parça değiştirince o parçanın sayısı ve çizgisi sıfırdan dolar','Hedefin üstünde üretilen adet “fazla” değil “hatalı” sayılır; özetteki hatalı sayısına ve fireye eklenir']],
   ['2.04',['Güncellemeler daha çabuk gelir: yeni sürüm her dakika denetlenir ve önbellek atlanarak yüklenir; bir pencere açıkken bekler, kapanınca yenilenir']],
   ['2.03',['Üretim sekmesi her açılışta canlanır: yüzde %0’dan sayarak çıkar, parça çizgileri sırayla dolar']],
@@ -3811,7 +3837,7 @@ function colorKg(cid){
 }
 let OLASTT=null;
 function paintOTab(){
-  const pFresh=OTAB==='prod'&&OLASTT!=='prod';OLASTT=OTAB;
+  const pFresh=OTAB==='prod'&&OLASTT!=='prod',yFresh=OTAB==='pay'&&OLASTT!=='pay';OLASTT=OTAB;
   const box=$('oTabs').querySelector('.seg');
   box.querySelectorAll('[data-otab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.otab===OTAB));placeInd(box);
   $('oInfo').hidden=OTAB!=='info';$('oProd').hidden=OTAB!=='prod';$('oPay').hidden=OTAB!=='pay';$('oCost').hidden=OTAB!=='cost';paintPayTab();
@@ -3819,7 +3845,7 @@ function paintOTab(){
    else if(mx.parentElement&&mx.parentElement.id==='oCostMixSlot')$('oMixHome').after(mx)}
   const pg=editOrder?prodProgress(editOrder):null;
   $('oTabProg').textContent=pg&&pg.target?`${nf.format(pg.done)}/${nf.format(pg.target)}`:'';
-  if(OTAB==='prod')renderProd(null,pFresh?{fresh:true}:undefined);else if(OTAB==='pay')renderPay(true);else if(OTAB==='cost')renderCost();else mixTotals('o');
+  if(OTAB==='prod')renderProd(null,pFresh?{fresh:true}:undefined);else if(OTAB==='pay')renderPay(true,yFresh);else if(OTAB==='cost')renderCost();else mixTotals('o');
 }
 /* Sipariş: maliyet — tek hesap (Maliyet sekmesi, Satışlar, sipariş kutusu hep bunu kullanır) */
 function costOfParts(parts){
@@ -3875,33 +3901,55 @@ function paintPayTab(){
   $('oTabPay').textContent=price?(rest<=0.009?'✓':tl(rest)):'';try{paintTL()}catch(e){}
   $('oPayGo').innerHTML=`<span style="color:var(--accent)">${paid>0?'Ödemeler →':'Ödeme ekle →'}</span>`;
 }
-function renderPay(anim){
+/* Ödeme: mor özet kartı + ödeme şekliyle ekleme (sipariş ve müşteri penceresi ortak) */
+const PAYM={n:'Nakit',h:'Havale',k:'Kredi kartı'};
+const PAYIC={n:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 10v4M18 10v4"/></svg>',
+  h:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-6 9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>',
+  k:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20M6 15h4"/></svg>',
+  x:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 9a2.5 2.5 0 114 2c-.9.6-1.5 1.1-1.5 2.2M12 17h.01"/></svg>'};
+let LASTPM='n';try{const v=localStorage.getItem('ad-paym');if(PAYM[v])LASTPM=v}catch(e){}
+function payBlockHTML(c){
+  const {key,price,pays,A}=c,t=todayISO(),paid=pays.reduce((a,p)=>a+(+p.a||0),0),rest=price-paid,pct=price?Math.min(100,Math.round(paid/price*100)):0;
+  const byM={};pays.forEach(p=>{const m=PAYM[p.m]?p.m:'x';byM[m]=(byM[m]||0)+(+p.a||0)});
+  const mline=pays.length?Object.entries(byM).sort((a,b)=>b[1]-a[1]).map(([m,v])=>`<span>${PAYIC[m]}${m==='x'?'Belirtilmemiş':PAYM[m]} ${tl(v)}</span>`).join(''):'<span>Henüz ödeme alınmadı</span>';
+  const right=!price?'Fiyat girilmemiş':`${tl(paid)} / ${tl(price)} alındı<br>${rest>0.009?`<b class="rk">${tl(rest)} kaldı</b>`:rest<-0.009?`<b class="rk">${tl(-rest)} fazla alındı</b>`:'<b class="rok">✓ Hepsi alındı</b>'}`;
+  const hero=`<div class="phero pay" data-phk="${esc(key)}" data-pct="${pct}"><div class="ph-t"><b class="ph-pct">%${pct}</b><span>${right}</span></div>
+    <div class="ph-seg"><i style="flex:1"><b data-w="${pct}" style="width:${pct}%"></b></i></div><div class="pay-m">${mline}</div></div>`;
+  const list=pays.length?`<div class="pyl"><h4>Alınan ödemeler</h4>${pays.map((p,i)=>({p,i})).sort((a,b)=>a.p.d<b.p.d?-1:a.p.d>b.p.d?1:a.i-b.i).map(({p,i},k)=>{const m=PAYM[p.m]?p.m:'x';return `<div class="pyr" style="--i:${k}"><button type="button" class="pym ${m}" data-${A.cyc}="${i}" title="Ödeme şeklini değiştir" aria-label="Ödeme şekli: ${m==='x'?'belirtilmemiş':PAYM[m]}, değiştir">${PAYIC[m]}</button><span class="pyt"><b>${p.d===t?'Bugün':fmtLong(p.d)}</b><small>${c.doneAt&&p.d===c.doneAt?'Teslimde':k===0?'Kapora / ilk ödeme':'Ödeme'} · ${m==='x'?'şekil yok, dokun':PAYM[m]}</small></span><b class="pya">+${tl(+p.a||0)}</b><button type="button" class="ldel" data-${A.del}="${i}" aria-label="Ödemeyi sil">${DELSVG}</button></div>`}).join('')}</div>`:'';
+  const panel=`<div class="pnew pay"><div class="pa-h"><b>Ödeme ekle</b><span>${rest>0.009?`${tl(rest)} kaldı`:'ödeme tamam'}</span></div>
+    <div class="pay-f"><div class="f"><label for="${c.ids.a}">Tutar (₺)</label><input id="${c.ids.a}" data-nodirty inputmode="decimal" placeholder="${rest>0.009?esc(inStr(r2(rest))):'0'}"></div><div class="f"><label for="${c.ids.d}">Tarih</label><input id="${c.ids.d}" data-nodirty type="date" value="${t}"></div></div>
+    ${rest>0.009?`<div class="pa-q"><button type="button" data-${A.q}="${r2(rest)}">Kalanın hepsi · ${tl(rest)}</button>${rest>=2?`<button type="button" data-${A.q}="${r2(rest/2)}">Yarısı · ${tl(rest/2)}</button>`:''}</div>`:''}
+    <div class="pmb">${['n','h','k'].map(m=>`<button type="button" class="${m===LASTPM?'pri':''}" data-${A.add}="${m}">${PAYIC[m]}<span>${PAYM[m]} ile ekle</span></button>`).join('')}</div></div>`;
+  return hero+panel+list;
+}
+function renderPay(anim,fresh,bump){
   const price=num($('oPrice').value)||0,paid=opaid(),rest=price-paid,t=todayISO(),done=editOrder&&editOrder.status==='done';
-  $('oPay').innerHTML=`<div class="paysum"><div><small>Toplam fiyat</small><b>${tl(price)}</b></div><div><small>Alınan</small><b>${tl(paid)}</b></div><div class="rest${rest<=0.009?' ok':''}"><small>${rest<-0.009?'Fazla alınan':'Kalan'}</small><b>${rest<=0.009&&rest>=-0.009?'✓ 0 ₺':tl(Math.abs(rest))}</b></div></div>
-    <div class="paybar"><i style="width:${price?Math.min(100,paid/price*100).toFixed(1):0}%"></i></div>
-    <div class="paylist">${OPAYS.length?[...OPAYS].map((p,i)=>({p,i})).sort((a,b)=>a.p.d<b.p.d?-1:1).map(({p,i},k)=>`<div class="payr" style="--i:${anim?k:0}"><span class="dt">${p.d===t?'Bugün':fmtDay(p.d)}</span><small>${done&&p.d===editOrder.doneAt?'Teslimde':k===0?'Kapora / ilk ödeme':'Ödeme'}</small><b>+${tl(p.a)}</b><button type="button" class="ldel" data-paydel="${i}" aria-label="Ödemeyi sil">${'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'}</button></div>`).join(''):'<p class="help" style="margin:0">Henüz ödeme yok.</p>'}</div>
-    <div class="payadd"><div class="f"><label for="payA">Alınan tutar (₺)</label><input id="payA" data-nodirty inputmode="decimal" placeholder="${rest>0.009?esc(inStr(r2(rest))):'0'}"></div><div class="f"><label for="payD">Tarih</label><input id="payD" data-nodirty type="date" value="${t}"></div><button type="button" class="btn primary" id="payAdd">Ödeme ekle</button></div>
-    ${rest>0.009?`<div class="payq"><button type="button" data-payq="${r2(rest)}">Kalanın hepsi · ${tl(rest)}</button>${rest>=2?`<button type="button" data-payq="${r2(rest/2)}">Yarısı · ${tl(rest/2)}</button>`:''}</div>`:''}
+  const pkey='pay:'+(editOrder&&editOrder.id||'new');
+  $('oPay').innerHTML=payBlockHTML({key:pkey,price,pays:OPAYS,doneAt:done&&editOrder.doneAt,A:{add:'payadd',del:'paydel',q:'payq',cyc:'paycy'},ids:{a:'payA',d:'payD'}})+`
     ${editOrder&&!done&&rest<=0.009&&price>0&&(()=>{const pg=prodProgress(editOrder);return pg.target>0&&pg.done>=pg.target})()?`<div class="rdy" style="grid-column:1 / -1"><span><b>Üretim bitti, ödeme tamam.</b><small>Teslim ettiysen siparişi kapat; bekleyenlerden çıkar, müşteride tamamlanmış görünür.</small></span><button type="button" class="btn primary" data-rdy>Teslim edildi</button></div>`:''}
     <p class="help" style="grid-column:1 / -1;margin:0">Eklediğin ödeme o günün kazancına (kasaya giren para) yazılır.${editOrder?' Hemen kaydedilir.':' Siparişi kaydedince kaydedilir.'}</p>`;
   paintPayTab();
+  $('oPay').classList.toggle('live',!anim&&!fresh);
+  prodAnimate($('oPay'),pkey,{fresh,bumpTxt:bump});
 }
-function savePays(msg){
+function savePays(msg,bump){
   const saved=editOrder&&S.orders.some(x=>x.id===editOrder.id);
   if(saved){const cur=S.orders.find(x=>x.id===editOrder.id);editOrder={...cur,pays:OPAYS.map(p=>({...p}))};put('orders',editOrder);toast(msg)}
   else{$('dOrder').dataset.dirty='1';toast(msg+' · siparişi kaydedince işlenir')}
-  renderPay(false);
+  renderPay(false,false,bump);
 }
 $('oPay').addEventListener('click',e=>{
   const q=e.target.closest('[data-payq]');if(q){$('payA').value=inStr(q.dataset.payq);$('payA').focus();return}
-  if(e.target.closest('#payAdd')){const raw=$('payA').value.trim(),price=num($('oPrice').value)||0,rest=price-opaid(),a=raw?num(raw):r2(rest);
+  const pa=e.target.closest('[data-payadd]');if(pa){const m=pa.dataset.payadd,raw=$('payA').value.trim(),price=num($('oPrice').value)||0,rest=price-opaid(),a=raw?num(raw):r2(rest);
     if(isNaN(a)||a<=0){toast('Tutar için sayı yaz, ör. 2000');$('payA').focus();return}
-    const d=$('payD').value||todayISO();OPAYS.push({d,a:r2(a)});savePays(`✓ ${tl(a)} ödeme kaydedildi${d===todayISO()?' · bugünün kazancına eklendi':''}`);return}
+    LASTPM=m;try{localStorage.setItem('ad-paym',m)}catch(er){}
+    const d=$('payD').value||todayISO();OPAYS.push({d,a:r2(a),m});savePays(`✓ ${tl(a)} ${PAYM[m].toLocaleLowerCase('tr')} ödeme kaydedildi${d===todayISO()?' · bugünün kazancına eklendi':''}`,'+'+tl(a));return}
+  const cy=e.target.closest('[data-paycy]');if(cy){const p=OPAYS[+cy.dataset.paycy];if(!p)return;const ord=['n','h','k'];p.m=ord[(ord.indexOf(p.m)+1)%3];savePays(`Ödeme şekli: ${PAYM[p.m]}`);return}
   if(e.target.closest('[data-rdy]')){OTAB='info';paintOTab();$('oDeliverBtn').click();return}
   const dl=e.target.closest('[data-paydel]');if(dl){if(!dl.classList.contains('arm')){dl.classList.add('arm');toast('Silmek için tekrar dokun');setTimeout(()=>dl.classList.remove('arm'),3000);return}
     const p=OPAYS.splice(+dl.dataset.paydel,1)[0];savePays(`${tl(p?p.a:0)} ödeme silindi`)}
 });
-$('oPay').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.target.id==='payA'||e.target.id==='payD')){e.preventDefault();$('payAdd').click()}});
+$('oPay').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.target.id==='payA'||e.target.id==='payD')){e.preventDefault();($('oPay').querySelector('[data-payadd].pri')||$('oPay').querySelector('[data-payadd]')).click()}});
 $('oPayGo').addEventListener('click',()=>{OTAB='pay';paintOTab()});
 $('oPrice').addEventListener('input',paintPayTab);
 $('oTabs').addEventListener('click',e=>{const b=e.target.closest('[data-otab]');if(!b||b.dataset.otab===OTAB)return;OTAB=b.dataset.otab;PFAIL=null;paintOTab();if(OTAB==='prod')stagger($('oProd').children)});
@@ -3975,6 +4023,7 @@ function prodAnimate(box,key,o){
     if(pn&&to!==fromN){const t0=performance.now()+80,dur=800;pn.textContent=nf.format(fromN);const tick=t=>{const k=Math.max(0,Math.min(1,(t-t0)/dur)),e=1-Math.pow(1-k,3);pn.textContent=nf.format(Math.round(fromN+(to-fromN)*e));if(k<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)}
   }
   if(pan&&o.dir)pan.classList.add(o.dir<0?'in-l':'in-r');
+  if(o.bumpTxt&&!red){const s=document.createElement('span');s.className='ph-bub solo';s.textContent=o.bumpTxt;hero.appendChild(s);setTimeout(()=>s.remove(),1200)}
   if(o.bump&&chips){const b=chips.querySelector(`[data-${o.attr||'psel'}="${CSS.escape(o.bump.pid)}"]`)||selB;if(b){const s=document.createElement('span');s.className='ph-bub';s.textContent='+'+nf.format(o.bump.n);s.style.left=(b.offsetLeft+b.offsetWidth/2)+'px';s.style.top=b.offsetTop+'px';chips.appendChild(s);setTimeout(()=>s.remove(),1200)}}
   else if(o.bump&&!chips){const s=document.createElement('span');s.className='ph-bub solo';s.textContent='+'+nf.format(o.bump.n);hero.appendChild(s);setTimeout(()=>s.remove(),1200)}
 }
@@ -6896,17 +6945,13 @@ function cdPayView(it,c){
   if(it.x){const x=it.x;return `<div class="paysum"><div><small>Satış tutarı</small><b>${tl(+x.amt||0)}</b></div><div><small>Alınan</small><b>${tl(+x.amt||0)}</b></div><div class="rest ok"><small>Kalan</small><b>✓ 0 ₺</b></div></div><div class="paybar"><i style="width:100%"></i></div>
     <div class="paylist"><div class="payr"><span class="dt">${x.date===t?'Bugün':fmtDay(x.date)}</span><small>Satış anında alındı</small><b>+${tl(+x.amt||0)}</b><span></span></div></div>
     <div class="payadd"><div class="f"><label for="cdSA">Satış tutarı (₺)</label><input id="cdSA" data-nodirty inputmode="decimal" value="${esc(inStr(r2(+x.amt||0)))}"></div><div class="f"><label for="cdSD">Tarih</label><input id="cdSD" data-nodirty type="date" value="${esc(x.date||t)}"></div><button type="button" class="btn primary" data-cdsale>Kaydet</button></div>`}
-  const o=it.o,price=+o.price||0,pays=o.pays||[],paid=pays.reduce((a,p)=>a+(+p.a||0),0),rest=price-paid,done=o.status==='done';
-  return `<div class="paysum"><div><small>Toplam fiyat</small><b>${tl(price)}</b></div><div><small>Alınan</small><b>${tl(paid)}</b></div><div class="rest${rest<=0.009?' ok':''}"><small>${rest<-0.009?'Fazla alınan':'Kalan'}</small><b>${rest<=0.009&&rest>=-0.009?'✓ 0 ₺':tl(Math.abs(rest))}</b></div></div>
-    <div class="paybar"><i style="width:${price?Math.min(100,paid/price*100).toFixed(1):0}%"></i></div>
-    <div class="paylist">${pays.length?pays.map((p,i)=>({p,i})).sort((a,b)=>a.p.d<b.p.d?-1:1).map(({p,i},k)=>`<div class="payr"><span class="dt">${p.d===t?'Bugün':fmtLong(p.d)}</span><small>${done&&p.d===o.doneAt?'Teslimde':k===0?'Kapora / ilk ödeme':'Ödeme'}</small><b>+${tl(p.a)}</b><button type="button" class="ldel" data-cdpdel="${i}" aria-label="Ödemeyi sil">${DELSVG}</button></div>`).join(''):'<p class="help" style="margin:0">Henüz ödeme alınmadı.</p>'}</div>
-    <div class="payadd"><div class="f"><label for="cdPA">Alınan tutar (₺)</label><input id="cdPA" data-nodirty inputmode="decimal" placeholder="${rest>0.009?esc(inStr(r2(rest))):'0'}"></div><div class="f"><label for="cdPD">Tarih</label><input id="cdPD" data-nodirty type="date" value="${t}"></div><button type="button" class="btn primary" data-cdpadd>Ödeme ekle</button></div>
-    ${rest>0.009?`<div class="payq"><button type="button" data-cdpq="${r2(rest)}">Kalanın hepsi · ${tl(rest)}</button>${rest>=2?`<button type="button" data-cdpq="${r2(rest/2)}">Yarısı · ${tl(rest/2)}</button>`:''}</div>`:''}
+  const o=it.o,price=+o.price||0,pays=o.pays||[],done=o.status==='done';
+  return payBlockHTML({key:'cpay:'+o.id,price,pays,doneAt:done&&o.doneAt,A:{add:'cdpadd',del:'cdpdel',q:'cdpq',cyc:'cdpcy'},ids:{a:'cdPA',d:'cdPD'}})+`
     <p class="help" style="margin:0">Eklediğin ödeme o günün kazancına yazılır ve siparişe hemen kaydedilir.</p>`;
 }
 function cpSave(oid,mut){const o=S.orders.find(x=>x.id===oid);if(!o)return null;const prod=JSON.parse(JSON.stringify(o.prod||{log:[],step:{}}));if(!prod.log)prod.log=[];mut(prod);const rec={...o,prod};put('orders',rec);return rec}
 function cpRefresh(anim){if(!CUR)return;const c=custAll().find(x=>x.key===CUR.key);if(c)CUR=c;cdBadges(CUR);if(CDTAB!=='info'){const it=CDTAB==='prod'?cdCurItem():{},cx0=anim&&anim.dir&&it.o?prodCx($('cdPane'),it.o.id):null;$('cdPane').innerHTML=`<button type="button" class="lnk cdback" data-cdback>← Müşteri bilgileri</button>`+cdTabHTML(CUR);$('cdPane').classList.toggle('live',!!anim&&!anim.fresh);cdProdAnim(anim,cx0)}}
-function cdProdAnim(anim,cx0){if(CDTAB!=='prod')return;const it=cdCurItem();if(it.o)prodAnimate($('cdPane'),it.o.id,{...(anim||{}),cx0,attr:'cpsel'})}
+function cdProdAnim(anim,cx0){const it=cdCurItem();if(!it.o)return;if(CDTAB==='prod')prodAnimate($('cdPane'),it.o.id,{...(anim||{}),cx0,attr:'cpsel'});else if(CDTAB==='pay')prodAnimate($('cdPane'),'cpay:'+it.o.id,{fresh:anim&&anim.fresh,bumpTxt:anim&&anim.bumpTxt})}
 function cdBadges(c){const op=c.orders.filter(o=>o.status!=='done');let d=0,tt=0;op.forEach(o=>{const pg=prodProgress(S.orders.find(x=>x.id===o.id)||o);d+=pg.done;tt+=pg.target});$('cdTProd').textContent=tt?`${nf.format(d)}/${nf.format(tt)}`:'';$('cdTPay').textContent=c.free?'':c.owed>0.009?tl(c.owed):(c.orders.some(o=>+o.price>0)||c.sales.length?'✓':'')}
 function cpPart(k){const [oid,pid]=k.split('|'),o=S.orders.find(x=>x.id===oid);return{o,oid,pid,p:o&&prodPartsOf(o).find(x=>x.pid===pid)}}
 function cdCurItem(){const v=$('cdPane').querySelector('.cdview');const k=v&&v.dataset.cdk||'';return k.startsWith('o:')?{o:S.orders.find(x=>x.id===k.slice(2))}:k.startsWith('s:')?{x:S.sales.find(x=>x.id===k.slice(2))}:{}}
@@ -6935,9 +6980,11 @@ function cpClick(e){
   if(ld){if(!ld.classList.contains('arm')){ld.classList.add('arm');toast('Silmek için tekrar dokun');setTimeout(()=>ld.classList.remove('arm'),3000);return true}
     const [oid,lid]=ld.dataset.cplogdel.split('|');cpSave(oid,pr=>{pr.log=pr.log.filter(l=>l.id!==lid)});cpRefresh();toast('Kayıt silindi');return true}
   const q=e.target.closest('[data-cdpq]');if(q){$('cdPA').value=inStr(q.dataset.cdpq);$('cdPA').focus();return true}
-  if(e.target.closest('[data-cdpadd]')){const {o}=cdCurItem();if(!o)return true;const pr=+o.price||0,rest=pr-paidOf(o),raw=$('cdPA').value.trim(),a=raw?num(raw):r2(rest);
+  const cy2=e.target.closest('[data-cdpcy]');if(cy2){const {o}=cdCurItem();if(!o)return true;const pays=(o.pays||[]).map(x=>({...x})),p=pays[+cy2.dataset.cdpcy];if(!p)return true;const ord=['n','h','k'];p.m=ord[(ord.indexOf(p.m)+1)%3];put('orders',{...o,pays});cpRefresh({});toast(`Ödeme şekli: ${PAYM[p.m]}`);return true}
+  const cpa=e.target.closest('[data-cdpadd]');if(cpa){const {o}=cdCurItem();if(!o)return true;const m=PAYM[cpa.dataset.cdpadd]?cpa.dataset.cdpadd:'n',pr=+o.price||0,rest=pr-paidOf(o),raw=$('cdPA').value.trim(),a=raw?num(raw):r2(rest);
     if(isNaN(a)||a<=0){toast('Tutar için sayı yaz, ör. 2000');$('cdPA').focus();return true}
-    const d=$('cdPD').value||todayISO();put('orders',{...o,pays:[...(o.pays||[]),{d,a:r2(a)}]});cpRefresh();toast(`✓ ${tl(a)} ödeme kaydedildi${d===todayISO()?' · bugünün kazancına eklendi':''}`);return true}
+    LASTPM=m;try{localStorage.setItem('ad-paym',m)}catch(er){}
+    const d=$('cdPD').value||todayISO();put('orders',{...o,pays:[...(o.pays||[]),{d,a:r2(a),m}]});cpRefresh({bumpTxt:'+'+tl(a)});toast(`✓ ${tl(a)} ödeme kaydedildi${d===todayISO()?' · bugünün kazancına eklendi':''}`);return true}
   const pd=e.target.closest('[data-cdpdel]');
   if(pd){if(!pd.classList.contains('arm')){pd.classList.add('arm');toast('Silmek için tekrar dokun');setTimeout(()=>pd.classList.remove('arm'),3000);return true}
     const {o}=cdCurItem();if(!o)return true;const pays=(o.pays||[]).slice(),rm=pays.splice(+pd.dataset.cdpdel,1)[0];put('orders',{...o,pays});cpRefresh();toast(`${tl(rm?rm.a:0)} ödeme silindi`);return true}
@@ -6998,7 +7045,7 @@ $('cdSale').addEventListener('click',()=>{const n=CUR&&CUR.name;$('dCust').close
 $('cdOrder').addEventListener('click',()=>{const n=CUR&&CUR.name;$('dCust').close();openOrder();$('oCust').value=n||'';$('oItem').focus()});
 $('cdTabs').addEventListener('click',e=>{const b=e.target.closest('[data-cdt]');if(!b)return;CPFAIL=null;CDTAB=b.dataset.cdt===CDTAB?'info':b.dataset.cdt;cdPaint();if(CDTAB!=='info')stagger($('cdPane').querySelectorAll('.cdrow'),60)});
 $('dCust').addEventListener('change',e=>{if(e.target.matches('[data-cdprice]'))cdPriceSave(e.target)});
-$('dCust').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('[data-cdprice]')){e.preventDefault();cdPriceSave(e.target);return}if(e.key==='Enter'&&e.target.matches('#cdPA')){e.preventDefault();$('cdPane').querySelector('[data-cdpadd]').click();return}if(e.key==='Enter'&&e.target.matches('.cdord')){$('dCust').close();openOrderById(e.target.dataset.cdo)}});
+$('dCust').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('[data-cdprice]')){e.preventDefault();cdPriceSave(e.target);return}if(e.key==='Enter'&&e.target.matches('#cdPA')){e.preventDefault();($('cdPane').querySelector('[data-cdpadd].pri')||$('cdPane').querySelector('[data-cdpadd]')).click();return}if(e.key==='Enter'&&e.target.matches('.cdord')){$('dCust').close();openOrderById(e.target.dataset.cdo)}});
 $('dCust').addEventListener('click',e=>{
   if(CDTAB!=='info'&&cpClick(e))return;
   if(e.target.closest('[data-cdback]')){CDTAB='info';cdPaint();return}
